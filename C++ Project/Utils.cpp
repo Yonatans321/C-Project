@@ -1,0 +1,40 @@
+#include <windows.h>
+#include <iostream>
+#include <cstdlib>
+#include "Utils.h"
+#include "Screen.h"
+
+
+
+//Taken from lab exercise 10.11.25
+void gotoxy(int x, int y) {
+    std::cout.flush();
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+void hideCursor() {
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(consoleHandle, &cursorInfo);
+    cursorInfo.bVisible = FALSE; // Hide the cursor
+    SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+}
+
+void cls() {
+    system("cls");
+}
+
+//setscreen taken from AI
+void setScreen(int width, int height) {
+    HANDLE hScreen = GetStdHandle(STD_OUTPUT_HANDLE);
+    
+    SMALL_RECT windowSize = { 0, 0, (short)(width - 1), (short)(height - 1) };
+    SetConsoleWindowInfo(hScreen, TRUE, &windowSize);
+  
+    COORD bufferSize = { (short)width, (short)height };
+    SetConsoleScreenBufferSize(hScreen, bufferSize);
+}
+
