@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Point.h"
 #include "utils.h"
+#include "Screen.h"
 
 void Point::draw(char c) {
 	gotoxy(x, y);
@@ -8,13 +9,16 @@ void Point::draw(char c) {
 }
 
 void Point::move() {
-	if (x + dirx < 0 || x + dirx > MAX_X) {
-		dirx = -dirx;
+	if (x + dir.dirx < 0 || x + dir.dirx > Screen::MAX_X) {
+		dir.dirx = -dir.dirx;
 	}
-	if (y + diry < 0 || y + diry > MAX_Y) {
-		diry = -diry;
+	if (y + dir.diry < 0 || y + dir.diry > Screen::MAX_Y) {
+		dir.diry = -dir.diry;
 	}
-	x += dirx;
-	y += diry;
+	x += dir.dirx;
+	y += dir.diry;
 }
-
+void Point::erase() const {
+	gotoxy(x, y);
+	std::cout << ' ';
+}

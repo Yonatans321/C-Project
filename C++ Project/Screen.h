@@ -1,13 +1,11 @@
 #pragma once
-
 #include <iostream>
-#include "Player.h"
-
-using std::cout, std::endl;
+#include "Point.h"
 
 class Screen {
 public:
-	enum { MAX_X = 80, MAX_Y = 25 };
+	static constexpr int MAX_X = 80;
+	static constexpr int MAX_Y = 25;
 private:
 	const char* screen[MAX_Y] = {
 		//   01234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -35,14 +33,11 @@ private:
 			"w                                                                              w", // 21
 			"w                                                                              w", // 22
 			"w                                                                              w", // 23
-			"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", // 24
+			"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww" // 24
 	};
-	char getCharAt(const Player& p) const {
-		return screen[p.getY()][p.getX()];
-	}
+	char getCharAt(const Point& p) const;
 public:
 	void draw() const;
-	bool isWall(const Player& p) const {
-		return getCharAt(p) == '#';
-	}
-}
+	bool isWall(const Point& p) const;
+	bool isObstacle(const Point& p) const;
+};

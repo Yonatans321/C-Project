@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 #include "Utils.h"
-#include "Screen.h"
-
 
 
 //Taken from lab exercise 10.11.25
@@ -36,5 +34,9 @@ void setScreen(int width, int height) {
   
     COORD bufferSize = { (short)width, (short)height };
     SetConsoleScreenBufferSize(hScreen, bufferSize);
+}
+//AI generated function to change text color in console
+void setColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 

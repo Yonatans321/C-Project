@@ -8,3 +8,4 @@ void cls();
 
 void setScreen(int width, int height);
 
+void setColor(int color);
