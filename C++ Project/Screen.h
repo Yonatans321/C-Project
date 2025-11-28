@@ -36,6 +36,7 @@ private:
 			"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww" // 24
 	};
 	char getCharAt(const Point& p) const;
+	void setCharAt(const Point& p, char ch);
 public:
 	void draw() const;
 	bool isWall(const Point& p) const;

@@ -4,13 +4,14 @@ class Switch
 private:
 	enum State
 	{
-		OFF,
-		ON
+		OFF, // '\'
+		ON   // '/'
 	};
 	State state;
 
 public:	
 	Switch(State initialState = OFF) : state(initialState) {}
+	
 	void toggle() {
 		if (state == OFF) {
 			state = ON;
@@ -24,14 +25,14 @@ public:
 	}
 	char getChar() const {
 		if (state == OFF) {
-			return '/';
+			return '\\' ;
 		}
 		else {
-			return '\\';
+			return '/' ;
 		}
 	}
 	static State stateFromChar(char c) {
-		if(c == '/') {
+		if(c == '\\') {
 			return OFF;
 		}
 		else {
@@ -39,5 +40,9 @@ public:
 		}
 			
 		}
+	static bool isSwitch(char ch)
+	{
+		return ch == '\\' || ch == '/';
+	}
 };
 

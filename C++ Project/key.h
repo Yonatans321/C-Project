@@ -8,6 +8,10 @@ private:
 public:
     Key(int id = -1): doorID(id) {}
 
+    bool isKey() const {
+        return doorID != -1;
+	}
+
     int getDoorID() const {
         return doorID;
     }

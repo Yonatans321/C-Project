@@ -13,6 +13,10 @@ void Screen::draw() const {
 char Screen::getCharAt(const Point& p) const {
 	return screen[p.getY()][p.getX()];
 }
+void Screen::setCharAt(const Point& p, char ch) {
+	char* row = const_cast<char*>(screen[p.getY()]);
+	row[p.getX()] = ch;
+}
 bool Screen::isWall(const Point& p) const {
 		return getCharAt(p) == 'w';
 }

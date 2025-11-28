@@ -244,3 +244,21 @@ void Game::gameLoop()
         
     }
 }
+
+void Game::handleDoor(Player& p)
+{
+	char cell = Screen.getCharAt(p.getPosition());
+    if (!Door::isDoorChar(cell))
+    {
+		return; // Not a door
+    }
+    if(!d->isOpen())
+    {
+        if (p.hasKeyForDoor(cell))
+        {
+            d->open();
+            Screen.updateDoorState(d);
+            p.useKeyForDoor(cell);
+        }
+	}
+}
