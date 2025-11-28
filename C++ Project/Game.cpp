@@ -24,19 +24,17 @@ void Game::showMenu()
 {
 
 	cls();
-	const int centerX = 40;
-	const int centerY = 12;
-	gotoxy(centerX, centerY);
+	gotoxy(25,12);
 	cout << "==============================" << endl;
-    gotoxy(centerX-3, centerY+1);
+    gotoxy(22,13);
 	cout << "      TEXT ADVENTURE GAME 2025      " << endl;
-    gotoxy(centerX, centerY + 2);
+    gotoxy(25,14);
     cout << "==============================" << endl;
-    gotoxy(centerX, centerY + 4);
+    gotoxy(29,16);
 	cout << "(1) Start a new game" << endl;
-    gotoxy(centerX, centerY +5);
+    gotoxy(23,17);
 	cout << "(8) Present instructions and keys" << endl;
-    gotoxy(centerX, centerY + 6);
+    gotoxy(36,18);
 	cout << "(9) EXIT" << endl;
 
 	bool  gameRunning = true;

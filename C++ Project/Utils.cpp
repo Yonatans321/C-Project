@@ -39,4 +39,6 @@ void setScreen(int width, int height) {
 void setColor(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
-
+void resetColor() {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
+}

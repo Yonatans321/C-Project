@@ -24,3 +24,17 @@ void Player::erase() const {
 	position.erase();
 }
 
+void GrabItem(char item) {
+	if (true)
+	{
+
+	}
+}
+void hasItem(char item) {
+	// Implementation for checking if the player has the specified item
+	
+}
+void hasKey(char key) {
+	// Implementation for checking if the player has the specified key
+	
+}
