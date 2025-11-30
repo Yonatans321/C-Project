@@ -40,7 +40,7 @@ public:
 	int getItemId() const;
 	void DropItem();
 	void GrabItem(char item, int id = -1);
-
+	bool useKeyForDoor(char doorChar);
 	// key and door function
 	
 	//bool hasKeyForDoor(char doorChar) const;
