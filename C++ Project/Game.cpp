@@ -311,4 +311,3 @@ void Game::handleDoor(Player& p)
         player1.draw();
 		player2.draw();
     }
-}

@@ -10,7 +10,7 @@ public:
 
 
 private:
-	 char screen[MAX_Y][MAX_X+1] = {
+	const char* screen[MAX_Y][MAX_X+1] = {
 		//   01234567890123456789012345678901234567890123456789012345678901234567890123456789
 			"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
 			"W                                                                              W", // 1
