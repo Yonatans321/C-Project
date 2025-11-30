@@ -14,7 +14,7 @@ private:
   
     // Game modes - ioptions of the game
 	Screen  currentScreen;
-    GameModes curr_status= GameModes::MENU;
+    GameModes currStatus = GameModes::MENU;
     Player player1;         
     Player player2;
 
@@ -22,8 +22,8 @@ private:
     void showMenu();        
     void showInstructions(); 
     void initLevel();       //run the game
-    void gameLoop();       
-   
+	void gameLoop();// main game loop       
+	void handleDoor(Player& p);// handle door interaction
 public:
     Game(); 
     void run(); 

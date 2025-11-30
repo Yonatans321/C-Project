@@ -1,7 +1,9 @@
 #pragma once
 #include "Point.h"
 #include "Screen.h"
-#include <cstddef>
+#include <cstddef>// for size_t
+
+
 
 class Player
 {
@@ -29,16 +31,20 @@ public:
 	int getX() const;
 	int getY() const;
 	char getChar() const;
+	Point getPosition() const { return position; }// get player's current position
 
 	// Item functions
-
 	bool hasItem() const;
 	bool hasItem(char item) const;
-	bool hasKey() const;
 	char getHeldItem() const;
 	int getItemId() const;
 	void DropItem();
 	void GrabItem(char item, int id = -1);
 
+	// key and door function
+	
+	//bool hasKeyForDoor(char doorChar) const;
+	
+	
 };
 

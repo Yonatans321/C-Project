@@ -39,6 +39,8 @@ void Player::keyPressed(char ch) {
 	}
 }
 
+
+
 bool Player::hasItem() const { // check if player has any item
 	return heldItem != 0;
 }
@@ -47,8 +49,20 @@ bool Player::hasItem(char item) const { // check if player has specific item
 	return heldItem == item;
 }
 
-bool Player::hasKey() const { // check if player has a key
-	return heldItem == 'K';
+bool Player::hasKey(char doorChar) const 
+{ // check if player has a key
+	if(heldItem != 'K'){
+		return false;
+	}
+	
+    int doorId = doorChar - '0';
+	if(itemId == doorId)// check if key id matches door id
+	{
+		return true;
+	}
+	{
+		return true;
+	}
 }
 char Player::getHeldItem() const { // get the held item
 	return heldItem;
@@ -65,4 +79,9 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 		return;
 	heldItem = item;
 	itemId = id;
+}
+void Player::useKeyForDoor(char doorChar) { // use key for a door
+	if (heldItem == 'K') {
+		DropItem();
+	}
 }

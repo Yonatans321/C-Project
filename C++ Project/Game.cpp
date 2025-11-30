@@ -18,7 +18,7 @@ Game::Game() : currentScreen(),
 {
     hideCursor();
     setScreen(Screen::MAX_X, Screen::MAX_Y);
-    curr_status = GameModes::MENU;
+    currStatus = GameModes::MENU;
 }
 void Game::showMenu()
 {
@@ -43,15 +43,15 @@ void Game::showMenu()
 		char input = _getch();
 
 		if (input == START_KEY) {
-			curr_status = GameModes::NEW_GAME;
+			currStatus = GameModes::NEW_GAME;
             gameRunning = false;
 		}
 		else if (input == INSTRUCTIONS_KEY) {
-			curr_status = GameModes::INSTRUCTIONS;
+			currStatus = GameModes::INSTRUCTIONS;
             gameRunning = false;
 		}
 		else if (input == EXIT_KEY) {
-			curr_status = GameModes::EXIT;
+			currStatus = GameModes::EXIT;
 			cls();
 			gameRunning = false;
 		}
@@ -160,22 +160,27 @@ void Game::showInstructions()
     setColor(7);
 
     _getch();
-    curr_status = GameModes::MENU;
+    currStatus = GameModes::MENU;
 
 }
 void Game::run()
 {
-	while (curr_status !=GameModes::EXIT )
+	while (currStatus !=GameModes::EXIT )
 	{
-		if (curr_status == GameModes::MENU) {
+		if (currStatus == GameModes::MENU) 
+        {
 			showMenu();
 		}
-		else if (curr_status == GameModes::INSTRUCTIONS) {
+		else if (currStatus == GameModes::INSTRUCTIONS) 
+        {
 			showInstructions();
 		}
-		else  {
+		else 
+        {
 			initLevel();
 			gameLoop();
+
+			currStatus = GameModes::MENU;// After game loop ends, return to menu
 		}
 	}
 }
@@ -220,23 +225,31 @@ void Game::gameLoop()
                         initLevel(); // Redraw the level
                     }
                     else if (pauseCh == 'H' || pauseCh == 'h') { // H to return to main menu
-                        curr_status = GameModes::MENU;
+                        currStatus = GameModes::MENU;
                         gameRunning = false;
                         paused = false;
                     }
                 }
             }
-            else {
+            else
+            {
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }
         }
+    
+        if(!gameRunning){
+            break; // Exit game loop if game is no longer running
+		}
 		// Erase players from current position
 		player1.erase();
 		player2.erase();
         // Move players
         player1.move();
         player2.move();
+		// Handle door interactions
+		handleDoor(player1);
+		handleDoor(player2);
         // Small delay to control game speed
         player1.draw();
         player2.draw();
@@ -247,18 +260,55 @@ void Game::gameLoop()
 
 void Game::handleDoor(Player& p)
 {
-	char cell = Screen.getCharAt(p.getPosition());
+    Point doorPos = p.getPosition();
+    char cell = currentScreen.getCharAt(doorPos);// Get the character at the player's position
+
     if (!Door::isDoorChar(cell))
     {
-		return; // Not a door
+        return; // Not a door
     }
-    if(!d->isOpen())
+    Door* d = currentScreen.getDoor(doorPos);// Get the door at the player's position
+    if (!d)// If no door found 
     {
-        if (p.hasKeyForDoor(cell))
+        return;
+    }
+
+    if (!d->isOpen())// If the door is not open
+    {
+        if (p.hasKey(cell))// If the player has the key for the door
         {
-            d->open();
-            Screen.updateDoorState(d);
-            p.useKeyForDoor(cell);
+            if (d->tryOpen(p.getItemId()))// Try to open the door with the key 
+            {
+                p.DropItem();// Remove the key from the player
+            }
+
         }
-	}
+        if (!d->isOpen())
+        {
+            return; // Door is still closed
+        }
+    }
+    if (d->isOpen())// If the door is open
+    {
+        int destLevel = d->getDestinationLevel();// Get the destination level
+
+        if (destLevel != -1)// If the destination level is valid
+        {
+            //loadLevel(destLevel);// Load the destination level
+            initLevel();// Initialize the new level
+        }
+    }
+}
+    void Game::initLevel()
+    {
+        cls();
+		setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
+        for (int i = 1; i <= 9; i++)
+        {
+           currentScreen.setdoor(i, i + 1);// Example of setting door i to lead to level i+1
+        }
+		currentScreen.draw();
+        player1.draw();
+		player2.draw();
+    }
 }
