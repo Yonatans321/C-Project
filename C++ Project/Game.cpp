@@ -12,12 +12,14 @@
 
 using namespace std;
 
-Game::Game() : currentScreen(),
-    player1(Point(10, 10,Direction::directions[Direction::STAY], '&'), { 'W', 'D', 'X', 'A', 'S', 'E' }, currentScreen),
-    player2(Point(15,10, Direction::directions[Direction::STAY], '$'), { 'I', 'L', 'M', 'J', 'K', 'O' }, currentScreen)
+Game::Game() :
+    currentLevel(0),
+    player1(Point(2, 2,Direction::directions[Direction::STAY], '&'), { 'W', 'D', 'X', 'A', 'S', 'E' }, gameScreens[0]),
+    player2(Point(77,2, Direction::directions[Direction::STAY], '$'), { 'I', 'L', 'M', 'J', 'K', 'O' }, gameScreens[0])
+	
 {
     hideCursor();
-    setScreen(Screen::MAX_X, Screen::MAX_Y);
+    //setScreen(Screen::MAX_X, Screen::MAX_Y);
     currStatus = GameModes::MENU;
 }
 void Game::showMenu()
@@ -198,22 +200,28 @@ void Game::GamePaused()
 
 void Game::initLevel()
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     cls();
     setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
-    for (int i = 1; i <= 9; i++)
-    {
-        currentScreen.setdoor(i, i + 1);// Example of setting door i to lead to level i+1
-    }
+	currentScreen.loadData(currentLevel);
+
+    
+
     currentScreen.draw();
     player1.draw();
     player2.draw();
-}
+ }
+
+
 
 void Game::gameLoop()
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     bool gameRunning = true;
     while (gameRunning)
     {
+		//point to the current screen
+        Screen& currentScreen = gameScreens[currentLevel];
         // Check for key presses
         if (_kbhit())
         {
@@ -264,6 +272,7 @@ void Game::gameLoop()
 
 void Game::handleDoor(Player& p)
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     Point doorPos = p.getPosition();
     char cell = currentScreen.getCharAt(doorPos);// Get the character at the player's position
 
@@ -287,7 +296,7 @@ void Game::handleDoor(Player& p)
             }
 
         }
-        if (!d->isOpen())
+		if (!d->isOpen())// If the door is still not open
         {
             return; // Door is still closed
         }
@@ -296,10 +305,96 @@ void Game::handleDoor(Player& p)
     {
         int destLevel = d->getDestinationLevel();// Get the destination level
 
-        if (destLevel != -1)// If the destination level is valid
+        if (destLevel != -1)// If destination level is the last level
         {
-            //loadLevel(destLevel);// Load the destination level
+			currentLevel = destLevel;// Change to the new level
+
             initLevel();// Initialize the new level
         }
     }
+}
+// Change to a new level
+void Game::changeLevel(int newLevel)
+{
+    currentLevel = newLevel;
+    initLevel(); 
+}
+
+// Load screens and set up doors for the level
+void Game::loadScreens(int level)
+{
+    Screen& currentScreen = gameScreens[level];
+    currentScreen.loadData(level);
+
+    if (level == 0) 
+    {
+        currentScreen.setDoor(1, 1); 
+    }
+    else if (level == 1) 
+    {
+        currentScreen.setDoor(2, 2); 
+    }
+    else if (level == 2) 
+    {
+    
+        currentScreen.setDoor(3, 3); 
+    }
+}
+
+// Show the win screen
+void Game::showWinScreen()
+{
+    cls();
+    
+    gotoxy(20, 10);
+    cout << "########################################" << endl;
+    gotoxy(20, 11);
+    cout << "#                                      #" << endl;
+    gotoxy(20, 12);
+    cout << "#        CONGRATULATIONS!              #" << endl;
+    gotoxy(20, 13);
+    cout << "#           YOU WON!                   #" << endl;
+    gotoxy(20, 14);
+    cout << "#                                      #" << endl;
+    gotoxy(20, 15);
+    cout << "########################################" << endl;
+
+    gotoxy(22, 17);
+    cout << "Press H to return to Main Menu...";
+
+	// Wait for 'H' key press
+    bool waiting = true;
+    while (waiting) {
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == 'h' || ch == 'H') {
+                waiting = false;
+            }
+        }
+    }
+
+    
+    currStatus = GameModes::MENU;
+}
+
+void Game::printStatus()
+{
+    int y = Screen::MAX_Y;
+    gotoxy(0, y);
+    setColor(7);
+
+    //player 1
+    gotoxy(2, y + 1);
+    std::cout << "P1(&) HP:" << player1.getLives() << " Sc:" << player1.getScore() << " Itm:";
+    if (player1.hasItem()) std::cout << player1.getHeldItem();
+    else std::cout << " ";
+
+    //seperate line
+    gotoxy(40, y + 1); std::cout << "|";
+    gotoxy(45, y + 1);
+
+    //player 2
+    std::cout << "P2($) HP:" << player2.getLives() << " Sc:" << player2.getScore() << " Itm:";
+    if (player2.hasItem()) std::cout << player2.getHeldItem();
+    else std::cout << " ";
 }

@@ -80,3 +80,6 @@ bool Player::useKeyForDoor(char doorChar)  // use key for a door
 			return true;
 		}
 	}
+void Player::setPosition(const Point& pos) {
+	position = pos;
+}

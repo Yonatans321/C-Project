@@ -41,7 +41,7 @@ public:
 	void DropItem();
 	void GrabItem(char item, int id = -1);
 	bool useKeyForDoor(char doorChar);
-	// key and door function
+	void setPosition(const Point& pos);// set player's position
 	
 	//bool hasKeyForDoor(char doorChar) const;
 	
