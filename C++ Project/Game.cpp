@@ -199,7 +199,11 @@ void Game::GamePaused()
 void Game::initLevel()
 {
     cls();
-	setScreen(Screen::MAX_X+1, Screen::MAX_Y+1);
+    setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
+    for (int i = 1; i <= 9; i++)
+    {
+        currentScreen.setdoor(i, i + 1);// Example of setting door i to lead to level i+1
+    }
     currentScreen.draw();
     player1.draw();
     player2.draw();
@@ -275,7 +279,7 @@ void Game::handleDoor(Player& p)
 
     if (!d->isOpen())// If the door is not open
     {
-        if (p.hasKey(cell))// If the player has the key for the door
+        if (p.useKeyForDoor(cell))// If the player has the key for the door
         {
             if (d->tryOpen(p.getItemId()))// Try to open the door with the key 
             {
@@ -299,15 +303,3 @@ void Game::handleDoor(Player& p)
         }
     }
 }
-    void Game::initLevel()
-    {
-        cls();
-		setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
-        for (int i = 1; i <= 9; i++)
-        {
-           currentScreen.setdoor(i, i + 1);// Example of setting door i to lead to level i+1
-        }
-		currentScreen.draw();
-        player1.draw();
-		player2.draw();
-    }

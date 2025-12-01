@@ -7,6 +7,7 @@ private:
 	int destinationLevel; // level to which the door leads
 
 public:
+	Door() : id(-1), open(false), destinationLevel(-1) {}
 	Door(int doorID,int dest=-1): id(doorID),open(false),destinationLevel(dest){}
 	
 	int getId() const;
