@@ -71,7 +71,7 @@ bool Player::useKeyForDoor(char doorChar)  // use key for a door
 			return false;
 
 		int doorId = doorChar - '0';
-		return itemId == doorId; // check if key id matches door id
+		return (itemId == doorId); // check if key id matches door id
 	}
 void Player::addPoints(int pts)
 {
@@ -103,14 +103,7 @@ int Player::getLives() const
 bool Player::isDead() const
 {
 	return lives <= 0;
-		if (itemId == doorId)// check if key id matches door id
-		{
-			return true;
-		}
-		{
-			return true;
-		}
-	}
+}
 void Player::setPosition(const Point& pos) {
 	position = pos;
 }

@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Utils.h"
 #include "Screen.h"
+#include "RiddleBank.h"
 #include <array>// for std::array (taken from AI)
 
 
@@ -23,6 +24,7 @@ private:
     GameModes currStatus = GameModes::MENU;
     Player player1;         
     Player player2;
+	RiddleBank riddleBank;
 
     
     void showMenu();        
@@ -30,9 +32,10 @@ private:
     void initLevel();       //run the game
 	void gameLoop();// main game loop       
 	void handleDoor(Player& p);// handle door interaction
+	void showWinScreen();
+	
 
 	void loadScreens(int level);
-	void showWinScreen();
 	void changeLevel(int newLevel);
 
 	void printStatus();
@@ -40,5 +43,6 @@ public:
     Game(); 
     void run(); 
 	void GamePaused();
+	void handleRiddle(Player& player);
    
 };

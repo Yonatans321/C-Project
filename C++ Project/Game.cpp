@@ -264,6 +264,9 @@ void Game::gameLoop()
 		// Handle door interactions
 		handleDoor(player1);
 		handleDoor(player2);
+		// Handle riddle interactions
+        handleRiddle(player1);
+        handleRiddle(player2);
         // Small delay to control game speed
         player1.draw();
         player2.draw();
@@ -318,43 +321,53 @@ void Game::handleDoor(Player& p)
 
 void Game::handleRiddle(Player& player)
 {
+	Screen& currentScreen = gameScreens[currentLevel];
+
     int x = player.getX();
     int y = player.getY();
-    char tile = screen.getCharAt(x, y);
+    char tile = currentScreen.getCharAt(x,y);
+
+
 
     if (tile != '?')
         return;
 
-    int riddleID = currentLevel; 
+    int riddleID = currentLevel;
 
     cout << "\nYou stepped on a RIDDLE!" << endl;
     cout << "Answer it? (Y/N): ";
 
-    char* choice;
-	getline(cin, choice);
+    string choice;
+    getline(cin, choice);
 
-    if (choice.empty()|| choice[0]=='N'|| choice[0] =='n') {
+    if (choice.empty() || choice[0] == 'N' || choice[0] == 'n') {
         cout << "You walk away from the riddle.\n";
         return;
     }
 
     RiddleOutcome result = riddleBank.askRiddleInteractive(riddleID);
 
-	switch (result) {
-   case RiddleOutcome::Correct:
-       cout << "Correct! You may proceed.\n" << endl;
-       cout << "+100 poitnts ! \n" << endl;
-       player.addPoints(100);
+    switch (result)
+    {
+    case RiddleOutcome::Correct:
+        cout << "Correct! You may proceed.\n" << endl;
+        cout << "+100 poitnts ! \n" << endl;
+        player.addPoints(100);
+        currentScreen.setCharAt(x, y, ' ');
         break;
+
     case RiddleOutcome::Incorrect:
         cout << "Incorrect! You lose a life.\n";
         player.loseLife();
         break;
+
     case RiddleOutcome::AlreadySolved:
         cout << "You have already solved this riddle.\n";
-		screen.setCharAt(x, y, ' '); // Remove the riddle from the screen
+        currentScreen.setCharAt(x,y,' ');// Remove the riddle from the screen
         break;
+
     case RiddleOutcome::NotFound:
         cout << "Riddle not found.\n";
-		break;  
+        break;
+    }
 }

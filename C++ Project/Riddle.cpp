@@ -1,4 +1,7 @@
 #include "Riddle.h"
+#include <string>
+#include <cctype>
+#include "Screen.h"
 #include <iostream>
 #include <cstring>	
 
