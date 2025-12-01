@@ -9,6 +9,7 @@ private:
 	const char* answer;
 	bool solved;
 public:
+	Riddle() : riddleID(-1), question(nullptr), answer(nullptr), solved(false) {}
 	Riddle(int id, const char* q, const char* a) :riddleID(id), question(q), answer(a), solved(false) {}
 	// functions declaration
 	void askQuestion() const;

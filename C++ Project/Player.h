@@ -14,6 +14,8 @@ private:
 	Screen& screen;
 	char heldItem;
 	int itemId;
+	int points=0;
+	int lives=3;
 public:
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS], Screen& theScreen)
 		:position(start_point), screen(theScreen), heldItem(0), itemId(-1)
@@ -41,10 +43,14 @@ public:
 	void DropItem();
 	void GrabItem(char item, int id = -1);
 	bool useKeyForDoor(char doorChar);
-	// key and door function
 	
-	//bool hasKeyForDoor(char doorChar) const;
-	
-	
+	// Score and Lives functions
+	void addPoints(int pts);
+	void losePoints(int pts);
+	int getScore() const;
+	void addLives();
+	int getLives() const;
+	void loseLife();
+	bool isDead() const;
 };
 

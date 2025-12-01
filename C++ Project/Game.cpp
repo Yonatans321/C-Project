@@ -8,6 +8,8 @@
 #include "Point.h"
 #include "Player.h"
 #include <cstring>
+#include "Riddle.h"
+#include "RiddleBank.h"
 
 
 using namespace std;
@@ -302,4 +304,47 @@ void Game::handleDoor(Player& p)
             initLevel();// Initialize the new level
         }
     }
+}
+
+void Game::handleRiddle(Player& player)
+{
+    int x = player.getX();
+    int y = player.getY();
+    char tile = screen.getCharAt(x, y);
+
+    if (tile != '?')
+        return;
+
+    int riddleID = currentLevel; 
+
+    cout << "\nYou stepped on a RIDDLE!" << endl;
+    cout << "Answer it? (Y/N): ";
+
+    char* choice;
+	getline(cin, choice);
+
+    if (choice.empty()|| choice[0]=='N'|| choice[0] =='n') {
+        cout << "You walk away from the riddle.\n";
+        return;
+    }
+
+    RiddleOutcome result = riddleBank.askRiddleInteractive(riddleID);
+
+	switch (result) {
+   case RiddleOutcome::Correct:
+       cout << "Correct! You may proceed.\n" << endl;
+       cout << "+100 poitnts ! \n" << endl;
+       player.addPoints(100);
+        break;
+    case RiddleOutcome::Incorrect:
+        cout << "Incorrect! You lose a life.\n";
+        player.loseLife();
+        break;
+    case RiddleOutcome::AlreadySolved:
+        cout << "You have already solved this riddle.\n";
+		screen.setCharAt(x, y, ' '); // Remove the riddle from the screen
+        break;
+    case RiddleOutcome::NotFound:
+        cout << "Riddle not found.\n";
+		break;  
 }
