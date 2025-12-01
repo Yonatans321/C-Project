@@ -103,4 +103,14 @@ int Player::getLives() const
 bool Player::isDead() const
 {
 	return lives <= 0;
+		if (itemId == doorId)// check if key id matches door id
+		{
+			return true;
+		}
+		{
+			return true;
+		}
+	}
+void Player::setPosition(const Point& pos) {
+	position = pos;
 }

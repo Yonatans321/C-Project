@@ -14,12 +14,14 @@
 
 using namespace std;
 
-Game::Game() : currentScreen(),
-    player1(Point(10, 10,Direction::directions[Direction::STAY], '&'), { 'W', 'D', 'X', 'A', 'S', 'E' }, currentScreen),
-    player2(Point(15,10, Direction::directions[Direction::STAY], '$'), { 'I', 'L', 'M', 'J', 'K', 'O' }, currentScreen)
+Game::Game() :
+    currentLevel(0),
+    player1(Point(2, 2,Direction::directions[Direction::STAY], '&'), { 'W', 'D', 'X', 'A', 'S', 'E' }, gameScreens[0]),
+    player2(Point(77,2, Direction::directions[Direction::STAY], '$'), { 'I', 'L', 'M', 'J', 'K', 'O' }, gameScreens[0])
+	
 {
     hideCursor();
-    setScreen(Screen::MAX_X, Screen::MAX_Y);
+    //setScreen(Screen::MAX_X, Screen::MAX_Y);
     currStatus = GameModes::MENU;
 }
 void Game::showMenu()
@@ -200,22 +202,28 @@ void Game::GamePaused()
 
 void Game::initLevel()
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     cls();
     setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
-    for (int i = 1; i <= 9; i++)
-    {
-        currentScreen.setdoor(i, i + 1);// Example of setting door i to lead to level i+1
-    }
+	currentScreen.loadData(currentLevel);
+
+    
+
     currentScreen.draw();
     player1.draw();
     player2.draw();
-}
+ }
+
+
 
 void Game::gameLoop()
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     bool gameRunning = true;
     while (gameRunning)
     {
+		//point to the current screen
+        Screen& currentScreen = gameScreens[currentLevel];
         // Check for key presses
         if (_kbhit())
         {
@@ -266,6 +274,7 @@ void Game::gameLoop()
 
 void Game::handleDoor(Player& p)
 {
+    Screen& currentScreen = gameScreens[currentLevel];
     Point doorPos = p.getPosition();
     char cell = currentScreen.getCharAt(doorPos);// Get the character at the player's position
 
@@ -289,7 +298,7 @@ void Game::handleDoor(Player& p)
             }
 
         }
-        if (!d->isOpen())
+		if (!d->isOpen())// If the door is still not open
         {
             return; // Door is still closed
         }
@@ -298,9 +307,10 @@ void Game::handleDoor(Player& p)
     {
         int destLevel = d->getDestinationLevel();// Get the destination level
 
-        if (destLevel != -1)// If the destination level is valid
+        if (destLevel != -1)// If destination level is the last level
         {
-            //loadLevel(destLevel);// Load the destination level
+			currentLevel = destLevel;// Change to the new level
+
             initLevel();// Initialize the new level
         }
     }
