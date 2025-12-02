@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstring>
 #include "Screen.h"
+#include "Door.h"
+#include "Rooms.h"
 #include "Utils.h"
 
 using namespace std;
@@ -130,11 +132,23 @@ void Screen::loadData(int mapIndex) {
 	if (mapIndex < 0 || mapIndex >= NUM_MAPS) {
 		return;
 	}
-	for (int i = 0; i < MAX_Y; i++) {
-		strncpy(screen[i], MAP_LAYOUTS[mapIndex][i], MAX_X);
-		screen[i][MAX_X] = '\0';
-	}
+	for (int i = 0; i < ROOM_HEIGHT; i++)
+	{
 	
+		switch (mapIndex)
+		{
+			case 0:
+				strncpy(screen[i], ROOM0[i], ROOM_WIDTH);
+				break;
+			case 1:
+				strncpy(screen[i], ROOM1[i], ROOM_WIDTH);
+				break;
+			case 2:
+				strncpy(screen[i], ROOM2[i], ROOM_WIDTH);
+				break;
+		}	
+		screen[i][ROOM_WIDTH] = '\0'; // Null-terminate each row
+	}
 }
 
 
