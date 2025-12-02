@@ -19,8 +19,9 @@ public:
 	
 	
 	char getCharAt(const Point& p) const;
+	char getCharAt(int x, int y) const;
 	void setCharAt(const Point& p, char ch);
-
+	void setCharAt(int x, int y, char ch);
 	void draw() const;
 	bool isWall(const Point& p) const;
 	bool isObstacle(const Point& p) const;

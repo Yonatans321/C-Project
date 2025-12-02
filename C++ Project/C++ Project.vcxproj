@@ -128,9 +128,11 @@
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="key.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Riddle.h" />
+    <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Switch.h" />
     <ClInclude Include="Utils.h" />
@@ -141,9 +143,11 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="key.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Riddle.cpp" />
+    <ClCompile Include="RiddleBank.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Switch.cpp" />
     <ClCompile Include="Utils.cpp" />

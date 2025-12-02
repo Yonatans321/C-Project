@@ -22,7 +22,8 @@ RiddleBank::RiddleBank() : riddleCount(0)
 }
 Riddle* RiddleBank::getRiddleById(int riddleID)
 {
-    for (size_t i = 0; i < riddleCount; ++i) {
+    for (size_t i = 0; i <riddleCount; ++i) {
+
         if (riddles[i].getRiddleID() == riddleID) {
             return &riddles[i];
         }
