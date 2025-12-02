@@ -4,7 +4,7 @@
 #include "Door.h"
 #include <array>
 #include "RoomScreenManager.h"
-
+// class to manage the screen layout and interactions
 class Screen {
 public:
 	static constexpr int MAX_X = 80;
