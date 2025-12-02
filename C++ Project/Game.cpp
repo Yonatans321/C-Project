@@ -494,3 +494,4 @@ void Game::clearBox(int x, int y, int width, int height)
 }
 
 //PALATIN
+// try
