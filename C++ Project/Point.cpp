@@ -22,3 +22,11 @@ void Point::erase() const {
 	gotoxy(x, y);
 	std::cout << ' ';
 }
+void Point::set(int new_x, int new_y) {
+	if (new_x >= 0 && new_x <= Screen::MAX_X) {
+		x = new_x;
+	}
+	if (new_y >= 0 && new_y <= Screen::MAX_Y) {
+		y = new_y;
+	}
+}

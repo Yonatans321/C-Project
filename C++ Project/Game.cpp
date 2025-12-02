@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
@@ -8,6 +8,8 @@
 #include "Point.h"
 #include "Player.h"
 #include <cstring>
+#include "Riddle.h"
+#include "RiddleBank.h"
 
 
 using namespace std;
@@ -262,6 +264,9 @@ void Game::gameLoop()
 		// Handle door interactions
 		handleDoor(player1);
 		handleDoor(player2);
+		// Handle riddle interactions
+        handleRiddle(player1);
+        handleRiddle(player2);
         // Small delay to control game speed
         player1.draw();
         player2.draw();
@@ -313,88 +318,177 @@ void Game::handleDoor(Player& p)
         }
     }
 }
-// Change to a new level
-void Game::changeLevel(int newLevel)
+// Function to draw a box at (x, y) with given width and height
+void Game::drawBox(int x, int y, int width, int height)
 {
-    currentLevel = newLevel;
-    initLevel(); 
+    for (int row = 0; row < height; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < width; col++)
+        {
+            if (row == 0 || row == height - 1)
+                cout << "-";
+            else if (col == 0 || col == width - 1)
+                cout << "|";
+            else
+                cout << " ";
+        }
+	}
+}
+// Function to get a yes/no response from the user
+char Game::getYesNo()
+{
+    while (true)
+    {
+        char input = _getch();
+        if (input == 'Y' || input == 'y')
+            return 'Y';
+        else if (input == 'N' || input == 'n')
+            return 'N';
+    }
+}
+// AI generated function to handle riddle interaction
+void Game::handleRiddle(Player& player)
+{
+    Screen& screen = gameScreens[currentLevel];
+
+    int x = player.getX();
+    int y = player.getY();
+    char cell = screen.getCharAt(x, y);
+
+    if (cell != '?')
+        return;
+
+    int id = currentLevel + 1;
+    Riddle* r = riddleBank.getRiddleById(id);
+    if (!r || r->isSolved())
+        return;
+
+    int bx = 15, by = 5, bw = 50, bh = 12;
+
+    // Step 1 – Ask Y/N
+    drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N): ";
+
+    char choice = getYesNo();
+
+    if (choice == 'N')
+    {
+        closeAnimatedBox(bx, by, bw, bh);
+
+        screen.setCharAt(x, y, '?');  // ❗ restore riddle
+        screen.draw();                // ❗ redraw full level
+        player1.draw();
+        player2.draw();
+        return;
+    }
+
+    closeAnimatedBox(bx, by, bw, bh);
+
+    // Step 2 – Show question
+    drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 1); cout << "Riddle:";
+
+    string q = r->getQuestion();
+    int line = by + 3;
+    string temp;
+
+    for (char c : q)
+    {
+        if (c == '\n')
+        {
+            gotoxy(bx + 2, line++);
+            cout << temp;
+            temp.clear();
+        }
+        else temp += c;
+    }
+    if (!temp.empty())
+    {
+        gotoxy(bx + 2, line++);
+        cout << temp;
+    }
+
+    clearInputBuffer();
+    gotoxy(bx + 2, line + 1);
+    cout << "Answer: ";
+
+    string ans;
+    getline(cin, ans);
+
+    RiddleOutcome result = riddleBank.checkAnswerFor(id, ans);
+
+    gotoxy(bx + 2, line + 3);
+
+    if (result == RiddleOutcome::Correct)
+    {
+        cout << "Correct! +100 points";
+        player.addPoints(100);
+        r->markAsSolved();
+        screen.setCharAt(x, y, ' ');
+    }
+    else
+    {
+        cout << "Wrong! -1 life";
+        player.loseLife();
+        screen.setCharAt(x, y, '?');   // ❗ put riddle back
+    }
+
+    Sleep(1200);
+
+    closeAnimatedBox(bx, by, bw, bh);
+
+    // FINAL REDRAW (fixes everything)
+    screen.draw();
+    player1.draw();
+    player2.draw();
+}
+void Game::clearInputBuffer()
+{
+    // Clear any remaining characters in the input buffer
+    while (_kbhit())
+    {
+        _getch();
+    }
+}
+void Game::handleTile(Player& player)
+{
+    Screen& currentScreen = gameScreens[currentLevel];
+    Point pos = player.getPosition();
+    char cell = currentScreen.getCharAt(pos);// Get the character at the player's position
+    switch (cell)
+    {
+    case '?':
+        handleRiddle(player);
+    }
+}
+void Game::drawAnimatedBox(int x, int y, int w, int h)
+{
+    for (int i = 0; i <= h; i += 2)
+    {
+		drawBox(x, y, w, i);
+        Sleep(50);
+	}
 }
 
-// Load screens and set up doors for the level
-void Game::loadScreens(int level)
+void Game::closeAnimatedBox(int x, int y, int w, int h)
 {
-    Screen& currentScreen = gameScreens[level];
-    currentScreen.loadData(level);
-
-    if (level == 0) 
+    for (int i = 0; i <= h; i += 2)
     {
-        currentScreen.setDoor(1, 1); 
+        drawBox(x, y, w, i);
+        Sleep(50);
     }
-    else if (level == 1) 
-    {
-        currentScreen.setDoor(2, 2); 
-    }
-    else if (level == 2) 
-    {
-    
-        currentScreen.setDoor(3, 3); 
-    }
+	clearBox(x, y, w, h);
 }
-
-// Show the win screen
-void Game::showWinScreen()
+void Game::clearBox(int x, int y, int width, int height)
 {
-    cls();
-    
-    gotoxy(20, 10);
-    cout << "########################################" << endl;
-    gotoxy(20, 11);
-    cout << "#                                      #" << endl;
-    gotoxy(20, 12);
-    cout << "#        CONGRATULATIONS!              #" << endl;
-    gotoxy(20, 13);
-    cout << "#           YOU WON!                   #" << endl;
-    gotoxy(20, 14);
-    cout << "#                                      #" << endl;
-    gotoxy(20, 15);
-    cout << "########################################" << endl;
-
-    gotoxy(22, 17);
-    cout << "Press H to return to Main Menu...";
-
-	// Wait for 'H' key press
-    bool waiting = true;
-    while (waiting) {
-        if (_kbhit()) {
-            char ch = _getch();
-            if (ch == 'h' || ch == 'H') {
-                waiting = false;
-            }
+    for (int row = 0; row < height; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < width; col++)
+        {
+            cout << " ";
         }
     }
-
-    
-    currStatus = GameModes::MENU;
-}
-
-void Game::printStatus()
-{
-    int y = Screen::MAX_Y;
-    gotoxy(0, y);
-    setColor(7);
-
-    //player 1
-    gotoxy(2, y + 1);
-    std::cout << "P1(&) HP:" << player1.getLives() << " Sc:" << player1.getScore() << " Itm:";
-    if (player1.hasItem()) std::cout << player1.getHeldItem();
-    else std::cout << " ";
-
-    //seperate line
-    gotoxy(40, y + 1); std::cout << "|";
-    gotoxy(45, y + 1);
-
-    //player 2
-    std::cout << "P2($) HP:" << player2.getLives() << " Sc:" << player2.getScore() << " Itm:";
-    if (player2.hasItem()) std::cout << player2.getHeldItem();
-    else std::cout << " ";
 }

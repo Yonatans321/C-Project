@@ -14,8 +14,8 @@ const char* const Screen::MAP_LAYOUTS[Screen::NUM_MAPS][Screen::MAX_Y] =
 		"W                                                                              W", // 1 
 		"W          WWWWWWWWWW             WWWWWWWWWWWW                                 W", // 2
 		"W          W        W             W          W                                 W", // 3
-		"W          W        W             W          W                                 W", // 4
-		"W          W   ?    W             W    K     W                                 W", // 5
+		"W                   W             W          W                                 W", // 4
+		"W              ?    W             W    K     W                                 W", // 5
 		"W          W        W             W          W                                 W", // 6
 		"W          WWWWWWWWWW             WWWW  WWWWWW                                 W", // 7
 		"W                                                                              W", // 8
@@ -112,8 +112,6 @@ const char* const Screen::MAP_LAYOUTS[Screen::NUM_MAPS][Screen::MAX_Y] =
 		"W                      (Press ESC to return to Menu)                           W",
 		"W                                                                              W",
 		"W                                                                              W",
-		"W                                                                              W",
-		"W                                                                              W",
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 	}
 };
@@ -159,6 +157,15 @@ char Screen::getCharAt(const Point& p) const
 	}
 	return ' ';
 }
+char Screen::getCharAt(int x, int y) const
+{
+
+	if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) {
+		return screen[y][x];
+	}
+	return ' ';
+}
+
 // set character at point p
 void Screen::setCharAt(const Point& p, char ch)
 {
@@ -170,7 +177,16 @@ void Screen::setCharAt(const Point& p, char ch)
 		std::cout << ch;
 	}
 }
+void Screen::setCharAt(int x, int y, char ch)
+{
+	if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) {
 
+		screen[y][x] = ch;
+
+		gotoxy(x,y);
+		std::cout << ch;
+	}
+}
 
 bool Screen::isWall(const Point& p) const // check if the point is a wall
 {

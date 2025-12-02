@@ -40,4 +40,5 @@ public:
 		return ch;
 	}
 	void erase() const;
+	void set(int new_x, int new_y); 
 };

@@ -67,19 +67,43 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 }
 bool Player::useKeyForDoor(char doorChar)  // use key for a door
 	{ // check if player has a key
-		if (heldItem != 'K') {
+		if (heldItem != 'K')
 			return false;
-		}
 
 		int doorId = doorChar - '0';
-		if (itemId == doorId)// check if key id matches door id
-		{
-			return true;
-		}
-		{
-			return true;
-		}
+		return (itemId == doorId); // check if key id matches door id
 	}
+void Player::addPoints(int pts)
+{
+	points += pts;
+}
+void Player::losePoints(int pts)
+{
+	points -= pts;
+}
+int Player::getScore() const
+{
+	return points;
+}
+void Player::addLives()
+{
+	lives++;
+}
+void Player::loseLife()
+{
+	if (lives>0)
+	{
+		lives--;
+	}
+}
+int Player::getLives() const
+{
+	return lives;
+}
+bool Player::isDead() const
+{
+	return lives <= 0;
+}
 void Player::setPosition(const Point& pos) {
 	position = pos;
 }
