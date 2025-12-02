@@ -20,6 +20,6 @@ public:
 	int getRiddleID() const;
 	static bool isRiddle(char ch);	
 	std::string getQuestion() const;
-	char* getHint(int riddleID) const;
+	char* getHint() const;
 };
 

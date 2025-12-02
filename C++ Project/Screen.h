@@ -3,6 +3,7 @@
 #include "Point.h"
 #include "Door.h"
 #include <array>
+#include "RoomScreenManager.h"
 
 class Screen {
 public:
@@ -13,7 +14,7 @@ public:
 private:
 	static const char* const MAP_LAYOUTS[NUM_MAPS][MAX_Y];// predefined map layouts
 	char screen[MAX_Y][MAX_X + 1]; 
-	Door doors[10]; // array to hold doors
+	Door doors [10]; // array to hold doors
 
 public:
 	

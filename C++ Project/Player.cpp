@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <cctype>
 #include "Direction.h"
+#include "Screen.h"
 
 // moving and drawing functions
 void Player::draw() { // draw player at current position
@@ -73,6 +74,10 @@ bool Player::useKeyForDoor(char doorChar)  // use key for a door
 		int doorId = doorChar - '0';
 		return (itemId == doorId); // check if key id matches door id
 	}
+void Player::keyUsed() { // remove the used key
+	heldItem = 0;
+	itemId = -1;
+}
 void Player::addPoints(int pts)
 {
 	points += pts;

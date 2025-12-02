@@ -1,6 +1,7 @@
-#include "RiddleBank.h"
+﻿#include "RiddleBank.h"
 #include <iostream>
 #include <string>
+#include <conio.h>
 
 using namespace std;
 
@@ -8,17 +9,17 @@ RiddleBank::RiddleBank() : riddleCount(0)
 {
     // Initialize with some riddles
     riddles[riddleCount++] = Riddle(1, "What's the output?\nint x = 3;\ncout << x + ++x;", "7","Remember:++x increments BEFORE use");
-    riddles[riddleCount++] = Riddle(2, "What does this print?\nfor(int i=0;i<3;i++) cout << i;", "012");
-    riddles[riddleCount++] = Riddle(3, "What's the output?\nbool a = true;\nbool b = false;\ncout << (a && b);", "0");
-    riddles[riddleCount++] = Riddle(4, "What is the output?\ncout << 7 / 2;", "3");
-    riddles[riddleCount++] = Riddle(5, "What does this print?\nstring s = \"Hello\";\ncout << s.length();", "5");
-    riddles[riddleCount++] = Riddle(6, "What's the output?\nint arr[] = {1,2,3};\ncout << arr[1];", "2");
-    riddles[riddleCount++] = Riddle(7, "What's the output?\ncout << (5 > 3 ? 10 : 20);", "10");
+    riddles[riddleCount++] = Riddle(2, "What does this print?\nfor(int i=0;i<3;i++) cout << i;", "012", "Remember:Loop just like C");
+    riddles[riddleCount++] = Riddle(3, "What's the output?\nbool a = true;\nbool b = false;\ncout << (a && b);", "0", "Remember:the outcome can be in numbers");
+    riddles[riddleCount++] = Riddle(4, "What is the output?\ncout << 7 / 2;", "3", "Remember:how Divide works..?");
+    riddles[riddleCount++] = Riddle(5, "What does this print?\nstring s = \"Hello\";\ncout << s.length();", "5", "Remember:just like in C");
+    riddles[riddleCount++] = Riddle(6, "What's the output?\nint arr[] = {1,2,3};\ncout << arr[1];", "2", "Remember:you start counting from 0");
+    riddles[riddleCount++] = Riddle(7, "What's the output?\ncout << (5 > 3 ? 10 : 20);", "10", "Remember:if/else outcome..");
 
     //fun riddlers
-    riddles[riddleCount++] = Riddle(8,"what has keys but can't open locks?","Keyboard");
-	riddles[riddleCount++] = Riddle(9, "what has a head and a tail but no body?", "Coin");
-	riddles[riddleCount++] = Riddle(10, "who will win the world cup 2026?", "Argentina");
+    riddles[riddleCount++] = Riddle(8,"what has keys but can't open locks?","Keyboard", "you are using it right now...");
+	riddles[riddleCount++] = Riddle(9, "what has a head and a tail but no body?", "Coin", "possibility of 50% to guess it");
+	riddles[riddleCount++] = Riddle(10, "who will win the world cup 2026?", "Argentina", "They've won in 2022...");
 }
 Riddle* RiddleBank::getRiddleById(int riddleID)
 {
@@ -76,10 +77,6 @@ void RiddleBank::printAllRiddles() const
         cout << "------------------------" << endl;
     }
 }
-char* RiddleBank::gethint(int riddleID) const
-{
-    return ri
-}
 
 void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level)
 {
@@ -87,6 +84,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
     int y = player.getY();
     char cell = screen.getCharAt(x, y);
 
+    // Only activate if stepped on '?'
     if (cell != '?')
         return;
 
@@ -98,24 +96,41 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
     int bx = 15, by = 5, bw = 50, bh = 12;
 
-    // ���� Y/N
+    // ───────────────────────────────────────────────
+    // STEP 1: Ask Y/N (with optional H for hint)
+    // ───────────────────────────────────────────────
+
     ui.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
-    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, or H for hint): ";
+    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, H for hint): ";
 
     char choice = _getch();
 
+    // ───────────────────────────────────────────────
+    // HINT DISPLAY — shows hint in SAME place where
+    // result (Correct/Wrong) will later appear.
+    // ───────────────────────────────────────────────
+
     if (choice == 'H' || choice == 'h')
     {
-        ui.clearBox(bx, by, bw, bh);
+        ui.closeAnimatedBox(bx, by, bw, bh);
         ui.drawAnimatedBox(bx, by, bw, bh);
 
-        gotoxy(bx + 2, by + 2);
-        cout << "Hint: " << r->getHint();
+        gotoxy(bx + 2, by + 1);
+        cout << "Hint:";
+
+        gotoxy(bx + 2, by + 3);
+        cout << r->getHint();
+
         Sleep(1500);
+
         ui.closeAnimatedBox(bx, by, bw, bh);
-        return;
+        return; // does NOT continue riddle
     }
+
+    // ───────────────────────────────────────────────
+    // If player refuses to answer
+    // ───────────────────────────────────────────────
 
     if (choice == 'N' || choice == 'n')
     {
@@ -127,7 +142,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
     ui.closeAnimatedBox(bx, by, bw, bh);
 
-    // ���� �����
+    // ───────────────────────────────────────────────
+    // STEP 2: Show the riddle question
+    // ───────────────────────────────────────────────
+
     ui.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 1); cout << "Riddle:";
 
@@ -151,13 +169,23 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
         cout << temp;
     }
 
+    // ───────────────────────────────────────────────
+    // STEP 3: Get user answer
+    // ───────────────────────────────────────────────
+
     gotoxy(bx + 2, line + 1);
     cout << "Answer: ";
+
+    clearInputBuffer();
 
     string ans;
     getline(cin, ans);
 
     RiddleOutcome result = checkAnswerFor(id, ans);
+
+    // ───────────────────────────────────────────────
+    // STEP 4: Show result (IN SAME PLACE AS HINT!)
+    // ───────────────────────────────────────────────
 
     gotoxy(bx + 2, line + 3);
 
@@ -176,16 +204,21 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
     }
 
     Sleep(1200);
+
     ui.closeAnimatedBox(bx, by, bw, bh);
+
+    // ───────────────────────────────────────────────
+    // FINAL REDRAW
+    // ───────────────────────────────────────────────
 
     screen.draw();
 }
 
-char* RiddleBank::getHint(int riddleID) const
+void RiddleBank::clearInputBuffer()
 {
-    Riddle* r = getRiddleById(riddleID);
-    if (r) {
-        return const_cast<char*>(r->getHint());
-    }
-    return nullptr;
+    while(_kbhit()) {
+        _getch();
+	}
 }
+
+

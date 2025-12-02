@@ -6,9 +6,11 @@
 #include <iostream>
 #include <conio.h>
 #include "RoomScreenManager.h"
+#include <windows.h>
+#include "Screen.h"
+#include "Utils.h"
 
 
-// Generatred AI functions for RiddleBank class
 // Stores and manages multiple riddles
 // Possible outcomes when asking or checking a riddle
 
@@ -42,6 +44,6 @@ public:
     RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
 	void printAllRiddles() const;
-    char* getHint(int riddleID) const;
+	void clearInputBuffer();
     void handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level);
 };

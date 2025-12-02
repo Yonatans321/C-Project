@@ -1,5 +1,9 @@
 #include "Door.h"
+#include "Player.h"
+#include "Screen.h"
+#include "RoomScreenManager.h" 
 
+using namespace std;
 int Door::getId() const
 {
 	return id;
@@ -34,46 +38,47 @@ void Door::setDestinationLevel(int level)
 	destinationLevel = level;
 }
 
-void Game::handleDoor(Player& p)
-{
-    Screen& currentScreen = gameScreens[currentLevel];
-    Point doorPos = p.getPosition();
-    char cell = currentScreen.getCharAt(doorPos);// Get the character at the player's position
+bool Door::handleDoor(Player& p, Screen& screen,RoomScreenManager& ui, int& currentLevel)
+{	
+	Point doorPos = p.getPosition();
+	char cell = screen.getCharAt(doorPos);
+	if (!isDoorChar(cell))
+	{
+		return false; // not a door
+	}
+	Door* door = screen.getDoor(doorPos);
+	if (door == nullptr)
+	{
+		return false; // door not found
+	}
+	if(!door->isOpen())
+	{
+		if (p.useKeyForDoor(cell))
+		{
+			if (door->tryOpen(cell - '0'))
+			{
+				ui.showMessage("You unlocked the door!.");
+				p.keyUsed();
+				return true; // door interaction handled
+			}
+			else
+			{
+				ui.showMessage("The key doesn't fit the door .");
+				return true; // door interaction handled
+			}
+		}
+		else
+		{
+			ui.showMessage("The door is locked. You need the matching key.");
+			return true; // door interaction handled
+		}
+	}
+	int dest = door->getDestinationLevel();
+	if (dest != -1)
+	{
+		currentLevel = dest;
+		return true; // tell Game it should reload the level
+	}
 
-    if (!Door::isDoorChar(cell))
-    {
-        return; // Not a door
-    }
-    Door* d = currentScreen.getDoor(doorPos);// Get the door at the player's position
-    if (!d)// If no door found 
-    {
-        return;
-    }
-
-    if (!d->isOpen())// If the door is not open
-    {
-        if (p.useKeyForDoor(cell))// If the player has the key for the door
-        {
-            if (d->tryOpen(p.getItemId()))// Try to open the door with the key 
-            {
-                p.DropItem();// Remove the key from the player
-            }
-
-        }
-        if (!d->isOpen())// If the door is still not open
-        {
-            return; // Door is still closed
-        }
-    }
-    if (d->isOpen())// If the door is open
-    {
-        int destLevel = d->getDestinationLevel();// Get the destination level
-
-        if (destLevel != -1)// If destination level is the last level
-        {
-            currentLevel = destLevel;// Change to the new level
-
-            initLevel();// Initialize the new level
-        }
-    }
+	return false;
 }

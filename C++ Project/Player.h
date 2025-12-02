@@ -1,9 +1,8 @@
 #pragma once
 #include "Point.h"
-#include "Screen.h"
 #include <cstddef>// for size_t
 
-
+class Screen; // forward declaration
 
 class Player
 {
@@ -44,7 +43,7 @@ public:
 	void GrabItem(char item, int id = -1);
 	bool useKeyForDoor(char doorChar);
 	void setPosition(const Point& pos);// set player's position
-	
+	void keyUsed();
 	//bool hasKeyForDoor(char doorChar) const;
 	
 	
