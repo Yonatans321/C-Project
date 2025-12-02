@@ -39,7 +39,9 @@ void Player::keyPressed(char ch) {
 		++index;
 	}
 }
-
+void Player::setScreen(Screen& newScreen) { // set player's current screen
+	this->screen = newScreen;
+}
 
 
 bool Player::hasItem() const { // check if player has any item

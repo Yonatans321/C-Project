@@ -10,7 +10,7 @@ private:
 	static constexpr size_t NUM_KEYS = 6;
 	Point position;
 	char keys[NUM_KEYS];
-	Screen& screen;
+	Screen* screen;
 	char heldItem;
 	int itemId;
 	int points=0;
@@ -33,6 +33,7 @@ public:
 	int getY() const;
 	char getChar() const;
 	Point getPosition() const { return position; }// get player's current position
+	void setScreen(Screen& newScreen);// set player's current screen
 
 	// Item functions
 	bool hasItem() const;
