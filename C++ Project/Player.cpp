@@ -23,7 +23,7 @@ char Player::getChar() const { // get player's character representation
 void Player::move() {
 	Point nextPosition = position;	
 	nextPosition.move();
-	if (!screen.isWall(nextPosition))
+	if (!screen->isWall(nextPosition))
 	{
 		position = nextPosition;
 	}
@@ -40,7 +40,7 @@ void Player::keyPressed(char ch) {
 	}
 }
 void Player::setScreen(Screen& newScreen) { // set player's current screen
-	this->screen = newScreen;
+	this->screen = &newScreen;
 }
 
 

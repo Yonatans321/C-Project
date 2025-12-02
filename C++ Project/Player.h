@@ -17,7 +17,7 @@ private:
 	int lives=3;
 public:
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS], Screen& theScreen)
-		:position(start_point), screen(theScreen), heldItem(0), itemId(-1)
+		:position(start_point), screen(&theScreen), heldItem(0), itemId(-1)
 	{
 		for (size_t i = 0; i < NUM_KEYS; ++i) {
 			keys[i] = the_keys[i];
