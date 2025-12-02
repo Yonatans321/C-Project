@@ -1,7 +1,11 @@
 #pragma once
 #include <string>
 #include "Riddle.h"
-
+#include "Player.h"
+#include "Rooms.h"
+#include <iostream>
+#include <conio.h>
+#include "RoomScreenManager.h"
 
 
 // Generatred AI functions for RiddleBank class
@@ -38,5 +42,6 @@ public:
     RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
 	void printAllRiddles() const;
-	void Hints() const;
+    char* getHint(int riddleID) const;
+    void handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level);
 };

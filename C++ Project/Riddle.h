@@ -8,9 +8,10 @@ private:
 	const char* question;
 	const char* answer;
 	bool solved;
+	const char* hint;
 public:
-	Riddle() : riddleID(-1), question(nullptr), answer(nullptr), solved(false) {}
-	Riddle(int id, const char* q, const char* a) :riddleID(id), question(q), answer(a), solved(false) {}
+	Riddle() : riddleID(-1), question(nullptr), answer(nullptr), solved(false), hint(nullptr) {}
+	Riddle(int id, const char* q, const char* a,const char* h) :riddleID(id), question(q), answer(a), solved(false),hint(h) {}
 	// functions declaration
 	void askQuestion() const;
 	bool checkAnswer(const char* userAnswer);
@@ -19,5 +20,6 @@ public:
 	int getRiddleID() const;
 	static bool isRiddle(char ch);	
 	std::string getQuestion() const;
+	char* getHint(int riddleID) const;
 };
 

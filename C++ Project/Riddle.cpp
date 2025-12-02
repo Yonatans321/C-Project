@@ -48,3 +48,7 @@ void Riddle::markAsSolved()
 {
     solved = true;
 }
+const char* Riddle::getHint() const
+{
+    return hint;
+}

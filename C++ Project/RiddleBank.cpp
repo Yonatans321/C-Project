@@ -7,7 +7,7 @@ using namespace std;
 RiddleBank::RiddleBank() : riddleCount(0)
 {
     // Initialize with some riddles
-    riddles[riddleCount++] = Riddle(1, "What's the output?\nint x = 3;\ncout << x + ++x;", "7");
+    riddles[riddleCount++] = Riddle(1, "What's the output?\nint x = 3;\ncout << x + ++x;", "7","Remember:++x increments BEFORE use");
     riddles[riddleCount++] = Riddle(2, "What does this print?\nfor(int i=0;i<3;i++) cout << i;", "012");
     riddles[riddleCount++] = Riddle(3, "What's the output?\nbool a = true;\nbool b = false;\ncout << (a && b);", "0");
     riddles[riddleCount++] = Riddle(4, "What is the output?\ncout << 7 / 2;", "3");
@@ -76,11 +76,116 @@ void RiddleBank::printAllRiddles() const
         cout << "------------------------" << endl;
     }
 }
-void RiddleBank::Hints() const
+char* RiddleBank::gethint(int riddleID) const
 {
-    cout << "Riddle Hints:" << endl;
-    for (int i = 0;i < riddleCount;i++)
+    return ri
+}
+
+void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level)
+{
+    int x = player.getX();
+    int y = player.getY();
+    char cell = screen.getCharAt(x, y);
+
+    if (cell != '?')
+        return;
+
+    int id = level + 1;
+    Riddle* r = getRiddleById(id);
+
+    if (!r || r->isSolved())
+        return;
+
+    int bx = 15, by = 5, bw = 50, bh = 12;
+
+    // שאלת Y/N
+    ui.drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, or H for hint): ";
+
+    char choice = _getch();
+
+    if (choice == 'H' || choice == 'h')
     {
-        cout << "Riddle ID: " << riddles[i].getRiddleID() << " - Hint: Think about basic C++ concepts!" << std::endl;
+        ui.clearBox(bx, by, bw, bh);
+        ui.drawAnimatedBox(bx, by, bw, bh);
+
+        gotoxy(bx + 2, by + 2);
+        cout << "Hint: " << r->getHint();
+        Sleep(1500);
+        ui.closeAnimatedBox(bx, by, bw, bh);
+        return;
     }
+
+    if (choice == 'N' || choice == 'n')
+    {
+        ui.closeAnimatedBox(bx, by, bw, bh);
+        screen.setCharAt(x, y, '?');
+        screen.draw();
+        return;
+    }
+
+    ui.closeAnimatedBox(bx, by, bw, bh);
+
+    // הצגת השאלה
+    ui.drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 1); cout << "Riddle:";
+
+    string q = r->getQuestion();
+    int line = by + 3;
+
+    string temp;
+    for (char c : q)
+    {
+        if (c == '\n')
+        {
+            gotoxy(bx + 2, line++);
+            cout << temp;
+            temp.clear();
+        }
+        else temp += c;
+    }
+    if (!temp.empty())
+    {
+        gotoxy(bx + 2, line++);
+        cout << temp;
+    }
+
+    gotoxy(bx + 2, line + 1);
+    cout << "Answer: ";
+
+    string ans;
+    getline(cin, ans);
+
+    RiddleOutcome result = checkAnswerFor(id, ans);
+
+    gotoxy(bx + 2, line + 3);
+
+    if (result == RiddleOutcome::Correct)
+    {
+        cout << "Correct! +100 points";
+        player.addPoints(100);
+        r->markAsSolved();
+        screen.setCharAt(x, y, ' ');
+    }
+    else
+    {
+        cout << "Wrong! -1 life";
+        player.loseLife();
+        screen.setCharAt(x, y, '?');
+    }
+
+    Sleep(1200);
+    ui.closeAnimatedBox(bx, by, bw, bh);
+
+    screen.draw();
+}
+
+char* RiddleBank::getHint(int riddleID) const
+{
+    Riddle* r = getRiddleById(riddleID);
+    if (r) {
+        return const_cast<char*>(r->getHint());
+    }
+    return nullptr;
 }
