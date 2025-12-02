@@ -15,7 +15,9 @@ public:
 	void askQuestion() const;
 	bool checkAnswer(const char* userAnswer);
 	bool isSolved() const;
+	void markAsSolved();
 	int getRiddleID() const;
 	static bool isRiddle(char ch);	
+	std::string getQuestion() const;
 };
 

@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
@@ -318,56 +318,177 @@ void Game::handleDoor(Player& p)
         }
     }
 }
-
+// Function to draw a box at (x, y) with given width and height
+void Game::drawBox(int x, int y, int width, int height)
+{
+    for (int row = 0; row < height; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < width; col++)
+        {
+            if (row == 0 || row == height - 1)
+                cout << "-";
+            else if (col == 0 || col == width - 1)
+                cout << "|";
+            else
+                cout << " ";
+        }
+	}
+}
+// Function to get a yes/no response from the user
+char Game::getYesNo()
+{
+    while (true)
+    {
+        char input = _getch();
+        if (input == 'Y' || input == 'y')
+            return 'Y';
+        else if (input == 'N' || input == 'n')
+            return 'N';
+    }
+}
+// AI generated function to handle riddle interaction
 void Game::handleRiddle(Player& player)
 {
-	Screen& currentScreen = gameScreens[currentLevel];
+    Screen& screen = gameScreens[currentLevel];
 
     int x = player.getX();
     int y = player.getY();
-    char tile = currentScreen.getCharAt(x,y);
+    char cell = screen.getCharAt(x, y);
 
-
-
-    if (tile != '?')
+    if (cell != '?')
         return;
 
-    int riddleID = currentLevel;
+    int id = currentLevel + 1;
+    Riddle* r = riddleBank.getRiddleById(id);
+    if (!r || r->isSolved())
+        return;
 
-    cout << "\nYou stepped on a RIDDLE!" << endl;
-    cout << "Answer it? (Y/N): ";
+    int bx = 15, by = 5, bw = 50, bh = 12;
 
-    string choice;
-    getline(cin, choice);
+    // Step 1 – Ask Y/N
+    drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N): ";
 
-    if (choice.empty() || choice[0] == 'N' || choice[0] == 'n') {
-        cout << "You walk away from the riddle.\n";
+    char choice = getYesNo();
+
+    if (choice == 'N')
+    {
+        closeAnimatedBox(bx, by, bw, bh);
+
+        screen.setCharAt(x, y, '?');  // ❗ restore riddle
+        screen.draw();                // ❗ redraw full level
+        player1.draw();
+        player2.draw();
         return;
     }
 
-    RiddleOutcome result = riddleBank.askRiddleInteractive(riddleID);
+    closeAnimatedBox(bx, by, bw, bh);
 
-    switch (result)
+    // Step 2 – Show question
+    drawAnimatedBox(bx, by, bw, bh);
+    gotoxy(bx + 2, by + 1); cout << "Riddle:";
+
+    string q = r->getQuestion();
+    int line = by + 3;
+    string temp;
+
+    for (char c : q)
     {
-    case RiddleOutcome::Correct:
-        cout << "Correct! You may proceed.\n" << endl;
-        cout << "+100 poitnts ! \n" << endl;
+        if (c == '\n')
+        {
+            gotoxy(bx + 2, line++);
+            cout << temp;
+            temp.clear();
+        }
+        else temp += c;
+    }
+    if (!temp.empty())
+    {
+        gotoxy(bx + 2, line++);
+        cout << temp;
+    }
+
+    clearInputBuffer();
+    gotoxy(bx + 2, line + 1);
+    cout << "Answer: ";
+
+    string ans;
+    getline(cin, ans);
+
+    RiddleOutcome result = riddleBank.checkAnswerFor(id, ans);
+
+    gotoxy(bx + 2, line + 3);
+
+    if (result == RiddleOutcome::Correct)
+    {
+        cout << "Correct! +100 points";
         player.addPoints(100);
-        currentScreen.setCharAt(x, y, ' ');
-        break;
-
-    case RiddleOutcome::Incorrect:
-        cout << "Incorrect! You lose a life.\n";
+        r->markAsSolved();
+        screen.setCharAt(x, y, ' ');
+    }
+    else
+    {
+        cout << "Wrong! -1 life";
         player.loseLife();
-        break;
+        screen.setCharAt(x, y, '?');   // ❗ put riddle back
+    }
 
-    case RiddleOutcome::AlreadySolved:
-        cout << "You have already solved this riddle.\n";
-        currentScreen.setCharAt(x,y,' ');// Remove the riddle from the screen
-        break;
+    Sleep(1200);
 
-    case RiddleOutcome::NotFound:
-        cout << "Riddle not found.\n";
-        break;
+    closeAnimatedBox(bx, by, bw, bh);
+
+    // FINAL REDRAW (fixes everything)
+    screen.draw();
+    player1.draw();
+    player2.draw();
+}
+void Game::clearInputBuffer()
+{
+    // Clear any remaining characters in the input buffer
+    while (_kbhit())
+    {
+        _getch();
+    }
+}
+void Game::handleTile(Player& player)
+{
+    Screen& currentScreen = gameScreens[currentLevel];
+    Point pos = player.getPosition();
+    char cell = currentScreen.getCharAt(pos);// Get the character at the player's position
+    switch (cell)
+    {
+    case '?':
+        handleRiddle(player);
+    }
+}
+void Game::drawAnimatedBox(int x, int y, int w, int h)
+{
+    for (int i = 0; i <= h; i += 2)
+    {
+		drawBox(x, y, w, i);
+        Sleep(50);
+	}
+}
+
+void Game::closeAnimatedBox(int x, int y, int w, int h)
+{
+    for (int i = 0; i <= h; i += 2)
+    {
+        drawBox(x, y, w, i);
+        Sleep(50);
+    }
+	clearBox(x, y, w, h);
+}
+void Game::clearBox(int x, int y, int width, int height)
+{
+    for (int row = 0; row < height; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < width; col++)
+        {
+            cout << " ";
+        }
     }
 }

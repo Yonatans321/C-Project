@@ -6,6 +6,7 @@
 #include <cstring>	
 
 void Riddle::askQuestion() const { // Display the riddle question
+    
 	std::cout << question << std::endl;
 }
 
@@ -32,10 +33,18 @@ bool Riddle::isSolved() const { // Check if the riddle has been solved
 	return solved;
 }
 
-int Riddle::getRiddleID() const
+int Riddle::getRiddleID() const // Get the riddle ID
 {
 	return riddleID;
 }
 bool Riddle::isRiddle(char ch) { // Check if the character represents a riddle
 	return ch == '?';
+}
+//AI helped to convert const char* to std::string
+std::string Riddle::getQuestion() const {
+    return std::string(question);
+}
+void Riddle::markAsSolved()
+{
+    solved = true;
 }

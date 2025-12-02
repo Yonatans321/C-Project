@@ -44,5 +44,11 @@ public:
     void run(); 
 	void GamePaused();
 	void handleRiddle(Player& player);
-   
+	void drawBox(int x, int y, int width, int height);
+	char getYesNo();
+	void clearBox(int x, int y, int width, int height);
+	void clearInputBuffer();
+	void handleTile(Player& player);
+	void drawAnimatedBox(int x, int y, int w, int h);
+	void closeAnimatedBox(int x, int y, int w, int h);
 };

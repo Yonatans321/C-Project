@@ -14,8 +14,8 @@ const char* const Screen::MAP_LAYOUTS[Screen::NUM_MAPS][Screen::MAX_Y] =
 		"W                                                                              W", // 1 
 		"W          WWWWWWWWWW             WWWWWWWWWWWW                                 W", // 2
 		"W          W        W             W          W                                 W", // 3
-		"W          W        W             W          W                                 W", // 4
-		"W          W   ?    W             W    K     W                                 W", // 5
+		"W                   W             W          W                                 W", // 4
+		"W              ?    W             W    K     W                                 W", // 5
 		"W          W        W             W          W                                 W", // 6
 		"W          WWWWWWWWWW             WWWW  WWWWWW                                 W", // 7
 		"W                                                                              W", // 8
