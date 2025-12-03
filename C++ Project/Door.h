@@ -22,5 +22,5 @@ public:
 	int getDestinationLevel() const; 
 	void setDestinationLevel(int level);
 
-	static bool handleDoor(Player& p, Screen& screen, RoomScreenManager& ui, int& currentLevel);
+	static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
 };

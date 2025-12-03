@@ -38,7 +38,7 @@ void Door::setDestinationLevel(int level)
 	destinationLevel = level;
 }
 
-bool Door::handleDoor(Player& p, Screen& screen,RoomScreenManager& ui, int& currentLevel)
+bool Door::handleDoor(Player& p, Screen& screen,int& currentLevel)
 {	
 	Point doorPos = p.getPosition();
 	char cell = screen.getCharAt(doorPos);
@@ -57,19 +57,19 @@ bool Door::handleDoor(Player& p, Screen& screen,RoomScreenManager& ui, int& curr
 		{
 			if (door->tryOpen(cell - '0'))
 			{
-				ui.showMessage("You unlocked the door!.");
+				screen.showMessage("You unlocked the door!.");
 				p.keyUsed();
 				return true; // door interaction handled
 			}
 			else
 			{
-				ui.showMessage("The key doesn't fit the door .");
+				screen.showMessage("The key doesn't fit the door .");
 				return true; // door interaction handled
 			}
 		}
 		else
 		{
-			ui.showMessage("The door is locked. You need the matching key.");
+			screen.showMessage("The door is locked. You need the matching key.");
 			return true; // door interaction handled
 		}
 	}

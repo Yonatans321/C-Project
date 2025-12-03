@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <conio.h>
+#include <Windows.h>
 
 using namespace std;
 
@@ -77,8 +78,8 @@ void RiddleBank::printAllRiddles() const
         cout << "------------------------" << endl;
     }
 }
-
-void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level)
+// AI genertaed func to help handle the Riddle when player steps on '?'
+void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 {
     int x = player.getX();
     int y = player.getY();
@@ -100,7 +101,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
     // STEP 1: Ask Y/N (with optional H for hint)
     // ───────────────────────────────────────────────
 
-    ui.drawAnimatedBox(bx, by, bw, bh);
+    screen.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
     gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, H for hint): ";
 
@@ -113,8 +114,8 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
     if (choice == 'H' || choice == 'h')
     {
-        ui.closeAnimatedBox(bx, by, bw, bh);
-        ui.drawAnimatedBox(bx, by, bw, bh);
+        screen.closeAnimatedBox(bx, by, bw, bh);
+        screen.drawAnimatedBox(bx, by, bw, bh);
 
         gotoxy(bx + 2, by + 1);
         cout << "Hint:";
@@ -124,7 +125,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
         Sleep(1500);
 
-        ui.closeAnimatedBox(bx, by, bw, bh);
+        screen.closeAnimatedBox(bx, by, bw, bh);
         return; // does NOT continue riddle
     }
 
@@ -134,19 +135,19 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
     if (choice == 'N' || choice == 'n')
     {
-        ui.closeAnimatedBox(bx, by, bw, bh);
+        screen.closeAnimatedBox(bx, by, bw, bh);
         screen.setCharAt(x, y, '?');
-        screen.draw();
+        player.draw();
         return;
     }
 
-    ui.closeAnimatedBox(bx, by, bw, bh);
+    screen.closeAnimatedBox(bx, by, bw, bh);
 
     // ───────────────────────────────────────────────
     // STEP 2: Show the riddle question
     // ───────────────────────────────────────────────
 
-    ui.drawAnimatedBox(bx, by, bw, bh);
+    screen.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 1); cout << "Riddle:";
 
     string q = r->getQuestion();
@@ -205,13 +206,13 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, RoomScreenManager&
 
     Sleep(1200);
 
-    ui.closeAnimatedBox(bx, by, bw, bh);
+    screen.closeAnimatedBox(bx, by, bw, bh);
 
     // ───────────────────────────────────────────────
     // FINAL REDRAW
     // ───────────────────────────────────────────────
-
-    screen.draw();
+    screen.drawMap();
+    player.draw();
 }
 
 void RiddleBank::clearInputBuffer()

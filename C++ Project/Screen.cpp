@@ -1,235 +1,203 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
-#include <cstring>
 #include "Screen.h"
-#include "Door.h"
 #include "Rooms.h"
-#include "Utils.h"
+#include <cstring>
+#include <windows.h>
 
 using namespace std;
-const char* const Screen::MAP_LAYOUTS[Screen::NUM_MAPS][Screen::MAX_Y] = 
+
+// =====================
+//   CONSTRUCTOR
+// =====================
+
+Screen::Screen()
 {
+    for (int y = 0; y < MAP_HEIGHT; y++)
+        for (int x = 0; x < WIDTH; x++)
+            screen[y][x] = ' ';
 
-	// Map 0
-	{//  01234567890123456789012345678901234567890123456789012345678901234567890123456789
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-		"W                                                                              W", // 1 
-		"W          WWWWWWWWWW             WWWWWWWWWWWW                                 W", // 2
-		"W          W        W             W          W                                 W", // 3
-		"W                   W             W          W                                 W", // 4
-		"W              ?    W             W    K     W                                 W", // 5
-		"W          W        W             W          W                                 W", // 6
-		"W          WWWWWWWWWW             WWWW  WWWWWW                                 W", // 7
-		"W                                                                              W", // 8
-		"W                                                                              W", // 9
-		"W        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                          W", // 10
-		"W                                                                              W", // 11
-		"W                                                                              W", // 12
-		"W                  WWWWWWWWWW                                                  W", // 13
-		"W                  W        W                                                  W", // 14
-		"W                  W   1    W                                                  W", // 15
-		"W                  W        W                                                  W", // 16
-		"W                  WWWWWWWWWW                                                  W", // 17
-		"W                                                                              W", // 18
-		"W                                                                              W", // 19
-		"W                                                                              W", // 20
-		"W                                                                              W", // 21
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
-	},
+    // init doors
+    for (int i = 0; i < 10; i++)
+        doors[i] = Door();
+}
 
-	// Map 1
-	{
-	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-	"W                                                                              W", // 1
-	"W                                                                              W", // 2
-	"W          WWWWWWWWWWWWWWWWWWWW                                                W", // 3
-	"W          W                  W                                                W", // 4
-	"W          W        #         W                                                W", // 5
-	"W          W                  W                                                W", // 6
-	"W          WWWWWWWW  WWWWWWWWWW                                                W", // 7
-	"W                  WW                                                          W", // 8
-	"W                  WW                                                          W", // 9
-	"W                  WW                                                          W", // 10
-	"W                  WW                                                          W", // 11
-	"W                  WW         WWWWWWWWWWWWWW                                   W", // 12
-	"W                  WW         W            W                                   W", // 13
-	"W                  WW         W     * W                                        W", // 14
-	"W                             W            W                                   W", // 15
-	"W                             WWWWWW  WWWWWW                                   W", // 16
-	"W                                                                              W", // 17
-	"W                                                                              W", // 18
-	"W                                       WWWWWWWW                               W", // 19
-	"W                                       W      W                               W", // 20
-	"W                                       W  2   W                               W", // 21
-	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
-	},
+// =====================
+//   LOAD MAP
+// =====================
 
-	// Map 2
-	{
-	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-	"W          W                  W                  W                             W", // 1
-	"W          W                  W                  W                             W", // 2
-	"WWWWWWW  WWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWWWWWWWWWWWWW  WWWWW", // 3
-	"W                  W                  W                  W                     W", // 4
-	"W        K         W        ?         W        !         W                     W", // 5
-	"W                  W                  W                  W                     W", // 6
-	"WWWWWWW  WWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWWWWWWWWWWWWW  WWWWW", // 7
-	"W                                                                              W", // 8
-	"W            WWWWWWWW                                                          W", // 9
-	"W            W      W                                                          W", // 10
-	"W            W      W                                                          W", // 11
-	"W            W      W                                                          W", // 12
-	"W            W      W                                                          W", // 13
-	"W            WW    WW                                                          W", // 14
-	"W                  WW                                                          W", // 15
-	"W                  WW                                                          W", // 16
-	"W                  WW                                                          W", // 17
-	"W                  WW                                                          W", // 18
-	"W        WWWWWWWWWWWWWWWWWWWWWW                                                W", // 19
-	"W        W                    W                                                W", // 20
-	"W        W         3          W                                                W", // 21
-	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 24
-	},
-	// Map 3: THE WIN SCREEN 
-	{
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W        W     W   WWWWWW   W     W      W       W   WWWWWW   W     W          W",
-		"W         W   W    O    O   U     U      W       W     II     NN    N          W",
-		"W          W W     O    O   U     U      W   W   W     II     N N   N          W",
-		"W           W      O    O   U     U      W W W W W     II     N  N  N          W",
-		"W           W      O    O   U     U      WW     WW     II     N   N N          W",
-		"W           W      WWWWWW   WWWWWWW      W       W   WWWWWW   N    NN          W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W                    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                          W",
-		"W                    W      CONGRATULATIONS !!!     W                          W",
-		"W                    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                          W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"W                      (Press ESC to return to Menu)                           W",
-		"W                                                                              W",
-		"W                                                                              W",
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-	}
-};
-
-
-// set door with id and destination level
-void Screen::setDoor(int id, int destlevel)
+void Screen::loadMap(int level)
 {
-	if (id >= 1 && id <= 9) {
-		doors[id] = Door(id, destlevel);
-	}
+    const char* const* src = nullptr;
 
-}
-// load map data into screen
-void Screen::loadData(int mapIndex) {
-	if (mapIndex < 0 || mapIndex >= NUM_MAPS) {
-		return;
-	}
-	for (int i = 0; i < ROOM_HEIGHT; i++)
-	{
-	
-		switch (mapIndex)
-		{
-			case 0:
-				strncpy(screen[i], ROOM0[i], ROOM_WIDTH);
-				break;
-			case 1:
-				strncpy(screen[i], ROOM1[i], ROOM_WIDTH);
-				break;
-			case 2:
-				strncpy(screen[i], ROOM2[i], ROOM_WIDTH);
-				break;
-		}	
-		screen[i][ROOM_WIDTH] = '\0'; // Null-terminate each row
-	}
+    switch (level)
+    {
+    case 0: src = ROOM0; break;
+    case 1: src = ROOM1; break;
+    case 2: src = ROOM2; break;
+    default: return;
+    }
+
+    for (int y = 0; y < MAP_HEIGHT; y++)
+    {
+        strncpy(screen[y], src[y], WIDTH);
+        screen[y][WIDTH] = '\0';
+    }
 }
 
+// =====================
+//   DRAW MAP
+// =====================
 
-
-//Taken from Lab exercise 10.11.25 
-void Screen::draw() const {
-	int y = 0;
-	for (int i = 0; i < MAX_Y; i++) {
-		gotoxy(0, i);
-		std::cout << screen[i];
-	}
-}
-
-// get character at point p
-char Screen::getCharAt(const Point& p) const
+void Screen::drawMap() const
 {
-	
-	if (p.getX() >= 0 && p.getX() < MAX_X && p.getY() >= 0 && p.getY() < MAX_Y) {
-		return screen[p.getY()][p.getX()];
-	}
-	return ' ';
-}
-char Screen::getCharAt(int x, int y) const
-{
+    cls();
 
-	if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) {
-		return screen[y][x];
-	}
-	return ' ';
+    for (int y = 0; y < MAP_HEIGHT; y++)
+    {
+        gotoxy(0, y);
+        cout << screen[y];
+    }
 }
 
-// set character at point p
-void Screen::setCharAt(const Point& p, char ch)
-{
-	if (p.getX() >= 0 && p.getX() < MAX_X && p.getY() >= 0 && p.getY() < MAX_Y) {
-		
-		screen[p.getY()][p.getX()] = ch;
+// =====================
+//   DRAWING HELPERS
+// =====================
 
-		gotoxy(p.getX(), p.getY());
-		std::cout << ch;
-	}
-}
 void Screen::setCharAt(int x, int y, char ch)
 {
-	if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) {
+    if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
+        return;
 
-		screen[y][x] = ch;
-
-		gotoxy(x,y);
-		std::cout << ch;
-	}
+    screen[y][x] = ch;
+    gotoxy(x, y);
+    cout << ch;
 }
 
-bool Screen::isWall(const Point& p) const // check if the point is a wall
+void Screen::setCharAt(const Point& p, char ch)
 {
-	if (getCharAt(p) == 'W'|| getCharAt(p) == 'w')
-	{
-		return true;
-	}
-		return false;
+    setCharAt(p.getX(), p.getY(), ch);
 }
-// check if the point is an obstacle
+
+void Screen::drawStatusBar(char inventory, int health, int score)
+{
+    gotoxy(0, MAP_HEIGHT);
+    cout << "Inventory: "
+        << inventory
+        << "  Health: " << health
+        << "  Score: " << score
+        << "                                        ";
+}
+
+void Screen::drawBox(int x, int y, int w, int h)
+{
+    for (int row = 0; row < h; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < w; col++)
+        {
+            if (row == 0 || row == h - 1)
+                cout << "-";
+            else if (col == 0 || col == w - 1)
+                cout << "|";
+            else
+                cout << " ";
+        }
+    }
+}
+
+void Screen::clearBox(int x, int y, int w, int h)
+{
+    for (int row = 0; row < h; row++)
+    {
+        gotoxy(x, y + row);
+        for (int col = 0; col < w; col++)
+            cout << " ";
+    }
+}
+
+void Screen::drawAnimatedBox(int x, int y, int w, int h)
+{
+    for (int i = 0; i <= h; i += 2)
+    {
+        drawBox(x, y, w, i);
+        Sleep(30);
+    }
+}
+
+void Screen::closeAnimatedBox(int x, int y, int w, int h)
+{
+    for (int i = h; i >= 0; i -= 2)
+    {
+        drawBox(x, y, w, i);
+        Sleep(30);
+    }
+    clearBox(x, y, w, h);
+}
+
+void Screen::printInBox(int x, int y, const string& msg)
+{
+    int idx = 0;
+    const int innerW = 50;
+    const int innerH = 10;
+
+    for (int row = 0; row < innerH && idx < msg.length(); row++)
+    {
+        gotoxy(x + 2, y + 2 + row);
+        for (int col = 0; col < innerW && idx < msg.length(); col++)
+        {
+            cout << msg[idx++];
+        }
+    }
+}
+
+void Screen::showMessage(const string& msg)
+{
+    int x = 20, y = 10, w = 40, h = 5;
+
+    drawAnimatedBox(x, y, w, h);
+    gotoxy(x + 2, y + 2);
+    cout << msg;
+    Sleep(1200);
+    closeAnimatedBox(x, y, w, h);
+}
+
+// =====================
+//   MAP LOGIC
+// =====================
+
+char Screen::getCharAt(int x, int y) const
+{
+    if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
+        return ' ';
+    return screen[y][x];
+}
+
+char Screen::getCharAt(const Point& p) const
+{
+    return getCharAt(p.getX(), p.getY());
+}
+
+bool Screen::isWall(const Point& p) const
+{
+    char c = getCharAt(p);
+    return (c == 'W' || c == 'w');
+}
+
 bool Screen::isObstacle(const Point& p) const
 {
-		return getCharAt(p) == '*';
+    return getCharAt(p) == '*';
 }
-// get door at point p
+
 Door* Screen::getDoor(const Point& p)
 {
-	char ch = getCharAt(p);
+    char ch = getCharAt(p);
 
-	if (!Door::isDoorChar(ch))
-	{
-		return nullptr; // Not a door
-	}
-	int id = ch - '0';// Convert char to door id
-	if(id >= 1 && id <= 9) {
-		return &doors[id];
-	}
-	return nullptr;
+    if (!Door::isDoorChar(ch))
+        return nullptr;
+
+    int id = ch - '0';
+    if (id >= 1 && id <= 9)
+        return &doors[id];
+
+    return nullptr;
 }
-
-
-	

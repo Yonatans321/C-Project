@@ -3,7 +3,6 @@
 #include "Player.h"
 #include "Screen.h"
 #include "RiddleBank.h"
-#include "RoomScreenManager.h"
 #include "UIScreens.h"
 #include "Utils.h"
 
@@ -26,7 +25,6 @@ private:
     Player player1;         
     Player player2;
 	RiddleBank riddleBank;
-	RoomScreenManager ui;
 
     
     void showMenu();        

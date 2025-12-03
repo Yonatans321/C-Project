@@ -1,81 +1,105 @@
 ﻿#include "Game.h"
-#include <iostream>
 #include <conio.h>
 #include <windows.h>
+#include <iostream>
 
 using namespace std;
 
-// פונקציה שמרוקנת לחלוטין את הבאפר של המקלדת
-static void clearBuffer()
-{
-    while (_kbhit())
-        _getch();
-}
+// ============================
+//       CONSTRUCTOR
+// ============================
 
-Game::Game() :
-    currentLevel(0),
-    player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
-        { 'W', 'D', 'X', 'A', 'S', 'E' }, gameScreens[0]),
+Game::Game()
+    : player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
+        { 'W','D','X','A','S','E' }),
     player2(Point(77, 2, Direction::directions[Direction::STAY], '$'),
-        { 'I', 'L', 'M', 'J', 'K', 'O' }, gameScreens[0])
+        { 'I','L','M','J','K','O' })
 {
     hideCursor();
     currStatus = GameModes::MENU;
+    
+	gameScreens[0].loadMap(0);
+	player1.setScreen(gameScreens[0]);
+	player2.setScreen(gameScreens[0]);
 }
+
+// ============================
+//     SHOW MAIN MENU
+// ============================
 
 void Game::showMenu()
 {
-    clearBuffer();
+    while (_kbhit()) _getch();
     UIScreens::showMenu();
 
     bool menu = true;
 
     while (menu)
     {
-        clearBuffer();           // מנקה תמיד לפני קליטת לחיצה
-        char input = _getch();   // קולט רק את הלחיצה האמיתית
+        if (_kbhit())
+        {
+            char input = _getch();
 
-        if (input == START_KEY)
-        {
-            currStatus = GameModes::NEW_GAME;
-            menu = false;
-        }
-        else if (input == INSTRUCTIONS_KEY)
-        {
-            currStatus = GameModes::INSTRUCTIONS;
-            menu = false;
-        }
-        else if (input == EXIT_KEY)
-        {
-            currStatus = GameModes::EXIT;
-            cls();
-            menu = false;
+            switch (input)
+            {
+            case START_KEY:
+                currStatus = GameModes::NEW_GAME;
+                menu = false;
+                break;
+
+            case INSTRUCTIONS_KEY:
+                currStatus = GameModes::INSTRUCTIONS;
+                menu = false;
+                break;
+
+            case EXIT_KEY:
+                currStatus = GameModes::EXIT;
+                menu = false;
+                break;
+            }
         }
     }
+
+    while (_kbhit()) _getch();
 }
+
+// ============================
+//       INSTRUCTIONS
+// ============================
 
 void Game::showInstructions()
 {
     UIScreens::showInstructions();
-    _getch();
-    clearBuffer();
+    while (_kbhit()) _getch();
+    _getch();  // Press any key
+    while (_kbhit()) _getch();
+
     currStatus = GameModes::MENU;
 }
+
+// ============================
+//       INIT LEVEL
+// ============================
 
 void Game::initLevel()
 {
     Screen& currentScreen = gameScreens[currentLevel];
-    cls();
-    setScreen(Screen::MAX_X + 1, Screen::MAX_Y + 1);
 
-    currentScreen.loadData(currentLevel);
-    currentScreen.draw();
+    cls();
+    currentScreen.loadMap(currentLevel);
+    currentScreen.drawMap();
+
+    // Assign screen to players
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
     player1.draw();
     player2.draw();
 }
+
+// ============================
+//        GAME LOOP
+// ============================
 
 void Game::gameLoop()
 {
@@ -85,46 +109,49 @@ void Game::gameLoop()
     {
         Screen& currentScreen = gameScreens[currentLevel];
 
-        // קליטת מקשים
+        // Handle input
         if (_kbhit())
         {
             char ch = _getch();
 
-            // ESC - Pause
+            // PAUSE → Escape key
             if (ch == 27)
             {
-                clearBuffer();
                 UIScreens::showPauseScreen();
+                while (_kbhit()) _getch();
 
                 bool paused = true;
 
                 while (paused)
                 {
-                    Sleep(100);
-
                     if (_kbhit())
                     {
-                        clearBuffer();
-                        char pauseCh = _getch();
+                        char c = _getch();
 
-                        if (pauseCh == 27)   // ESC שוב - Resume
+                        if (c == 27)          // ESC → return to game
                         {
                             paused = false;
-                            clearBuffer();
-
-                            cls();
-                            currentScreen.draw();
-                            player1.draw();
-                            player2.draw();
                         }
-                        else if (pauseCh == 'H' || pauseCh == 'h')
+                        else if (c == 'H' || c == 'h') // go to menu
                         {
-                            gameRunning = false;
-                            paused = false;
                             currStatus = GameModes::MENU;
+                            paused = false;
+                            gameRunning = false;
                         }
                     }
+
+                    Sleep(50);
                 }
+
+                while (_kbhit()) _getch();
+
+                if (!gameRunning)
+                    break;
+
+                cls();
+                currentScreen.drawMap();
+                player1.draw();
+                player2.draw();
             }
             else
             {
@@ -133,8 +160,7 @@ void Game::gameLoop()
             }
         }
 
-        if (!gameRunning) break;
-
+        // Update players
         player1.erase();
         player2.erase();
 
@@ -147,9 +173,13 @@ void Game::gameLoop()
         player1.draw();
         player2.draw();
 
-        Sleep(100);
+        Sleep(80);
     }
 }
+
+// ============================
+//       HANDLE TILE
+// ============================
 
 void Game::handleTile(Player& player)
 {
@@ -160,17 +190,19 @@ void Game::handleTile(Player& player)
     switch (cell)
     {
     case '?':
-        riddleBank.handleRiddle(player, currentScreen, ui, currentLevel);
+        riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
 
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
-        if (Door::handleDoor(player, currentScreen, ui, currentLevel))
+        if (Door::handleDoor(player, currentScreen, currentLevel))
+        {
             initLevel();
+        }
         break;
 
     case 'K':
-        player.GrabItem('K', cell - '0');
+        player.GrabItem('K', 0);
         currentScreen.setCharAt(pos, ' ');
         break;
 
@@ -179,6 +211,20 @@ void Game::handleTile(Player& player)
     }
 }
 
+// ============================
+//       WIN SCREEN
+// ============================
+
+void Game::showWinScreen()
+{
+    UIScreens::showWinScreen();
+    _getch();
+}
+
+// ============================
+//          RUN
+// ============================
+
 void Game::run()
 {
     while (currStatus != GameModes::EXIT)
@@ -186,7 +232,7 @@ void Game::run()
         if (currStatus == GameModes::MENU)
         {
             cls();
-            clearBuffer();
+            while (_kbhit()) _getch();
             showMenu();
         }
         else if (currStatus == GameModes::INSTRUCTIONS)
@@ -197,6 +243,7 @@ void Game::run()
         {
             initLevel();
             gameLoop();
+
             currStatus = GameModes::MENU;
         }
     }

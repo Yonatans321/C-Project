@@ -3,12 +3,9 @@
 #include "Riddle.h"
 #include "Player.h"
 #include "Rooms.h"
+#include "Screen.h"
 #include <iostream>
 #include <conio.h>
-#include "RoomScreenManager.h"
-#include <windows.h>
-#include "Screen.h"
-#include "Utils.h"
 
 
 // Stores and manages multiple riddles
@@ -45,5 +42,5 @@ public:
 
 	void printAllRiddles() const;
 	void clearInputBuffer();
-    void handleRiddle(Player& player, Screen& screen, RoomScreenManager& ui, int level);
+    void handleRiddle(Player& player, Screen& screen, int level);
 };

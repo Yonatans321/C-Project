@@ -101,9 +101,6 @@
     <ClCompile Include="Obstacle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rooms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UIScreens.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
