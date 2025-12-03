@@ -4,13 +4,13 @@
 #include "Utils.h"
 #include "Screen.h"
 #include "RiddleBank.h"
+#include "UIScreens.h"
 #include <array>// for std::array (taken from AI)
 
 
 static constexpr char START_KEY = '1';
 static constexpr char INSTRUCTIONS_KEY = '8';
 static constexpr char EXIT_KEY = '9';
-enum class GameModes { MENU, INSTRUCTIONS, NEW_GAME, EXIT };
 // class to contorl the the game
 class Game {
 private:
