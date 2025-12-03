@@ -70,8 +70,9 @@ void Game::showMenu()
 void Game::showInstructions()
 {
     UIScreens::showInstructions();
-    while (_kbhit()) _getch();
-    _getch();  // Press any key
+    while (_kbhit()) _getch(); // פונקציית עזר CLEANBUFFER ב UTILLS להוסיףףףףףףף
+    [[maybe_unused]]
+    auto i =_getch();  // Press any key לעשות פונקציית עזר WAIT FOR KEY שיבינו מה עושים
     while (_kbhit()) _getch();
 
     currStatus = GameModes::MENU;
@@ -115,7 +116,7 @@ void Game::gameLoop()
             char ch = _getch();
 
             // PAUSE → Escape key
-            if (ch == 27)
+            if (ch == 27) // להחליף בקבוע ESC ( יותר קריא בשביל בודק התרגליים)
             {
                 UIScreens::showPauseScreen();
                 while (_kbhit()) _getch();
@@ -242,7 +243,7 @@ void Game::run()
         else if (currStatus == GameModes::NEW_GAME)
         {
             initLevel();
-            gameLoop();
+            gameLoop(); 
 
             currStatus = GameModes::MENU;
         }

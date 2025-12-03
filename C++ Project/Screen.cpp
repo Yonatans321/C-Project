@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS // TO SUPPORT STRNCPY ON VISUAL STUDIO
 #include "Screen.h"
 #include "Rooms.h"
 #include <cstring>
@@ -39,7 +39,7 @@ void Screen::loadMap(int level)
 
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
-        strncpy(screen[y], src[y], WIDTH);
+        strncpy_s(screen[y], src[y], WIDTH);
         screen[y][WIDTH] = '\0';
     }
 }

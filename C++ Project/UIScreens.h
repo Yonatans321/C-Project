@@ -13,8 +13,4 @@ public:
 	static void showWinScreen();
 private:
 	static void printScreen(const char** screen );
-	static const char* MENU_SCREEN[HEIGHT];
-	static const char*  INSTRUCTIONS_SCREEN[HEIGHT];
-	static const char*  PAUSE_SCREEN[HEIGHT];
-	static const char* WIN_SCREEN[HEIGHT];
 };

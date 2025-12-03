@@ -36,7 +36,7 @@ void UIScreens::showMenu()
         "                            [9]  Exit                                            ",
         "                                                                                ",
         "                                                                                ",
-        "                       Tip: If you get lost… that's on you.                      ",
+        "                       Tip: If you get lost that's on you.                      ",
         "                                                                                ",
         "                                                                                ",
         "                                                                                ",
@@ -59,30 +59,31 @@ void UIScreens::showInstructions()
 {
     static const char* INSTRUCTIONS_SCREEN[HEIGHT] =
     {
-        "                                                                                ",
-        "                                GAME INSTRUCTIONS                               ",
-        "                                                                                ",
-        "  A puzzle maze built for two players. Cooperate, explore, solve challenges,     ",
-        "  and escape together — because alone you won't survive (or think clearly).      ",
-        "                                                                                ",
-        "   PLAYER 1 ($)              |                PLAYER 2 (&)                      ",
-        "   W - Up                    |                I - Up                            ",
-        "   X - Down                  |                M - Down                          ",
-        "   A - Left                  |                J - Left                          ",
-        "   D - Right                 |                L - Right                         ",
-        "   S - Stay                  |                K - Stay                          ",
-        "   E - Action                |                O - Action                        ",
-        "                                                                                ",
-        "   ITEMS                     |                ELEMENTS                           ",
-        "   K - Key       | Opens doors. Simple.                                          ",
-        "   * - Obstacle  | Push together / spring-boost to move it.                      ",
-        "   ! - Torch     | Use it wisely... I'm scared of the dark.                      ",
-        "   ? - Riddle    | Solve it or stare at it awkwardly.                            ",
-        "   # - Spring    | Launches you like a cartoon hero.                             ",
-        "   /\\ - Switch  | ON/OFF. Surprisingly dramatic click.                          ",
-        "   S  - Signal   | Whatever the switch activates.                                 ",
-        "                                                                                ",
-        "                       Press ANY key to return to the Main Menu                 ",
+        "                                                                                ", // 1
+        "                                GAME INSTRUCTIONS                               ", // 2
+        "                                                                                ", // 3
+        "  A puzzle maze built for two players. Cooperate, explore, solve challenges,     ", // 4
+        "  and escape together — because alone you won't survive (or think clearly).      ", // 5
+        "                                                                                ", // 6
+        "   PLAYER 1 ($)              |                PLAYER 2 (&)                      ", // 7
+        "   W - Up                    |                I - Up                            ", // 8
+        "   X - Down                  |                M - Down                          ", // 9
+        "   A - Left                  |                J - Left                          ", // 10
+        "   D - Right                 |                L - Right                         ", // 11
+        "   S - Stay                  |                K - Stay                          ", // 12
+        "   E - Action                |                O - Action                        ", // 13
+        "                                                                                ", // 14
+        "   ITEMS                     |                ELEMENTS                           ", // 15
+        "   K - Key       | Opens doors. Simple.                                          ", // 16
+        "   * - Obstacle  | Push together / spring-boost to move it.                      ", // 17
+        "   ! - Torch     | Use it wisely... I'm scared of the dark.                      ", // 18
+        "   ? - Riddle    | Solve it or stare at it awkwardly.                            ", // 19
+        "   # - Spring    | Launches you like a cartoon hero.                             ", // 20
+        "   /\\ - Switch  | ON/OFF. Surprisingly dramatic click.                          ", // 21
+        "   S  - Signal   | Whatever the switch activates.                                 ", // 22
+        "                                                                                ", // 23
+        "                       Press ANY key to return to the Main Menu                 ", // 24
+        "                                                                                "  // 25 (ðåñôä)
     };
 
     printScreen(INSTRUCTIONS_SCREEN);
@@ -94,30 +95,31 @@ void UIScreens::showPauseScreen()
 {
     static const char* PAUSE_SCREEN[HEIGHT] =
     {
-        "                                                                                ",
-        "                                   GAME PAUSED                                  ",
-        "                                                                                ",
-        "                                 ================                                ",
-        "                                  The game is paused                             ",
-        "                                 ================                                ",
-        "                                                                                ",
-        "                      Press ESC to return to the game                            ",
-        "                      Press H   to return to the main menu                       ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
-        "                                                                                "
+        "                                                                                ", // 1
+        "                                   GAME PAUSED                                  ", // 2
+        "                                                                                ", // 3
+        "                                 ================                                ", // 4
+        "                                  The game is paused                             ", // 5
+        "                                 ================                                ", // 6
+        "                                                                                ", // 7
+        "                      Press ESC to return to the game                            ", // 8
+        "                      Press H   to return to the main menu                       ", // 9
+        "                                                                                ", // 10
+        "                                                                                ", // 11
+        "                                                                                ", // 12
+        "                                                                                ", // 13
+        "                                                                                ", // 14
+        "                                                                                ", // 15
+        "                                                                                ", // 16
+        "                                                                                ", // 17
+        "                                                                                ", // 18
+        "                                                                                ", // 19
+        "                                                                                ", // 20
+        "                                                                                ", // 21
+        "                                                                                ", // 22
+        "                                                                                ", // 23
+        "                                                                                ", // 24
+        "                                                                                "  // 25
     };
 
     printScreen(PAUSE_SCREEN);
