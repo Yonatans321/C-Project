@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <cctype>
 #include "Direction.h"
+#include "Screen.h"
 
 // moving and drawing functions
 void Player::draw() { // draw player at current position
@@ -22,7 +23,7 @@ char Player::getChar() const { // get player's character representation
 void Player::move() {
 	Point nextPosition = position;	
 	nextPosition.move();
-	if (!screen.isWall(nextPosition))
+	if (!screen->isWall(nextPosition))
 	{
 		position = nextPosition;
 	}
@@ -38,7 +39,9 @@ void Player::keyPressed(char ch) {
 		++index;
 	}
 }
-
+void Player::setScreen(Screen& newScreen) { // set player's current screen
+	this->screen = &newScreen;
+}
 
 
 bool Player::hasItem() const { // check if player has any item
@@ -73,6 +76,10 @@ bool Player::useKeyForDoor(char doorChar)  // use key for a door
 		int doorId = doorChar - '0';
 		return (itemId == doorId); // check if key id matches door id
 	}
+void Player::keyUsed() { // remove the used key
+	heldItem = 0;
+	itemId = -1;
+}
 void Player::addPoints(int pts)
 {
 	points += pts;

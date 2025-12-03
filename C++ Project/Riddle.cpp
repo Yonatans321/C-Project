@@ -48,3 +48,8 @@ void Riddle::markAsSolved()
 {
     solved = true;
 }
+//AI generated function to get hint
+char* Riddle::getHint() const
+{
+    return const_cast<char*>(hint);
+}

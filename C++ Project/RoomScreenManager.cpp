@@ -1,6 +1,8 @@
 #include "RoomScreenManager.h"
 #include <iostream>
 #include "Utils.h"
+#include <windows.h>
+#include <string>
 
 using namespace std;
 
@@ -10,25 +12,25 @@ void RoomScreenManager::drawRoom(const char* room[])
 	for (int y = 0; y < HEIGHT-1; ++y)
 	{
 		gotoxy(0, y);
-		cout << room[y];
+		std::cout << room[y];
 	}
 }
 
 void RoomScreenManager::drawStatusBar(char inventory, int health, int score)
 {
-	gotoxy(0, HEIGHT);
-	cout << "Inventory: " << inventory << "  Health: " << health << "  Score: " << score << "                              ";
+	gotoxy(0, HEIGHT-1);
+	std::cout << "Inventory: " << inventory << "  Health: " << health << "  Score: " << score << "                              ";
 }
 
 void RoomScreenManager::setCharAt(const Point& p, char ch)
 {
 	gotoxy(p.getX(), p.getY());
-	cout << ch;
+	std::cout << ch;
 }
 void RoomScreenManager::setCharAt(int x, int y, char ch)
 {
 	gotoxy(x, y);
-	cout << ch;
+	std::cout << ch;
 }
 
 void RoomScreenManager::drawBox(int x, int y, int width, int height)
@@ -39,11 +41,11 @@ void RoomScreenManager::drawBox(int x, int y, int width, int height)
 		for (int col = 0; col < width; col++)
 		{
 			if (row == 0 || row == height - 1)
-				cout << "-";
+				std::cout << "-";
 			else if (col == 0 || col == width - 1)
-				cout << "|";
+				std::cout << "|";
 			else
-				cout << " ";
+				std::cout << " ";
 		}
 	}
 }
@@ -55,7 +57,7 @@ void RoomScreenManager::clearBox(int x, int y, int width, int height)
 		gotoxy(x, y + row);
 		for (int col = 0; col < width; col++)
 		{
-			cout << " ";
+			std::cout << " ";
 		}
 	}
 }
@@ -90,7 +92,21 @@ void RoomScreenManager::printInBox(int x, int y, const std::string& message)
 		gotoxy(startX, startY + row);
 		for (int col = 0; col < boxWidth - 4 && msgIndex < message.length(); col++)
 		{
-			cout << message[msgIndex++];
+			std::cout << message[msgIndex++];
 		}
 	}
+}
+
+void RoomScreenManager::showMessage(const std::string& msg)
+{
+	int bx = 20, by = 20, bw = 40, bh = 3;
+
+	drawAnimatedBox(bx, by, bw, bh);
+
+	gotoxy(bx + 2, by + 1);
+	cout << msg;
+
+	Sleep(1200);
+
+	closeAnimatedBox(bx, by, bw, bh);
 }

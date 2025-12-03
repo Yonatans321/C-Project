@@ -1,8 +1,8 @@
 #pragma once
 #include <iostream>
 #include "Point.h"
-#include "Player.h"
 #include <windows.h> 
+#include <string>
 
 class RoomScreenManager
 {
@@ -23,4 +23,5 @@ public:
 	void drawAnimatedBox(int x, int y, int w, int h);
 	void closeAnimatedBox(int x, int y, int w, int h);
 	void printInBox(int x, int y, const std::string& message);
+	void showMessage(const std::string& msg);
 };

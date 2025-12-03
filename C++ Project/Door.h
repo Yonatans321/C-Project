@@ -1,4 +1,8 @@
 #pragma once
+class Player; // forward declaration
+class Screen; // forward declaration
+class RoomScreenManager; // forward declaration
+
 class Door
 {
 private:
@@ -17,5 +21,6 @@ public:
 	static bool isDoorChar(char c);
 	int getDestinationLevel() const; 
 	void setDestinationLevel(int level);
-};
 
+	static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
+};
