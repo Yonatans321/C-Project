@@ -4,8 +4,6 @@
 #include "Player.h"
 #include "Rooms.h"
 #include "Screen.h"
-#include <iostream>
-#include <conio.h>
 
 
 // Stores and manages multiple riddles
@@ -26,21 +24,33 @@ private:
 	int riddleCount = 0;
 
 public:
+	// Constructor////
     RiddleBank();
-	// Retrieve a riddle by its ID (returns nullptr if not found)
 
+	// Riddle Retrieval Functions
+    
+	// Retrieve a riddle by its ID (returns nullptr if not found)
 	Riddle* getRiddleById(int riddleID);
-    // Add a riddle to the bank (stores a copy)
+
+	// Retrieve a riddle by its position (x, y) on the screen
+	Riddle* getRiddleAt(int x, int y);
+
+    void attachPositionToRoom(const char room[][Screen::WIDTH], int roomWidth, int roomHeight);
+
+	//Riddle Logic Functions////
+    
+     // Add a riddle to the bank (stores a copy)
     void addRiddle(const Riddle& r);
+
+    // Non-interactive check: supply an answer string and receive outcome.
+    RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
     // Ask the riddle interactively (prints question and reads a full line).
     // Returns outcome; caller should update score / life based on the result.
     RiddleOutcome askRiddleInteractive(int riddleID);
 
-    // Non-interactive check: supply an answer string and receive outcome.
-    RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
+   
 
 	void printAllRiddles() const;
-	void clearInputBuffer();
     void handleRiddle(Player& player, Screen& screen, int level);
 };

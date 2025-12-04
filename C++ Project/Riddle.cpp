@@ -49,7 +49,15 @@ void Riddle::markAsSolved()
     solved = true;
 }
 //AI generated function to get hint
-char* Riddle::getHint() const
+const char* Riddle::getHint() const
 {
     return const_cast<char*>(hint);
+}
+Point Riddle::getPosition() const
+{
+    return pos;
+}
+void Riddle::setPosition(const Point& p)
+{
+    pos = p;
 }

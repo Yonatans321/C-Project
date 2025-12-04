@@ -22,6 +22,12 @@ public:
 		dir = the_dir;
 		ch = c;
 	}
+	Point(int x1, int y1) {
+		x = x1;
+		y = y1;
+		dir = Direction::directions[Direction::STAY];
+		ch = ' ';
+	}
 	void draw() {
 		draw(ch);
 	}

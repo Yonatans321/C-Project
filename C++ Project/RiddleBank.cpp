@@ -3,8 +3,8 @@
 #include <string>
 #include <conio.h>
 #include <Windows.h>
+#include "Utils.h"
 
-using namespace std;
 
 RiddleBank::RiddleBank() : riddleCount(0)
 {
@@ -37,6 +37,62 @@ void RiddleBank::addRiddle(const Riddle& r)
         riddles[riddleCount++] = r;
 	}
 }
+Riddle* RiddleBank::getRiddleAt(int x, int y)
+{
+    for (size_t i = 0; i < riddleCount; ++i) {
+        Point p = riddles[i].getPosition();
+        if (p.getX() == x && p.getY() == y) {
+            return &riddles[i];
+        }
+    }
+    return nullptr; // Not found
+}
+
+void RiddleBank::attachPositionToRoom(const char room[][Screen::WIDTH], int roomWidth, int roomHeight)
+{
+    int nextRiddleIndex = 0;
+
+    // Find first unassigned riddle
+    for (int i = 0; i < riddleCount; ++i)
+    {
+        Point p = riddles[i].getPosition();
+        if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved())
+        {
+            nextRiddleIndex = i;
+            break;
+        }
+    }
+
+    for (int y = 0; y < roomHeight; ++y)
+    {
+        for (int x = 0; x < roomWidth; ++x)
+        {
+            if (room[y][x] == '?')
+            {
+                // Find next available riddle
+                while (nextRiddleIndex < riddleCount)
+                {
+                    Point p = riddles[nextRiddleIndex].getPosition();
+
+                    if (p.getX() == 0 && p.getY() == 0 &&
+                        !riddles[nextRiddleIndex].isSolved())
+                    {
+                        break; // found one
+                    }
+                    nextRiddleIndex++;
+                }
+
+                if (nextRiddleIndex >= riddleCount)
+                    return; // no more riddles left
+
+                // Assign coordinates
+                riddles[nextRiddleIndex].setPosition(Point(x, y));
+                nextRiddleIndex++;
+            }
+        }
+    }
+}
+
 //Generated helper function to ask the riddle interactively
 RiddleOutcome RiddleBank::askRiddleInteractive(int riddleID)
 {
@@ -46,16 +102,16 @@ RiddleOutcome RiddleBank::askRiddleInteractive(int riddleID)
     // Show question
     r->askQuestion();
     // Read user's full-line answer
-    string userAnswer;
-    cout << "\nYour answer: ";
-    getline(cin, userAnswer);
+    std::string userAnswer;
+    std::cout << "\nYour answer: ";
+    std::getline(std::cin, userAnswer);
     if (r->checkAnswer(userAnswer.c_str())) {
         return RiddleOutcome::Correct;
     }
     return RiddleOutcome::Incorrect;
 }
 
-RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const string& answer)
+RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
     Riddle* r = getRiddleById(riddleID);
     if (!r) return RiddleOutcome::NotFound;
@@ -69,13 +125,13 @@ RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const string& answer)
 }
 void RiddleBank::printAllRiddles() const
 {
-    cout << "Riddle Bank:" <<endl;
+    std::cout << "Riddle Bank:" << std::endl;
     for (int i = 0;i < riddleCount;i++) {
 		const Riddle& r = riddles[i];
-        cout << "Riddle ID: " << r.getRiddleID() << endl;
+        std::cout << "Riddle ID: " << r.getRiddleID() << std::endl;
         r.askQuestion();
-        cout << "Solved: " << (r.isSolved() ? "Yes" : "No") << endl;
-        cout << "------------------------" << endl;
+        std::cout << "Solved: " << (r.isSolved() ? "Yes" : "No") << std::endl;
+        std::cout << "------------------------" << std::endl;
     }
 }
 // AI genertaed func to help handle the Riddle when player steps on '?'
@@ -102,8 +158,8 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     // ───────────────────────────────────────────────
 
     screen.drawAnimatedBox(bx, by, bw, bh);
-    gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
-    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, H for hint): ";
+    gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 3); std::cout << "Answer it? (Y/N, H for hint): ";
 
     char choice = _getch();
 
@@ -118,10 +174,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         screen.drawAnimatedBox(bx, by, bw, bh);
 
         gotoxy(bx + 2, by + 1);
-        cout << "Hint:";
+        std::cout << "Hint:";
 
         gotoxy(bx + 2, by + 3);
-        cout << r->getHint();
+        std::cout << r->getHint();
 
         Sleep(1500);
 
@@ -148,18 +204,18 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     // ───────────────────────────────────────────────
 
     screen.drawAnimatedBox(bx, by, bw, bh);
-    gotoxy(bx + 2, by + 1); cout << "Riddle:";
+    gotoxy(bx + 2, by + 1); std::cout << "Riddle:";
 
-    string q = r->getQuestion();
+    std::string q = r->getQuestion();
     int line = by + 3;
 
-    string temp;
+    std::string temp;
     for (char c : q)
     {
         if (c == '\n')
         {
             gotoxy(bx + 2, line++);
-            cout << temp;
+            std::cout << temp;
             temp.clear();
         }
         else temp += c;
@@ -167,7 +223,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     if (!temp.empty())
     {
         gotoxy(bx + 2, line++);
-        cout << temp;
+        std::cout << temp;
     }
 
     // ───────────────────────────────────────────────
@@ -175,12 +231,12 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     // ───────────────────────────────────────────────
 
     gotoxy(bx + 2, line + 1);
-    cout << "Answer: ";
+    std::cout << "Answer: ";
 
     clearInputBuffer();
 
-    string ans;
-    getline(cin, ans);
+    std::string ans;
+    std::getline(std::cin, ans);
 
     RiddleOutcome result = checkAnswerFor(id, ans);
 
@@ -192,14 +248,14 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
     if (result == RiddleOutcome::Correct)
     {
-        cout << "Correct! +100 points";
+        std::cout << "Correct! +100 points";
         player.addPoints(100);
         r->markAsSolved();
         screen.setCharAt(x, y, ' ');
     }
     else
     {
-        cout << "Wrong! -1 life";
+        std::cout << "Wrong! -1 life";
         player.loseLife();
         screen.setCharAt(x, y, '?');
     }
@@ -210,16 +266,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
     // ───────────────────────────────────────────────
     // FINAL REDRAW
-    // ───────────────────────────────────────────────
+    // ─────────────────────────────────────────────── 
     screen.drawMap();
     player.draw();
 }
-
-void RiddleBank::clearInputBuffer()
-{
-    while(_kbhit()) {
-        _getch();
-	}
-}
-
-
