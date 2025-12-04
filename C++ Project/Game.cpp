@@ -89,6 +89,7 @@ void Game::initLevel()
     cls();
     currentScreen.loadMap(currentLevel);
     currentScreen.drawMap();
+    riddleBank.attachPositionToRoom(currentScreen);
 
     // Assign screen to players
     player1.setScreen(currentScreen);
@@ -165,11 +166,21 @@ void Game::gameLoop()
         player1.erase();
         player2.erase();
 
+      
+
+        bool stop1 = handleTile(player1);
+        bool stop2 = handleTile(player2);
+
+        if (stop1 || stop2)
+        {
+            // לא מזיזים את השחקנים יותר הפעם
+            player1.draw();
+            player2.draw();
+            continue;
+        }
+
         player1.move();
         player2.move();
-
-        handleTile(player1);
-        handleTile(player2);
 
         player1.draw();
         player2.draw();
@@ -182,7 +193,7 @@ void Game::gameLoop()
 //       HANDLE TILE
 // ============================
 
-void Game::handleTile(Player& player)
+bool Game::handleTile(Player& player)
 {
     Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
@@ -192,24 +203,24 @@ void Game::handleTile(Player& player)
     {
     case '?':
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
-        break;
+        return true;   // ← חידה → עצור לולאה
 
-    case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9':
+    case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
         if (Door::handleDoor(player, currentScreen, currentLevel))
         {
             initLevel();
+            return true; // ← דלת עשתה מעבר → עצור
         }
         break;
 
     case 'K':
         player.GrabItem('K', 0);
         currentScreen.setCharAt(pos, ' ');
-        break;
-
-    default:
-        break;
+        return false;
     }
+
+    return false; // לא היה אירוע מיוחד
 }
 
 // ============================
@@ -248,4 +259,5 @@ void Game::run()
             currStatus = GameModes::MENU;
         }
     }
+	UIScreens::showExitMessage();
 }

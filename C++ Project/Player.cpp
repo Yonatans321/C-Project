@@ -20,13 +20,24 @@ char Player::getChar() const { // get player's character representation
 	return position.getChar();
 }
 // move player in the current direction if no wall is there - taken from lab 4
-void Player::move() {
+void Player::move()
+{
+	prevPos = position; // store current position before moving
 	Point nextPosition = position;	
 	nextPosition.move();
 	if (!screen->isWall(nextPosition))
 	{
 		position = nextPosition;
 	}
+}
+
+void Player::rememberPosition() { // remember current position
+	prevPos = position;
+}
+
+void Player::stepBack() { // move player back to previous position
+	position = prevPos;
+	position.changeDirection(Direction::directions[Direction::STAY]);
 }
 // change direction based on key pressed - Taken from lab 4
 void Player::keyPressed(char ch) {

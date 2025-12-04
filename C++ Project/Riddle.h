@@ -15,7 +15,6 @@ public:
 	Riddle() : riddleID(-1), question(nullptr), answer(nullptr), solved(false), hint(nullptr),pos(0,0) {}
 	Riddle(int id, const char* q, const char* a,const char* h) :riddleID(id), question(q), answer(a), solved(false),hint(h),pos(0,0) {}
 	// functions declaration
-	void askQuestion() const;
 	bool checkAnswer(const char* userAnswer);
 	bool isSolved() const;
 	void markAsSolved();

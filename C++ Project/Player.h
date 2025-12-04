@@ -9,6 +9,7 @@ class Player
 private:
 	static constexpr size_t NUM_KEYS = 6;
 	Point position;
+	Point prevPos;
 	char keys[NUM_KEYS];
 	Screen* screen;
 	char heldItem;
@@ -34,7 +35,8 @@ public:
 	char getChar() const;
 	Point getPosition() const { return position; }// get player's current position
 	void setScreen(Screen& newScreen);// set player's current screen
-
+	void rememberPosition();
+	void stepBack();// move player back to previous position
 	// Item functions
 	bool hasItem() const;
 	bool hasItem(char item) const;

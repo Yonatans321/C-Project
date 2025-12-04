@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "Utils.h"
 #include <conio.h>
+#include <limits>
 
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
@@ -45,7 +46,7 @@ void resetColor() {
 
 void clearInputBuffer()
 {
-    while (_kbhit()) {
-        auto i = _getch();
-    }
+    std::cin.clear();
+    while (std::cin.peek() == '\n')
+        std::cin.ignore();
 }

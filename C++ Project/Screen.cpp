@@ -129,7 +129,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
     for (int i = h; i >= 0; i -= 2)
     {
         drawBox(x, y, w, i);
-        Sleep(30);
+        Sleep(10);
     }
     clearBox(x, y, w, h);
 }
@@ -200,4 +200,10 @@ Door* Screen::getDoor(const Point& p)
         return &doors[id];
 
     return nullptr;
+}
+const char* Screen::getMapRow(int row) const
+{
+    if (row < 0 || row >= MAP_HEIGHT)
+        return nullptr;
+    return screen[row];
 }

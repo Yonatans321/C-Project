@@ -44,6 +44,7 @@ public:
 	bool isObstacle(const Point& p) const;
 	Door* getDoor(const Point& p);
 
+	const char* getMapRow(int row) const; // get a specific row of the map
 	/*void draw() const;
 	void loadData(int mapIndex);
 	void setDoor(int id, int destlevel);*/

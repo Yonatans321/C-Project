@@ -35,7 +35,7 @@ public:
 	// Retrieve a riddle by its position (x, y) on the screen
 	Riddle* getRiddleAt(int x, int y);
 
-    void attachPositionToRoom(const char room[][Screen::WIDTH], int roomWidth, int roomHeight);
+    void attachPositionToRoom(Screen& screen);
 
 	//Riddle Logic Functions////
     
@@ -45,12 +45,6 @@ public:
     // Non-interactive check: supply an answer string and receive outcome.
     RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
-    // Ask the riddle interactively (prints question and reads a full line).
-    // Returns outcome; caller should update score / life based on the result.
-    RiddleOutcome askRiddleInteractive(int riddleID);
-
    
-
-	void printAllRiddles() const;
     void handleRiddle(Player& player, Screen& screen, int level);
 };
