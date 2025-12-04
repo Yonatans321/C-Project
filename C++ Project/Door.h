@@ -21,6 +21,5 @@ public:
 	static bool isDoorChar(char c);
 	int getDestinationLevel() const; 
 	void setDestinationLevel(int level);
-
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
 };

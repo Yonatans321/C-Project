@@ -2,12 +2,15 @@
 #include <cctype>
 #include "Direction.h"
 #include "Screen.h"
+#include "Door.h"
 
 // moving and drawing functions
 void Player::draw() { // draw player at current position
+	if (active) 
 	position.draw();
 }
 void Player::erase() const { // erase player from current position
+	if (active)
 	position.erase();
 }
 int Player::getX() const { // get player's X position
@@ -21,13 +24,21 @@ char Player::getChar() const { // get player's character representation
 }
 // move player in the current direction if no wall is there - taken from lab 4
 void Player::move() {
+	if (!active) return;
 	Point nextPosition = position;	
 	nextPosition.move();
-	if (!screen->isWall(nextPosition))
+	char nextCell = screen->getCharAt(nextPosition);
+	if (screen->isWall(nextPosition))
 	{
-		position = nextPosition;
+		return;
 	}
+	if (Door::isDoorChar(nextCell)) {
+		return;
+	}
+	position = nextPosition;
 }
+
+
 // change direction based on key pressed - Taken from lab 4
 void Player::keyPressed(char ch) {
 	size_t index = 0;
@@ -59,6 +70,10 @@ int Player::getItemId() const { // get the held item id
 	return itemId;
 }
 void Player::DropItem() { // drop the held item
+	if (myKey != nullptr) {
+		delete myKey;
+		myKey = nullptr;
+	}
 	heldItem = 0;
 	itemId = -1;
 }
@@ -69,16 +84,18 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 	itemId = id;
 }
 bool Player::useKeyForDoor(char doorChar)  // use key for a door
-	{ // check if player has a key
-		if (heldItem != 'K')
-			return false;
-
-		int doorId = doorChar - '0';
-		return (itemId == doorId); // check if key id matches door id
+{ // check if player hasn't a key
+	if (heldItem == 'K')
+	{
+		return true;
 	}
+		return false;
+	
+}
+		
 void Player::keyUsed() { // remove the used key
-	heldItem = 0;
-	itemId = -1;
+	
+	DropItem();
 }
 void Player::addPoints(int pts)
 {

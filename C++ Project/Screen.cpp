@@ -201,3 +201,15 @@ Door* Screen::getDoor(const Point& p)
 
     return nullptr;
 }
+
+Point Screen::findDoorLocation(int doorIndex) {
+	char doorChar = '0' + doorIndex;
+    for(int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            if (screen[y][x] == doorChar) {
+                return Point(x, y, Direction::directions[Direction::STAY], doorChar);
+            }
+        }
+	}
+	return Point(-1, -1, Direction::directions[Direction::STAY], ' ');
+}

@@ -13,7 +13,7 @@ public:
 	static constexpr int HEIGHT = 25;
 	static constexpr int MAP_HEIGHT = 23;
 	static constexpr int NUM_MAPS = 4;
-
+	Point findDoorLocation(int doorIndex);
 private:
 	char screen[MAP_HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
