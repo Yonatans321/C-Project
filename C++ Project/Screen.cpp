@@ -129,7 +129,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
     for (int i = h; i >= 0; i -= 2)
     {
         drawBox(x, y, w, i);
-        Sleep(10);
+        Sleep(100);
     }
     clearBox(x, y, w, h);
 }

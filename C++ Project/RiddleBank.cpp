@@ -141,7 +141,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     if (choice == 'N' || choice == 'n')
     {
         screen.closeAnimatedBox(bx, by, bw, bh);
-		player.stepBack(); // move player back to avoid re-triggering
+        player.stepBack(); // move player back to avoid re-triggering
         // מחזיר את ה-? לגביו
         screen.setCharAt(x, y, '?');
 
@@ -192,93 +192,103 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         std::cout << temp;
     }
 
-    int answerLine = line + 3;
-    std::string ans;
-    clearInputBuffer();
-	// ==========================================
+    int  answerLine = line + 1;
+    int answerInputLine = line + 2;
+    int hintorResultLine = line + 3;
+
+    // ==========================================
     bool answered = false;
 
     while (!answered)
     {
         // Prompt
-        gotoxy(bx + 2, line + 1);
-        std::cout << "Answer (press H for hint): ";
-
-        std::string ans;
-        int answerLine = line + 3;
-
-        // ננקה את הבופר ממש לפני קלט מלא
-        clearInputBuffer();
-
-        // העבר את הקלט לשורה נפרדת
         gotoxy(bx + 2, answerLine);
-        std::cout << "> ";
-        gotoxy(bx + 4, answerLine);
+        std::cout << "Answer (press H for hint): ";
+		gotoxy(bx + 2, answerInputLine);
+        std::cout << ">>> " << std::string(40, ' ');
+        std::string ans = "";
+            
+		int promptX = bx + 2;
+        int cursorX = promptX + 4;
+	    int cursorY = answerInputLine;
+		
+        gotoxy(cursorX, cursorY);
 
-        bool waitingForEnter = false;
-
-        while (true)
-        {
-            char c = _getch();
-
-            if (c == 'H' || c == 'h')
+            while (true)
             {
-                // הצג רמז
-                gotoxy(bx + 2, answerLine + 1);
-                std::cout << std::string(50, ' ');
-                gotoxy(bx + 2, answerLine + 1);
-                std::cout << "Hint: " << r->getHint();
+                char c = _getch();
+
+                if (c == '\r')   // ENTER
+                {
+                    break; // מסיים את החידה
+                }
+                else if ((c == 'H' || c == 'h') && ans.empty())
+                {
+                    // הצג רמז
+                    gotoxy(bx + 2, hintorResultLine);
+                    std::cout << std::string(50, ' ');
+                    gotoxy(bx + 2, hintorResultLine);
+                    std::cout << "Hint: " << r->getHint();
+                    gotoxy(cursorX + ans.length(), cursorY);
+					continue;
+                }
+                if (c == '\b') // BACKSPACE
+                {
+                    if (!ans.empty())
+                    {
+						ans.pop_back();
+						gotoxy(cursorX + ans.length(), cursorY);
+						std::cout << ' ';
+                        gotoxy(cursorX + ans.length(), cursorY);
+                    }
+                    continue;
+				}
+                if (ans.length()<40)
+                {
+                    ans.push_back(c);
+					gotoxy(cursorX + ans.length() - 1, cursorY);
+					std::cout << c;
+                }
             }
-            else if (c == '\r')   // ENTER
+
+            // ------------------------
+            // STEP 4 – CHECK ANSWER
+            // ------------------------
+            bool correct = r->checkAnswer(ans.c_str());
+            //Clear hint line
+            gotoxy(bx + 2, hintorResultLine);
+            std::cout << std::string(50, ' ');
+
+            // Write feedback
+            gotoxy(bx + 2, hintorResultLine);
+
+
+            if (correct)
             {
-                break; // מסיים את החידה
+                std::cout << "Correct! +100 points";
+                player.addPoints(100);
+                r->markAsSolved();
+
+                // remove '?'
+                screen.setCharAt(x, y, ' ');
             }
             else
             {
-                // תו רגיל → הכנס אותו ל־ans + הדפס
-                ans.push_back(c);
-                std::cout << c;
+                std::cout << "Wrong! -1 life";
+                player.loseLife();
+
+                // put the riddle symbol back
+                screen.setCharAt(x, y, '?');
             }
-        }
 
-        // ------------------------
-        // STEP 4 – CHECK ANSWER
-        // ------------------------
+            Sleep(700);
+            screen.closeAnimatedBox(bx, by, bw, bh);
 
-        //Clear hint line
-        gotoxy(bx + 2, answerLine + 1);
-        std::cout << std::string(50, ' ');
+            // ALWAYS redraw map and player after closing box
+            player.stepBack(); // move player back to avoid re-triggering
+            screen.drawMap();
+            player.draw();
 
-        // Write feedback
-        gotoxy(bx + 2, answerLine + 1);
-        bool correct = r->checkAnswer(ans.c_str());
-
-        if (correct)
-        {
-            std::cout << "Correct! +100 points";
-            player.addPoints(100);
-            r->markAsSolved();
-
-            // remove '?'
-            screen.setCharAt(x, y, ' ');
-        }
-        else
-        {
-            std::cout << "Wrong! -1 life";
-            player.loseLife();
-
-            // put the riddle symbol back
-            screen.setCharAt(x, y, '?');
-        }
-
-        Sleep(150);
-        screen.closeAnimatedBox(bx, by, bw, bh);
-
-        // ALWAYS redraw map and player after closing box
-		player.stepBack(); // move player back to avoid re-triggering
-        screen.drawMap();
-        player.draw();
-
-        answered = true;
+            answered = true;
     }
 }
