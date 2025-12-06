@@ -241,14 +241,25 @@ void Game::gameLoop()
                 player2.keyPressed(ch);
             }
         }
-    
-        if(!gameRunning){
-            break; // Exit game loop if game is no longer running
-		}
-		// Erase players from current position
-		player1.erase();
-		player2.erase();
-        // Move players
+
+        // Update players
+        player1.erase();
+        player2.erase();
+
+		handleTile(player1);
+		handleTile(player2);
+
+        //bool stop1 = handleTile(player1);
+        //bool stop2 = handleTile(player2);
+
+        //if (stop1 || stop2)
+        //{
+        //    // לא מזיזים את השחקנים יותר הפעם
+        //    player1.draw();
+        //    player2.draw();
+        //    continue;
+        //}
+
         player1.move();
         player2.move();
 		// Handle door interactions
