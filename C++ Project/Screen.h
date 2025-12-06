@@ -13,7 +13,7 @@ public:
 	static constexpr int HEIGHT = 25;
 	static constexpr int MAP_HEIGHT = 23;
 	static constexpr int NUM_MAPS = 4;
-	Point findDoorLocation(int doorIndex);
+	//Point findDoorLocation(int doorIndex);
 private:
 	char screen[MAP_HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
@@ -30,10 +30,10 @@ public:
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
 	void drawStatusBar(char inventory, int health, int score);
-	void drawBox(int x, int y, int width, int height);
-	void clearBox(int x, int y, int width, int height);
-	void drawAnimatedBox(int x, int y, int w, int h);
-	void closeAnimatedBox(int x, int y, int w, int h);
+	static void drawBox(int x, int y, int width, int height);
+	static void clearBox(int x, int y, int width, int height);
+	static void drawAnimatedBox(int x, int y, int w, int h);
+	static void closeAnimatedBox(int x, int y, int w, int h);
 	void printInBox(int x, int y, const std::string& message);
 	void showMessage(const std::string& msg);
 
@@ -44,6 +44,9 @@ public:
 	bool isObstacle(const Point& p) const;
 	Door* getDoor(const Point& p);
 
+	//Map data
+	int getWidth() const;
+	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
 	/*void draw() const;
 	void loadData(int mapIndex);

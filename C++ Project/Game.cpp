@@ -3,6 +3,9 @@
 #include <windows.h>
 #include <iostream>
 #include "Door.h"
+#include "Obstacle.h"
+#include "Switch.h"
+
 using std::cout;
 
 // ============================
@@ -101,6 +104,11 @@ void Game::initLevel()
 
     player1.draw();
     player2.draw();
+
+    if (!Switch::exists(currentScreen))
+    {
+        Door::allSwitchesAreOn();
+    }
 }
 
 // ============================
@@ -170,34 +178,29 @@ void Game::gameLoop()
         player1.erase();
         player2.erase();
 
-      
-
         bool stop1 = handleTile(player1);
         bool stop2 = handleTile(player2);
 
-        if (stop1 || stop2)
+        if (!stop1)
         {
-            // לא מזיזים את השחקנים יותר הפעם
-            player1.draw();
-            player2.draw();
-            continue;
+            player1.move();
+        }
+        if (!stop2)
+        {
+            player2.move();
         }
 
-        player1.move();
-        player2.move();
-
-        handleTile(player1);
-        handleTile(player2);
-
-        if (!player1.isActive() && !player2.isActive())
-        {
-            currentLevel++;
-
-            
-            initLevel(); 
-        }
         player1.draw();
         player2.draw();
+
+        if (checkLevel() == true)
+        {
+            gameRunning = false;      // עוצר את הלולאה
+            currStatus = GameModes::MENU; // מעדכן סטטוס לתפריט ראשי
+            break;                    // יוצא מיידית מהלולאה
+        }
+
+       
 
         Sleep(80);
     }
@@ -214,6 +217,7 @@ bool Game::handleTile(Player& player)
     Point targetPos = pos;
     targetPos.move();
     char cell = currentScreen.getCharAt(pos);
+    char targetCell = currentScreen.getCharAt(targetPos);
 
     switch (cell)
     {
@@ -234,20 +238,58 @@ bool Game::handleTile(Player& player)
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel,activeDoor);
         if (doorOpened)
-        {
-          
-            player.setPosition(targetPos);
+        case '?':
+            riddleBank.handleRiddle(player, currentScreen, currentLevel);
+            break;
+
+        case 'K':
+            player.GrabItem('K', 0);
+            currentScreen.setCharAt(pos, ' ');
+            break;
+        case '\\':
+        case '/' :
+            Switch::handleSwitch(player, currentScreen);
+            return false;
         }
-        break;
+        
+        switch (targetCell)
+        {
+        case '1': case '2': case '3': case '4': case '5':
+        case '6': case '7': case '8': case '9':
+        {
+            bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
+            if (doorOpened)
+            {
+          
+                player.setPosition(targetPos);
+                return true;
+            }
+            break;
 
-    }
-    default:
-        break;
-    }
+        }
+        case '*':
+        {
+            Obstacle::handleObstacle(player1, player2, currentScreen);
 
-    return false; // לא היה אירוע מיוחד
+            char afterPush = currentScreen.getCharAt(targetPos);
+
+            if (afterPush == '*')
+                return true;    // עדיין חסום → אל תזוז ואל תחזיר אחורה
+
+            player.setPosition(targetPos);
+            return true;
+        }
+        case '#': case 's':
+            return true;
+            break;
+
+        default:
+            break;
+        }
+
+        return false; // לא היה אירוע מיוחד
 }
 
 // ============================
@@ -286,4 +328,39 @@ void Game::run()
             currStatus = GameModes::MENU;
         }
     }
+}
+
+// =========================
+//          CHECK LEVEL
+// ============================
+
+bool Game::checkLevel()
+{
+    if (!player1.isActive() && !player2.isActive())
+    {
+        if (activeDoor == '1')
+        {
+            if (currentLevel == 0)
+                currentLevel = 1;
+            else if (currentLevel == 1)
+                currentLevel = 0;
+        }
+        else if (activeDoor == '2')
+        {
+            if (currentLevel == 1)
+                currentLevel = 2;
+            else if (currentLevel == 2)
+                currentLevel = 1;
+        }
+        else if (activeDoor == '3')
+        {
+            showWinScreen();
+            activeDoor = 0;
+            return true;
+        }
+
+        activeDoor = 0;
+        initLevel();
+    }
+    return false;
 }
