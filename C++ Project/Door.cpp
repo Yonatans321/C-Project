@@ -46,7 +46,7 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 
 	Point playerPos = p.getPosition();
 
-	// Check directions og the player
+	// Check directions of the player
 	int dirX[] = { 1, -1, 0, 0 };
 	int dirY[] = { 0, 0, 1, -1 };
 
@@ -75,9 +75,9 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 			// Try to use key for the door
 			else if (p.useKeyForDoor(cell))
 			{
-				door->tryOpen(doorIndex);     // פתיחת האובייקט הספציפי
-				openDoors[doorIndex] = true;  // שמירה בזיכרון הגלובלי לכל הדלתות עם מספר זה
-				p.keyUsed();                  // הורדת המפתח מהשחקן
+				door->tryOpen(doorIndex);     
+				openDoors[doorIndex] = true;  
+				p.keyUsed();                 
 				doorCanPass = true;
 			}
 			
@@ -98,5 +98,22 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 	return false;
 }
 
+Point Door::findLocation(const Screen& screen, int doorIndex) {
+	char targetChar = '0' + doorIndex;
+
+	
+	for (int y = 0; y < 23; y++) {
+		for (int x = 0; x < 80; x++) {
+
+			
+			if (screen.getCharAt(x, y) == targetChar) {
+				return Point(x, y, Direction::directions[Direction::STAY], targetChar);
+			}
+		}
+	}
+
+	
+	return Point(-1, -1, Direction::directions[Direction::STAY], ' ');
+}
 
 

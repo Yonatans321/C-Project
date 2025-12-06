@@ -2,8 +2,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <iostream>
-
-using namespace std;
+#include "Door.h"
+using std::cout;
 
 // ============================
 //       CONSTRUCTOR
@@ -71,7 +71,7 @@ void Game::showInstructions()
 {
     UIScreens::showInstructions();
     while (_kbhit()) _getch(); // פונקציית עזר CLEANBUFFER ב UTILLS להוסיףףףףףףף
-    [[maybe_unused]]
+    //[[maybe_unused]]
     auto i =_getch();  // Press any key לעשות פונקציית עזר WAIT FOR KEY שיבינו מה עושים
     while (_kbhit()) _getch();
 
@@ -93,10 +93,11 @@ void Game::initLevel()
     // Assign screen to players
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
+
 	// Reset players' positions
     player1.activate();
     player2.activate();
-    
+
     player1.draw();
     player2.draw();
 }

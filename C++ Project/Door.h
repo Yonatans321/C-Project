@@ -1,4 +1,5 @@
 #pragma once
+#include "Player.h"
 class Player; // forward declaration
 class Screen; // forward declaration
 class RoomScreenManager; // forward declaration
@@ -22,4 +23,6 @@ public:
 	int getDestinationLevel() const; 
 	void setDestinationLevel(int level);
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
+	static Point findLocation(const Screen& screen, int doorIndex);
+
 };

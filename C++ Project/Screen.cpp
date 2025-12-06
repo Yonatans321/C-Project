@@ -1,4 +1,4 @@
-//#define _CRT_SECURE_NO_WARNINGS // TO SUPPORT STRNCPY ON VISUAL STUDIO
+
 #include "Screen.h"
 #include "Rooms.h"
 #include <cstring>
@@ -42,7 +42,21 @@ void Screen::loadMap(int level)
         strncpy_s(screen[y], src[y], WIDTH);
         screen[y][WIDTH] = '\0';
     }
+    for (int y = 0; y < 23; y++)
+    {
+        for (int x = 0; x < 80; x++)
+        {
+            char c = screen[y][x];
+            
+            if (c >= '1' && c <= '9')
+            {
+                int id = c - '0'; 
+                doors[id] = Door(id);
+            }
+        }
+    }
 }
+
 
 // =====================
 //   DRAW MAP
@@ -202,14 +216,3 @@ Door* Screen::getDoor(const Point& p)
     return nullptr;
 }
 
-Point Screen::findDoorLocation(int doorIndex) {
-	char doorChar = '0' + doorIndex;
-    for(int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-            if (screen[y][x] == doorChar) {
-                return Point(x, y, Direction::directions[Direction::STAY], doorChar);
-            }
-        }
-	}
-	return Point(-1, -1, Direction::directions[Direction::STAY], ' ');
-}
