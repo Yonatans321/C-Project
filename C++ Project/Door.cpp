@@ -2,9 +2,12 @@
 #include "Player.h"
 #include "Screen.h"
 #include "RoomScreenManager.h" 
+#include <iostream>
 
-using namespace std;
+using std::cout;
+
 static bool openDoors[10] = { false }; // static array to track open doors
+
 int Door::getId() const
 {
 	return id;
@@ -40,7 +43,7 @@ void Door::setDestinationLevel(int level)
 }
 
 
-bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
+bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor)
 {
 	if (!p.isActive()) return false;
 
@@ -87,7 +90,7 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 				// Move the player through the door
 				p.setInactive();
 				p.erase();
-
+				foundDoor = cell;
 		
 				// int dest = door->getDestinationLevel();
 				// if (dest != -1) currentLevel = dest;

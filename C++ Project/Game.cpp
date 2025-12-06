@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <iostream>
 #include "Door.h"
+
+
 using std::cout;
 
 // ============================
@@ -189,13 +191,13 @@ void Game::gameLoop()
         handleTile(player1);
         handleTile(player2);
 
-        if (!player1.isActive() && !player2.isActive())
+        if (checkLevel() == true)
         {
-            currentLevel++;
-
-            
-            initLevel(); 
+            gameRunning = false;      // עוצר את הלולאה
+            currStatus = GameModes::MENU; // מעדכן סטטוס לתפריט ראשי
+            break;                    // יוצא מיידית מהלולאה
         }
+
         player1.draw();
         player2.draw();
 
@@ -234,7 +236,7 @@ bool Game::handleTile(Player& player)
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel,activeDoor);
         if (doorOpened)
         {
           
@@ -286,4 +288,39 @@ void Game::run()
             currStatus = GameModes::MENU;
         }
     }
+}
+
+// =========================
+//          CHECK LEVEL
+// ============================
+
+bool Game::checkLevel()
+{
+    if (!player1.isActive() && !player2.isActive())
+    {
+        if (activeDoor == '1')
+        {
+            if (currentLevel == 0)
+                currentLevel = 1;
+            else if (currentLevel == 1)
+                currentLevel = 0;
+        }
+        else if (activeDoor == '2')
+        {
+            if (currentLevel == 1)
+                currentLevel = 2;
+            else if (currentLevel == 2)
+                currentLevel = 1;
+        }
+        else if (activeDoor == '3')
+        {
+            showWinScreen();
+            activeDoor = 0;
+            return true;
+        }
+
+        activeDoor = 0;
+        initLevel();
+    }
+    return false;
 }
