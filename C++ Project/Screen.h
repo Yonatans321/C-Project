@@ -1,59 +1,51 @@
 #pragma once
 #include <iostream>
+#include <array>
+#include <string>
 #include "Point.h"
 #include "Door.h"
+#include "Utils.h"
 
+// class to manage the screen layout and interactions
 class Screen {
 public:
-	static constexpr int MAX_X = 80;
-	static constexpr int MAX_Y = 25;
-
-
+	static constexpr int WIDTH = 80;
+	static constexpr int HEIGHT = 25;
+	static constexpr int MAP_HEIGHT = 23;
+	static constexpr int NUM_MAPS = 4;
+	Point findDoorLocation(int doorIndex);
 private:
-	 char screen[MAX_Y][MAX_X+1] = {
-		//   01234567890123456789012345678901234567890123456789012345678901234567890123456789
-			"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-			"W                                                                              W", // 1
-			"W                                                                              W", // 2
-			"W                                                                              W", // 3
-			"W                                                                              W", // 4
-			"W                                                                              W", // 5
-			"W                                                                              W", // 6
-			"W                                                                              W", // 7
-			"W                                                                              W", // 8
-			"W                                                                              W", // 9
-			"W                                                                              W", // 10
-			"W                                                                              W", // 11
-			"W                                                                              W", // 12
-			"W                                                                              W", // 13
-			"W                                                                              W", // 14
-			"W                                                                              W", // 15
-			"W                                                                              W", // 16
-			"W                                                                              W", // 17
-			"W                                                                              W", // 18
-			"W                                                                              W", // 19
-			"W                                                                              W", // 20
-			"W                                                                              W", // 21
-			"W                                                                              W", // 22
-			"W                                                                              W", // 23
-			"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 24
-	};
-	Door doors[10]; // array to hold doors
+	char screen[MAP_HEIGHT][WIDTH + 1];
+	Door doors [10]; // array to hold doors
 
+	static const char* const MAP_LAYOUTS[NUM_MAPS][MAP_HEIGHT];
 public:
-	char getCharAt(const Point& p) const;
-	void setCharAt(const Point& p, char ch);
+	Screen();
 
-	void draw() const;
+	// Map drawing
+	void loadMap(int level);
+	void drawMap() const;
+
+	// Text drawing
+	void setCharAt(const Point& p, char ch);
+	void setCharAt(int x, int y, char ch);
+	void drawStatusBar(char inventory, int health, int score);
+	void drawBox(int x, int y, int width, int height);
+	void clearBox(int x, int y, int width, int height);
+	void drawAnimatedBox(int x, int y, int w, int h);
+	void closeAnimatedBox(int x, int y, int w, int h);
+	void printInBox(int x, int y, const std::string& message);
+	void showMessage(const std::string& msg);
+
+	//Map logic
+	char getCharAt(const Point& p) const;
+	char getCharAt(int x, int y) const;
 	bool isWall(const Point& p) const;
 	bool isObstacle(const Point& p) const;
-
-	void setdoor(int id,int destlevel) {
-		
-		if (id >= 1 && id <= 9) {
-		 doors[id] = Door(id, destlevel);
-			
-		}
-	}
 	Door* getDoor(const Point& p);
+
+	const char* getMapRow(int row) const; // get a specific row of the map
+	/*void draw() const;
+	void loadData(int mapIndex);
+	void setDoor(int id, int destlevel);*/
 };
