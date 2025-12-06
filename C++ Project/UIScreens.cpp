@@ -2,6 +2,7 @@
 #include <iostream>
 #include <conio.h>
 #include "Utils.h"
+#include <windows.h>
 
     using namespace std;
 
@@ -160,4 +161,15 @@ void UIScreens::showWinScreen()
 
     printScreen(WIN_SCREEN);
     _getch();
+}
+
+void UIScreens::showExitMessage()
+{
+    cls();
+    cout << "\n\n";
+    cout << "=============================================\n";
+    cout << "           THANKS FOR PLAYING! :)\n";
+    cout << "=============================================\n\n";
+
+    Sleep(1200); // רגע קטן לראות את ההודעה ואז סוגרים
 }

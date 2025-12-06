@@ -11,6 +11,7 @@ public:
 	static void showInstructions();
 	static void showPauseScreen();
 	static void showWinScreen();
+	static void showExitMessage();
 private:
 	static void printScreen(const char** screen );
 };

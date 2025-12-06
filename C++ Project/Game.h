@@ -31,7 +31,7 @@ private:
     void showInstructions(); 
     void initLevel();  //run the game
 	void gameLoop();// main game loop       
-	void handleTile(Player& player);
+	bool handleTile(Player& player);
 	void showWinScreen();
 	
 public:

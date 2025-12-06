@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstdlib>
 #include "Utils.h"
+#include <conio.h>
+#include <limits>
 
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
@@ -40,4 +42,11 @@ void setColor(int color) {
 }
 void resetColor() {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
+}
+
+void clearInputBuffer()
+{
+    std::cin.clear();
+    while (std::cin.peek() == '\n')
+        std::cin.ignore();
 }

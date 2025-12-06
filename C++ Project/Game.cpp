@@ -89,6 +89,7 @@ void Game::initLevel()
     cls();
     currentScreen.loadMap(currentLevel);
     currentScreen.drawMap();
+    riddleBank.attachPositionToRoom(currentScreen);
 
     // Assign screen to players
     player1.setScreen(currentScreen);
@@ -169,6 +170,19 @@ void Game::gameLoop()
         player1.erase();
         player2.erase();
 
+      
+
+        bool stop1 = handleTile(player1);
+        bool stop2 = handleTile(player2);
+
+        if (stop1 || stop2)
+        {
+            // לא מזיזים את השחקנים יותר הפעם
+            player1.draw();
+            player2.draw();
+            continue;
+        }
+
         player1.move();
         player2.move();
 
@@ -193,7 +207,7 @@ void Game::gameLoop()
 //       HANDLE TILE
 // ============================
 
-void Game::handleTile(Player& player)
+bool Game::handleTile(Player& player)
 {
     Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
@@ -232,6 +246,8 @@ void Game::handleTile(Player& player)
     default:
         break;
     }
+
+    return false; // לא היה אירוע מיוחד
 }
 
 // ============================
