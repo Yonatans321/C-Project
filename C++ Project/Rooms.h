@@ -12,11 +12,11 @@ static constexpr int ROOM_HEIGHT = 23;
 static const char* const ROOM0[ROOM_HEIGHT] =
 {//  01234567890123456789012345678901234567890123456789012345678901234567890123456789
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-    "W                                                                              W", // 1 
-    "W          WWWWWWWWWW             WWWWWWWWWWWW                                 W", // 2
-    "W          W        W             W          W                                 W", // 3
-    "W                   W             W          W                                 W", // 4
-    "W              ?    W             W    K     W                                 W", // 5
+    "W                                                             s                W", // 1 
+    "W          WWWWWWWWWW             WWWWWWWWWWWW                s                W", // 2
+    "W          W        W             W          W                s                W", // 3
+    "W                   W             W          W                s                W", // 4
+    "W              ?    W             W    K     W                ssssssssssssssss W", // 5
     "W          W        W             W          W                                 W", // 6
     "W          WWWWWWWWWW             WWWW  WWWWWW                                 W", // 7
     "W                 *                                                            W", // 8
@@ -32,7 +32,7 @@ static const char* const ROOM0[ROOM_HEIGHT] =
     "W                                                                              W", // 18
     "W                                                                              W", // 19
     "W                                                                              W", // 20
-    "W                                                                              W", // 21
+    "W     \\                                                                       W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
 

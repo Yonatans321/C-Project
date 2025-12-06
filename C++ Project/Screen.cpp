@@ -221,3 +221,12 @@ const char* Screen::getMapRow(int row) const
         return nullptr;
     return screen[row];
 }
+
+int Screen::getWidth() const
+{
+    return WIDTH;
+}
+int Screen::getHeight() const
+{
+    return MAP_HEIGHT;
+}

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Door.h"
 #include "Obstacle.h"
+#include "Switch.h"
 
 using std::cout;
 
@@ -103,6 +104,11 @@ void Game::initLevel()
 
     player1.draw();
     player2.draw();
+
+    if (!Switch::exists(currentScreen))
+    {
+        Door::allSwitchesAreOn();
+    }
 }
 
 // ============================
@@ -210,6 +216,7 @@ bool Game::handleTile(Player& player)
     Point targetPos = pos;
     targetPos.move();
     char cell = currentScreen.getCharAt(pos);
+    char targetCell = currentScreen.getCharAt(targetPos);
 
     switch (cell)
     {
@@ -221,11 +228,11 @@ bool Game::handleTile(Player& player)
             player.GrabItem('K', 0);
             currentScreen.setCharAt(pos, ' ');
             break;
-
-        default:
-            break;
+        case '\\':
+        case '/' :
+            Switch::handleSwitch(player, currentScreen);
+            return true;
         }
-        char targetCell = currentScreen.getCharAt(targetPos);
         
         switch (targetCell)
         {
@@ -237,6 +244,7 @@ bool Game::handleTile(Player& player)
             {
           
                 player.setPosition(targetPos);
+                return true;
             }
             break;
 
@@ -253,8 +261,9 @@ bool Game::handleTile(Player& player)
             player.setPosition(targetPos);
             return true;
         }
-        case '#':
+        case '#': case 's':
             player.stepBack();
+            return true;
             break;
 
         default:
