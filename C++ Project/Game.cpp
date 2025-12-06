@@ -173,6 +173,7 @@ void Game::gameLoop()
                 player2.keyPressed(ch);
             }
         }
+        
 
         // Update players
         player1.erase();
@@ -200,8 +201,8 @@ void Game::gameLoop()
             break;                    // יוצא מיידית מהלולאה
         }
 
-       
 
+    
         Sleep(80);
     }
 }
@@ -221,75 +222,78 @@ bool Game::handleTile(Player& player)
 
     switch (cell)
     {
+    //case '?':
+    //    riddleBank.handleRiddle(player, currentScreen, currentLevel);
+    //    break;
+   
+
+    //default:
+    //    break;
+    //}
+   
+    //switch (targetCell)
+    //{
+    //case '1': case '2': case '3': case '4': case '5':
+    //case '6': case '7': case '8': case '9':
+    //{
+    //    bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);
+    //    if (doorOpened)
+    //    {
+    //        player.setPosition(targetPos);
+    //        return true;
+    //    }
+    //}
     case '?':
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
+
     case 'K':
         player.GrabItem('K', 0);
         currentScreen.setCharAt(pos, ' ');
         break;
-
-    default:
-        break;
+    case '\\':
+    case '/':
+        Switch::handleSwitch(player, currentScreen);
+        return false;
     }
-    char targetCell = currentScreen.getCharAt(targetPos);
+
     switch (targetCell)
     {
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel,activeDoor);
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);
         if (doorOpened)
-        case '?':
-            riddleBank.handleRiddle(player, currentScreen, currentLevel);
-            break;
-
-        case 'K':
-            player.GrabItem('K', 0);
-            currentScreen.setCharAt(pos, ' ');
-            break;
-        case '\\':
-        case '/' :
-            Switch::handleSwitch(player, currentScreen);
-            return false;
-        }
-        
-        switch (targetCell)
         {
-        case '1': case '2': case '3': case '4': case '5':
-        case '6': case '7': case '8': case '9':
-        {
-            bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
-            if (doorOpened)
-            {
-          
-                player.setPosition(targetPos);
-                return true;
-            }
-            break;
-
-        }
-        case '*':
-        {
-            Obstacle::handleObstacle(player1, player2, currentScreen);
-
-            char afterPush = currentScreen.getCharAt(targetPos);
-
-            if (afterPush == '*')
-                return true;    // עדיין חסום → אל תזוז ואל תחזיר אחורה
 
             player.setPosition(targetPos);
             return true;
         }
-        case '#': case 's':
-            return true;
-            break;
+        break;
 
-        default:
-            break;
-        }
+    }
+    case '*':
+    {
+        Obstacle::handleObstacle(player1, player2, currentScreen);
 
-        return false; // לא היה אירוע מיוחד
+        char afterPush = currentScreen.getCharAt(targetPos);
+
+        if (afterPush == '*')
+            return true;    // עדיין חסום → אל תזוז ואל תחזיר אחורה
+
+        player.setPosition(targetPos);
+        return true;
+    }
+    case '#': case 's':
+        return true;
+        break;
+
+    default:
+        break;
+    }
+
+    return false; // לא היה אירוע מיוחד
+    
 }
 
 // ============================
