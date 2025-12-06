@@ -42,27 +42,27 @@ static const char* const ROOM0[ROOM_HEIGHT] =
 static const char* const ROOM1[ROOM_HEIGHT] =
 {
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-    "W                                                                              W", // 1
+    "W 1                                                                            W", // 1
     "W                                                                              W", // 2
     "W          WWWWWWWWWWWWWWWWWWWW                                                W", // 3
     "W          W                  W                                                W", // 4
     "W          W        #         W                                                W", // 5
     "W          W                  W                                                W", // 6
-    "W          WWWWWWWW  WWWWWWWWWW                                                W", // 7
+    "W          WWW**WWW  WWWWWWWWWW                                                W", // 7
     "W                  WW                                                          W", // 8
     "W                  WW                                                          W", // 9
     "W                  WW                                                          W", // 10
     "W                  WW                                                          W", // 11
     "W                  WW         WWWWWWWWWWWWWW                                   W", // 12
     "W                  WW         W            W                                   W", // 13
-    "W                  WW         W     * W                                        W", // 14
+    "W                  WW         W  K  * W                                        W", // 14
     "W                             W            W                                   W", // 15
     "W                             WWWWWW  WWWWWW                                   W", // 16
     "W                                                                              W", // 17
     "W                                                                              W", // 18
     "W                                       WWWWWWWW                               W", // 19
     "W                                       W      W                               W", // 20
-    "W                                       W  2   W                               W", // 21
+    "W                                          2   W                               W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
 

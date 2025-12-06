@@ -19,7 +19,7 @@ private:
 	static constexpr int MAX_LEVELS = 4;    
 	std::array<Screen, MAX_LEVELS> gameScreens;
 	int currentLevel = 0;
-
+    
     // Game modes - options of the game
     GameModes currStatus = GameModes::MENU;
     Player player1;         
@@ -29,7 +29,7 @@ private:
     
     void showMenu();        
     void showInstructions(); 
-    void initLevel();       //run the game
+    void initLevel();  //run the game
 	void gameLoop();// main game loop       
 	bool handleTile(Player& player);
 	void showWinScreen();
