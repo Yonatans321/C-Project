@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include "Utils.h"
 
-
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
     std::cout.flush();
