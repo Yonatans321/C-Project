@@ -96,10 +96,10 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 						std::cout << "All switcehs must be ON!";
 						Sleep(1200);
 						Screen::closeAnimatedBox(10, 5, 50, 12);
+						p.stepBack();
 						screen.drawMap();
 						p.draw();
-						p.stepBack();
-					return false;
+						return false;
 				}
 				if (p.useKeyForDoor(cell))
 				{
@@ -115,9 +115,9 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 						std::cout << "you need the correct key!";
 						Sleep(1100);
 						Screen::closeAnimatedBox(10, 5, 50, 12);
+						p.stepBack();
 						screen.drawMap();
 						p.draw();
-						p.stepBack();
 						return false;
 				}
 			}
