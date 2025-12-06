@@ -19,7 +19,9 @@ private:
 	static constexpr int MAX_LEVELS = 4;    
 	std::array<Screen, MAX_LEVELS> gameScreens;
 	int currentLevel = 0;
-    
+   
+	char activeDoor = ' '; // to track last door used
+
     // Game modes - options of the game
     GameModes currStatus = GameModes::MENU;
     Player player1;         
@@ -37,4 +39,5 @@ private:
 public:
     Game(); 
     void run(); 
+    bool checkLevel();
 };

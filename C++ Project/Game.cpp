@@ -193,14 +193,15 @@ void Game::gameLoop()
         player1.draw();
         player2.draw();
 
-        if (!player1.isActive() && !player2.isActive())
+        if (checkLevel() == true)
         {
-            currentLevel++;
-
-            
-            initLevel(); 
+            gameRunning = false;      // עוצר את הלולאה
+            currStatus = GameModes::MENU; // מעדכן סטטוס לתפריט ראשי
+            break;                    // יוצא מיידית מהלולאה
         }
-      
+
+       
+
         Sleep(80);
     }
 }
@@ -220,6 +221,25 @@ bool Game::handleTile(Player& player)
 
     switch (cell)
     {
+    case '?':
+        riddleBank.handleRiddle(player, currentScreen, currentLevel);
+        break;
+    case 'K':
+        player.GrabItem('K', 0);
+        currentScreen.setCharAt(pos, ' ');
+        break;
+
+    default:
+        break;
+    }
+    char targetCell = currentScreen.getCharAt(targetPos);
+    switch (targetCell)
+    {
+    case '1': case '2': case '3': case '4': case '5':
+    case '6': case '7': case '8': case '9':
+    {
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel,activeDoor);
+        if (doorOpened)
         case '?':
             riddleBank.handleRiddle(player, currentScreen, currentLevel);
             break;
@@ -308,5 +328,39 @@ void Game::run()
             currStatus = GameModes::MENU;
         }
     }
-    UIScreens::showExitMessage();
+}
+
+// =========================
+//          CHECK LEVEL
+// ============================
+
+bool Game::checkLevel()
+{
+    if (!player1.isActive() && !player2.isActive())
+    {
+        if (activeDoor == '1')
+        {
+            if (currentLevel == 0)
+                currentLevel = 1;
+            else if (currentLevel == 1)
+                currentLevel = 0;
+        }
+        else if (activeDoor == '2')
+        {
+            if (currentLevel == 1)
+                currentLevel = 2;
+            else if (currentLevel == 2)
+                currentLevel = 1;
+        }
+        else if (activeDoor == '3')
+        {
+            showWinScreen();
+            activeDoor = 0;
+            return true;
+        }
+
+        activeDoor = 0;
+        initLevel();
+    }
+    return false;
 }

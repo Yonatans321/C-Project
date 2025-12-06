@@ -52,7 +52,7 @@ bool Door::isDoorChar(char c)
 }
 
 
-bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
+bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor)
 {
 	if (!p.isActive()) return false;
 
@@ -128,7 +128,7 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 				// Move the player through the door
 				p.setInactive();
 				p.erase();
-
+				foundDoor = cell;
 		
 				// int dest = door->getDestinationLevel();
 				// if (dest != -1) currentLevel = dest;

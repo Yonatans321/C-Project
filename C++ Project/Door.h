@@ -22,6 +22,9 @@ public:
 	bool tryOpen(int keyId);
 	bool canPass() const;
 	static bool isDoorChar(char c);
+	int getDestinationLevel() const; 
+	void setDestinationLevel(int level);
+	static bool handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor);
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
 	static Point findLocation(const Screen& screen, int doorIndex);
 	static void allSwitchesAreOn();
