@@ -162,3 +162,4 @@ void Door::allSwitchesAreOn()
 	switchesAreOn = true;
 }
 
+///GUY PALATIN
