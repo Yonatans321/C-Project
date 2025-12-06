@@ -30,17 +30,18 @@ public:
 	}
 
 	// moving and drawing functions
-	void draw();
+	void draw(); // 
 	void move();
 	void keyPressed(char ch);
 	void erase() const;
 	int getX() const;
 	int getY() const;
 	char getChar() const;
-	Point getPosition() const { return position; }// get player's current position
+	const Point getPosition() const { return position; }// get player's current position
 	void setScreen(Screen& newScreen);// set player's current screen
 	void rememberPosition();
 	void stepBack();// move player back to previous position
+
 	// Item functions
 	bool hasItem() const;
 	bool hasItem(char item) const;
@@ -56,7 +57,15 @@ public:
 	void keyUsed();
 	//bool hasKeyForDoor(char doorChar) const;
 	
-	
+	//Directions functions
+	Direction getDirection() const
+	{
+		return position.getDirection();
+	}
+	Direction getOppositeDirection() const
+	{
+		return position.getOppositeDirection();
+	}
 	// Score and Lives functions
 	void addPoints(int pts);
 	void losePoints(int pts);

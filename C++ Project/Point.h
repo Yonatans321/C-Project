@@ -15,6 +15,8 @@ class Point {
 
 	//Taken from lab exercise number 4
 public:
+
+	// constructor
 	Point() :x(0),y(0),dir(Direction::directions[Direction::STAY]),ch('$'){}
 	Point(int x1, int y1, const Direction& the_dir, char c) {
 		x = x1;
@@ -28,14 +30,24 @@ public:
 		dir = Direction::directions[Direction::STAY];
 		ch = ' ';
 	}
+
+	//draing functions
 	void draw() {
 		draw(ch);
 	}
 	void draw(char c);
+	void erase() const;
+
+	//moving and direction functions
 	void move();
 	void changeDirection(const Direction& new_dir) {
 		dir = new_dir;
 	}
+	Direction getDirection() const { return dir; };
+	Direction getOppositeDirection() const {
+		return Direction(-dir.getX(), -dir.getY());
+	}
+	//data functions
 	int getX() const {
 		return x;
 	}
@@ -45,6 +57,6 @@ public:
 	char getChar() const {
 		return ch;
 	}
-	void erase() const;
+	
 	void set(int new_x, int new_y); 
 };

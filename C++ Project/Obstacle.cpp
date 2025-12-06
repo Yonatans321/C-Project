@@ -1,86 +1,118 @@
-//#include "Obstacle.h"
-//#include "Player.h"
-//#include "Screen.h"
-//#include "Point.h"
-//#include <vector>
-//
-//void Obstacle::tryPushObstacles(Player& p1, Player& p2, Screen& screen)
-//{
-//    // αγεχ χεγν δΰν p1 δεΰ ζδ ωγεησ
-//    Point firstObstacle(0, 0);
-//    if (playerIsAgainstObstacle(p1, screen, firstObstacle) &&
-//        secondPlayerSupportsPush(p1, p2))
-//    {
-//        auto chain = collectChain(firstObstacle, p1, screen);
-//        pushChainForward(chain, p1, screen);
-//        return;
-//    }
-//
-//    // αγεχ δΰν p2 δεΰ ζδ ωγεησ
-//    if (playerIsAgainstObstacle(p2, screen, firstObstacle) &&
-//        secondPlayerSupportsPush(p2, p1))
-//    {
-//        auto chain = collectChain(firstObstacle, p2, screen);
-//        pushChainForward(chain, p2, screen);
-//    }
-//}
-//
-//bool Obstacle::playerIsAgainstObstacle(Player& p, Screen& screen, Point& obstaclePos)
-//{
-//    Point pos = p.getPosition();
-//    Point forward = pos;
-//    forward.move(p.getDirection());
-//
-//    if (screen.getCharAt(forward.getX(), forward.getY()) == '*')
-//    {
-//        obstaclePos = forward;
-//        return true;
-//    }
-//
-//    return false;
-//}
-//
-//bool Obstacle::secondPlayerSupportsPush(Player& front, Player& back)
-//{
-//    Point backPos = front.getPosition();
-//    backPos.move(front.getOppositeDirection());
-//
-//    return backPos == back.getPosition();
-//}
-//
-//std::vector<Point> Obstacle::collectChain(Point start, Player& p, Screen& screen)
-//{
-//    std::vector<Point> chain;
-//    Point cur = start;
-//
-//    while (screen.getCharAt(cur.getX(), cur.getY()) == '*')
-//    {
-//        chain.push_back(cur);
-//        cur.move(p.getDirection());
-//    }
-//
-//    // ΰν δϊΰ ΰηψι δωψωψϊ μΰ ψιχ — ΰι ΰτωψ μγηεσ
-//    if (screen.getCharAt(cur.getX(), cur.getY()) != ' ')
-//        chain.clear(); // ξηζιψ ψιχ = ριξο μλιωμεο
-//
-//    return chain;
-//}
-//
-//void Obstacle::pushChainForward(const std::vector<Point>& chain, Player& p, Screen& screen)
-//{
-//    if (chain.empty()) return;
-//
-//    // δπχεγδ δηγωδ μξλωεμ δΰηψεο
-//    Point next = chain.back();
-//    next.move(p.getDirection());
-//
-//    // ξζιζιν ξδρεσ μδϊημδ (μΰ ξεηχιν ξλωεμιν αγψκ)
-//    for (int i = chain.size() - 1; i >= 0; i--)
-//    {
-//        Point from = chain[i];
-//        Point to = (i == chain.size() - 1) ? next : chain[i + 1];
-//
-//        screen.setCharAt(to.getX(), to.getY(), '*');
-//        screen.setCharAt(from.getX(), from.getY(), ' ');
-//    }
-//}
+ο»Ώ#include "Obstacle.h"
+#include "Player.h"
+#include "Screen.h"
+#include "Point.h"
+#include "Direction.h"
+#include <vector>
+
+// ======================================================
+//            Χ¤Χ•Χ Χ§Χ¦Χ™Χ” Χ¨ΧΧ©Χ™Χª Χ©Χ”ΧΧ©Χ—Χ§ Χ§Χ•Χ¨Χ
+// ======================================================
+void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
+{
+    Point obs(0, 0);
+
+    // Χ‘Χ“Χ™Χ§Χ” ΧΧ p1 Χ”Χ•Χ Χ”Χ“Χ•Χ—Χ£ Χ”ΧΧ•Χ‘Χ™Χ
+    if (isFacingObstacle(p1, screen, obs) && playersAlignedAndPushing(p1, p2))
+    {
+        auto chain = collectChain(obs, p1.getDirection(), screen);
+        if (!chain.empty())
+            pushChain(chain, p1.getDirection(), screen);
+        return;
+    }
+
+    // Χ‘Χ“Χ™Χ§Χ” ΧΧ p2 Χ”Χ•Χ Χ”Χ“Χ•Χ—Χ£ Χ”ΧΧ•Χ‘Χ™Χ
+    if (isFacingObstacle(p2, screen, obs) && playersAlignedAndPushing(p2, p1))
+    {
+        auto chain = collectChain(obs, p2.getDirection(), screen);
+        if (!chain.empty())
+            pushChain(chain, p2.getDirection(), screen);
+    }
+}
+
+// ======================================================
+//        Χ‘Χ“Χ™Χ§Χ” ΧΧ Χ©Χ—Χ§Χ ΧΆΧ•ΧΧ“ ΧΧ•Χ Χ›Χ•Χ›Χ‘Χ™Χª
+// ======================================================
+bool Obstacle::isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos)
+{
+    Point pos = p.getPosition();
+    Direction dir = p.getDirection();
+
+    Point forward(pos.getX() + dir.getX(), pos.getY() + dir.getY());
+
+    if (screen.getCharAt(forward.getX(), forward.getY()) == '*')
+    {
+        obstaclePos = forward;
+        return true;
+    }
+    return false;
+}
+
+// ======================================================
+//     Χ‘Χ“Χ™Χ§Χ” ΧΧ Χ©Χ Χ™ Χ”Χ©Χ—Χ§Χ Χ™Χ ΧΧ™Χ•Χ©Χ¨Χ™Χ Χ•Χ™Χ›Χ•ΧΧ™Χ ΧΧ“Χ—Χ•Χ£ Χ™Χ—Χ“
+// ======================================================
+bool Obstacle::playersAlignedAndPushing(Player& front, Player& back)
+{
+    Direction df = front.getDirection();
+    Direction db = back.getDirection();
+
+    // Χ—Χ™Χ™Χ‘Χ™Χ ΧΧ“Χ—Χ•Χ£ Χ‘ΧΧ•ΧªΧ• Χ›Χ™Χ•Χ•Χ
+    if (df.getX() != db.getX() || df.getY() != db.getY())
+        return false;
+
+    // Χ”Χ©Χ—Χ§Χ Χ”ΧΧ—Χ•Χ¨Χ™ Χ—Χ™Χ™Χ‘ ΧΧ–Χ•Χ– (ΧΧ STAY)
+    if (db.getX() == 0 && db.getY() == 0)
+        return false;
+
+    // Χ‘Χ“Χ™Χ§Χ” Χ©Χ”Χ©Χ—Χ§Χ Χ”ΧΧ—Χ•Χ¨Χ™ Χ¦ΧΧ•Χ“ ΧΧΧ© ΧΧΧ—Χ•Χ¨
+    Point fp = front.getPosition();
+    Direction opp = front.getOppositeDirection();
+
+    Point expectedBack(fp.getX() + opp.getX(),
+        fp.getY() + opp.getY());
+
+    return (expectedBack.getX() == back.getX() &&
+        expectedBack.getY() == back.getY());
+}
+
+// ======================================================
+//        ΧΧ™Χ΅Χ•Χ£ Χ”Χ©Χ¨Χ©Χ¨Χª Χ©Χ Χ”ΧΧ›Χ©Χ•ΧΧ™Χ (***)
+// ======================================================
+std::vector<Point> Obstacle::collectChain(Point start, const Direction& dir, Screen& screen)
+{
+    std::vector<Point> chain;
+    Point cur = start;
+
+    while (screen.getCharAt(cur.getX(), cur.getY()) == '*')
+    {
+        chain.push_back(cur);
+        cur = Point(cur.getX() + dir.getX(), cur.getY() + dir.getY());
+    }
+
+    // ΧΧ Χ”ΧªΧ Χ©ΧΧ—Χ¨Χ™ ΧΧ Χ¨Χ™Χ§ β€” ΧΧ™ ΧΧ¤Χ©Χ¨ ΧΧ–Χ•Χ–
+    if (screen.getCharAt(cur.getX(), cur.getY()) != ' ')
+        return {};
+
+    return chain;
+}
+
+// ======================================================
+//                 Χ“Χ—Χ™Χ¤Χª Χ›Χ Χ”Χ©Χ¨Χ©Χ¨Χª Χ§Χ“Χ™ΧΧ”
+// ======================================================
+void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, Screen& screen)
+{
+    if (chain.empty()) return;
+
+    Point newSpot(chain.back().getX() + dir.getX(),
+        chain.back().getY() + dir.getY());
+
+    // Χ“Χ•Χ—Χ¤Χ™Χ ΧΧ”Χ΅Χ•Χ£ ΧΧ”ΧªΧ—ΧΧ”
+    for (int i = chain.size() - 1; i >= 0; i--)
+    {
+        Point from = chain[i];
+        Point to = (i == chain.size() - 1) ? newSpot : chain[i + 1];
+
+        screen.setCharAt(to.getX(), to.getY(), '*');
+        screen.setCharAt(from.getX(), from.getY(), ' ');
+    }
+}

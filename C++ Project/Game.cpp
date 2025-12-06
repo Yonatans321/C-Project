@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <iostream>
 #include "Door.h"
+#include "Obstacle.h"
+
 using std::cout;
 
 // ============================
@@ -165,19 +167,25 @@ void Game::gameLoop()
                 player2.keyPressed(ch);
             }
         }
-    
-        if(!gameRunning){
-            break; // Exit game loop if game is no longer running
-		}
-		// Erase players from current position
-		player1.erase();
-		player2.erase();
-        // Move players
-        player1.move();
-        player2.move();
 
-        handleTile(player1);
-        handleTile(player2);
+        // Update players
+        player1.erase();
+        player2.erase();
+
+        bool stop1 = handleTile(player1);
+        bool stop2 = handleTile(player2);
+
+        if (!stop1)
+        {
+            player1.move();
+        }
+        if (!stop2)
+        {
+            player2.move();
+        }
+
+        player1.draw();
+        player2.draw();
 
         if (!player1.isActive() && !player2.isActive())
         {
@@ -186,9 +194,7 @@ void Game::gameLoop()
             
             initLevel(); 
         }
-        player1.draw();
-        player2.draw();
-
+      
         Sleep(80);
     }
 }
@@ -207,37 +213,55 @@ bool Game::handleTile(Player& player)
 
     switch (cell)
     {
-    case '?':
-        riddleBank.handleRiddle(player, currentScreen, currentLevel);
-        break;
-    case 'K':
-        player.GrabItem('K', 0);
-        currentScreen.setCharAt(pos, ' ');
-        break;
+        case '?':
+            riddleBank.handleRiddle(player, currentScreen, currentLevel);
+            break;
 
-    default:
-        break;
-    }
-    char targetCell = currentScreen.getCharAt(targetPos);
-    switch (targetCell)
-    {
-    case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9':
-    {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
-        if (doorOpened)
-        {
-          
-            player.setPosition(targetPos);
+        case 'K':
+            player.GrabItem('K', 0);
+            currentScreen.setCharAt(pos, ' ');
+            break;
+
+        default:
+            break;
         }
-        break;
+        char targetCell = currentScreen.getCharAt(targetPos);
+        
+        switch (targetCell)
+        {
+        case '1': case '2': case '3': case '4': case '5':
+        case '6': case '7': case '8': case '9':
+        {
+            bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
+            if (doorOpened)
+            {
+          
+                player.setPosition(targetPos);
+            }
+            break;
 
-    }
-    default:
-        break;
-    }
+        }
+        case '*':
+        {
+            Obstacle::handleObstacle(player1, player2, currentScreen);
 
-    return false; // לא היה אירוע מיוחד
+            char afterPush = currentScreen.getCharAt(targetPos);
+
+            if (afterPush == '*')
+                return true;    // עדיין חסום → אל תזוז ואל תחזיר אחורה
+
+            player.setPosition(targetPos);
+            return true;
+        }
+        case '#':
+            player.stepBack();
+            break;
+
+        default:
+            break;
+        }
+
+        return false; // לא היה אירוע מיוחד
 }
 
 // ============================
