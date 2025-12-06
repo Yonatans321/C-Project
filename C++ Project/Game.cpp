@@ -259,5 +259,4 @@ void Game::run()
             currStatus = GameModes::MENU;
         }
     }
-	UIScreens::showExitMessage();
 }
