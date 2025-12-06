@@ -1,10 +1,13 @@
 #pragma once
 #include <string>
 #include "Riddle.h"
+#include "Player.h"
+#include "Rooms.h"
+#include "Screen.h"
+#include <iostream>
+#include <conio.h>
 
 
-
-// Generatred AI functions for RiddleBank class
 // Stores and manages multiple riddles
 // Possible outcomes when asking or checking a riddle
 
@@ -38,5 +41,6 @@ public:
     RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
 	void printAllRiddles() const;
-	void Hints() const;
+	void clearInputBuffer();
+    void handleRiddle(Player& player, Screen& screen, int level);
 };
