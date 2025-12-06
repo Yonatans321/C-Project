@@ -2,8 +2,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <iostream>
-
-using namespace std;
+#include "Door.h"
+using std::cout;
 
 // ============================
 //       CONSTRUCTOR
@@ -71,7 +71,7 @@ void Game::showInstructions()
 {
     UIScreens::showInstructions();
     while (_kbhit()) _getch(); // פונקציית עזר CLEANBUFFER ב UTILLS להוסיףףףףףףף
-    [[maybe_unused]]
+    //[[maybe_unused]]
     auto i =_getch();  // Press any key לעשות פונקציית עזר WAIT FOR KEY שיבינו מה עושים
     while (_kbhit()) _getch();
 
@@ -93,6 +93,10 @@ void Game::initLevel()
     // Assign screen to players
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
+
+	// Reset players' positions
+    player1.activate();
+    player2.activate();
 
     player1.draw();
     player2.draw();
@@ -171,6 +175,13 @@ void Game::gameLoop()
         handleTile(player1);
         handleTile(player2);
 
+        if (!player1.isActive() && !player2.isActive())
+        {
+            currentLevel++;
+
+            
+            initLevel(); 
+        }
         player1.draw();
         player2.draw();
 
@@ -186,6 +197,8 @@ void Game::handleTile(Player& player)
 {
     Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
+    Point targetPos = pos;
+    targetPos.move();
     char cell = currentScreen.getCharAt(pos);
 
     switch (cell)
@@ -193,20 +206,29 @@ void Game::handleTile(Player& player)
     case '?':
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
-
-    case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9':
-        if (Door::handleDoor(player, currentScreen, currentLevel))
-        {
-            initLevel();
-        }
-        break;
-
     case 'K':
         player.GrabItem('K', 0);
         currentScreen.setCharAt(pos, ' ');
         break;
 
+    default:
+        break;
+    }
+    char targetCell = currentScreen.getCharAt(targetPos);
+    switch (targetCell)
+    {
+    case '1': case '2': case '3': case '4': case '5':
+    case '6': case '7': case '8': case '9':
+    {
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel);
+        if (doorOpened)
+        {
+          
+            player.setPosition(targetPos);
+        }
+        break;
+
+    }
     default:
         break;
     }
