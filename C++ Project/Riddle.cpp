@@ -5,11 +5,6 @@
 #include <iostream>
 #include <cstring>	
 
-void Riddle::askQuestion() const { // Display the riddle question
-    
-	std::cout << question << std::endl;
-}
-
 // Check if the provided answer is correct- if correct, mark the riddle as solved, helped by AI
 bool Riddle::checkAnswer(const char* userAnswer)
  {
@@ -49,7 +44,15 @@ void Riddle::markAsSolved()
     solved = true;
 }
 //AI generated function to get hint
-char* Riddle::getHint() const
+const char* Riddle::getHint() const
 {
-    return const_cast<char*>(hint);
+    return hint;
+}
+Point Riddle::getPosition() const
+{
+    return pos;
+}
+void Riddle::setPosition(const Point& p)
+{
+    pos = p;
 }

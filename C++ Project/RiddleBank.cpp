@@ -3,8 +3,8 @@
 #include <string>
 #include <conio.h>
 #include <Windows.h>
+#include "Utils.h"
 
-using namespace std;
 
 RiddleBank::RiddleBank() : riddleCount(0)
 {
@@ -38,25 +38,69 @@ void RiddleBank::addRiddle(const Riddle& r)
         riddles[riddleCount++] = r;
 	}
 }
-//Generated helper function to ask the riddle interactively
-RiddleOutcome RiddleBank::askRiddleInteractive(int riddleID)
+Riddle* RiddleBank::getRiddleAt(int x, int y)
 {
-    Riddle* r = getRiddleById(riddleID);
-    if (!r) return RiddleOutcome::NotFound;
-    if (r->isSolved()) return RiddleOutcome::AlreadySolved;
-    // Show question
-    r->askQuestion();
-    // Read user's full-line answer
-    string userAnswer;
-    cout << "\nYour answer: ";
-    getline(cin, userAnswer);
-    if (r->checkAnswer(userAnswer.c_str())) {
-        return RiddleOutcome::Correct;
+    for (size_t i = 0; i < riddleCount; ++i) {
+        Point p = riddles[i].getPosition();
+        if (p.getX() == x && p.getY() == y) {
+            return &riddles[i];
+        }
     }
-    return RiddleOutcome::Incorrect;
+    return nullptr; // Not found
 }
 
-RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const string& answer)
+void RiddleBank::attachPositionToRoom(Screen& screen)
+{
+    int nextRiddleIndex = 0;
+
+    // קח את מימדי המפה מתוך Screen
+    const int W = Screen::WIDTH;
+    const int H = Screen::MAP_HEIGHT;
+
+    // מצא את החידה הראשונה שעדיין לא הוצמדה למיקום
+    for (int i = 0; i < riddleCount; ++i)
+    {
+        Point p = riddles[i].getPosition();
+        if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved())
+        {
+            nextRiddleIndex = i;
+            break;
+        }
+    }
+
+    for (int y = 0; y < H; ++y)
+    {
+        for (int x = 0; x < W; ++x)
+        {
+            char c = screen.getCharAt(x, y);
+
+            if (c == '?')
+            {
+                while (nextRiddleIndex < riddleCount)
+                {
+                    Point p = riddles[nextRiddleIndex].getPosition();
+
+                    if (p.getX() == 0 && p.getY() == 0 &&
+                        !riddles[nextRiddleIndex].isSolved())
+                    {
+                        break;
+                    }
+
+                    nextRiddleIndex++;
+                }
+
+                if (nextRiddleIndex >= riddleCount)
+                    return;
+
+                // תן לחידה את הקואורדינטות של ה-'?'
+                riddles[nextRiddleIndex].setPosition(Point(x, y));
+                nextRiddleIndex++;
+            }
+        }
+    }
+}
+
+RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
     Riddle* r = getRiddleById(riddleID);
     if (!r) return RiddleOutcome::NotFound;
@@ -68,17 +112,7 @@ RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const string& answer)
     }
     return RiddleOutcome::Incorrect;
 }
-void RiddleBank::printAllRiddles() const
-{
-    cout << "Riddle Bank:" <<endl;
-    for (int i = 0;i < riddleCount;i++) {
-		const Riddle& r = riddles[i];
-        cout << "Riddle ID: " << r.getRiddleID() << endl;
-        r.askQuestion();
-        cout << "Solved: " << (r.isSolved() ? "Yes" : "No") << endl;
-        cout << "------------------------" << endl;
-    }
-}
+
 // AI genertaed func to help handle the Riddle when player steps on '?'
 void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 {
@@ -86,81 +120,69 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     int y = player.getY();
     char cell = screen.getCharAt(x, y);
 
-    // Only activate if stepped on '?'
     if (cell != '?')
         return;
 
-    int id = level + 1;
-    Riddle* r = getRiddleById(id);
-
+    Riddle* r = getRiddleAt(x, y);
     if (!r || r->isSolved())
         return;
 
-    int bx = 15, by = 5, bw = 50, bh = 12;
+    const int bx = 15, by = 5, bw = 50, bh = 12;
 
-    // ───────────────────────────────────────────────
-    // STEP 1: Ask Y/N (with optional H for hint)
-    // ───────────────────────────────────────────────
+    // ==========================================
+    // STEP 1 – YES/NO (NO HINT HERE)
+    // ==========================================
 
     screen.drawAnimatedBox(bx, by, bw, bh);
-    gotoxy(bx + 2, by + 2); cout << "You stepped on a riddle.";
-    gotoxy(bx + 2, by + 3); cout << "Answer it? (Y/N, H for hint): ";
+    gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
 
     char choice = _getch();
-
-    // ───────────────────────────────────────────────
-    // HINT DISPLAY — shows hint in SAME place where
-    // result (Correct/Wrong) will later appear.
-    // ───────────────────────────────────────────────
-
-    if (choice == 'H' || choice == 'h')
-    {
-        screen.closeAnimatedBox(bx, by, bw, bh);
-        screen.drawAnimatedBox(bx, by, bw, bh);
-
-        gotoxy(bx + 2, by + 1);
-        cout << "Hint:";
-
-        gotoxy(bx + 2, by + 3);
-        cout << r->getHint();
-
-        Sleep(1500);
-
-        screen.closeAnimatedBox(bx, by, bw, bh);
-        return; // does NOT continue riddle
-    }
-
-    // ───────────────────────────────────────────────
-    // If player refuses to answer
-    // ───────────────────────────────────────────────
 
     if (choice == 'N' || choice == 'n')
     {
         screen.closeAnimatedBox(bx, by, bw, bh);
+        player.stepBack(); // move player back to avoid re-triggering
+        // מחזיר את ה-? לגביו
         screen.setCharAt(x, y, '?');
+
+        // מצייר מחדש את המפה והשחקן
+        screen.drawMap();
+        player.draw();
+
+        return;
+    }
+
+    if (choice != 'Y' && choice != 'y')
+    {
+        screen.closeAnimatedBox(bx, by, bw, bh);
+        screen.drawMap();
         player.draw();
         return;
     }
 
     screen.closeAnimatedBox(bx, by, bw, bh);
 
-    // ───────────────────────────────────────────────
-    // STEP 2: Show the riddle question
-    // ───────────────────────────────────────────────
+    // ==========================================
+    // STEP 2 – SHOW RIDDLE (+ HINT OPTION)
+    // ==========================================
 
     screen.drawAnimatedBox(bx, by, bw, bh);
-    gotoxy(bx + 2, by + 1); cout << "Riddle:";
 
-    string q = r->getQuestion();
+    gotoxy(bx + 2, by + 1);
+    std::cout << "Riddle:";
+
+    // print the question
+    std::string q = r->getQuestion();
     int line = by + 3;
+    std::string temp;
 
-    string temp;
     for (char c : q)
     {
         if (c == '\n')
         {
             gotoxy(bx + 2, line++);
-            cout << temp;
+            std::cout << temp;
             temp.clear();
         }
         else temp += c;
@@ -168,59 +190,106 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     if (!temp.empty())
     {
         gotoxy(bx + 2, line++);
-        cout << temp;
+        std::cout << temp;
     }
 
-    // ───────────────────────────────────────────────
-    // STEP 3: Get user answer
-    // ───────────────────────────────────────────────
+    int  answerLine = line + 1;
+    int answerInputLine = line + 2;
+    int hintorResultLine = line + 3;
 
-    gotoxy(bx + 2, line + 1);
-    cout << "Answer: ";
+    // ==========================================
+    bool answered = false;
 
-    clearInputBuffer();
-
-    string ans;
-    getline(cin, ans);
-
-    RiddleOutcome result = checkAnswerFor(id, ans);
-
-    // ───────────────────────────────────────────────
-    // STEP 4: Show result (IN SAME PLACE AS HINT!)
-    // ───────────────────────────────────────────────
-
-    gotoxy(bx + 2, line + 3);
-
-    if (result == RiddleOutcome::Correct)
+    while (!answered)
     {
-        cout << "Correct! +100 points";
-        player.addPoints(100);
-        r->markAsSolved();
-        screen.setCharAt(x, y, ' ');
+        // Prompt
+        gotoxy(bx + 2, answerLine);
+        std::cout << "Answer (press H for hint): ";
+		gotoxy(bx + 2, answerInputLine);
+        std::cout << ">>> " << std::string(40, ' ');
+        std::string ans = "";
+            
+		int promptX = bx + 2;
+        int cursorX = promptX + 4;
+	    int cursorY = answerInputLine;
+		
+        gotoxy(cursorX, cursorY);
+
+            while (true)
+            {
+                char c = _getch();
+
+                if (c == '\r')   // ENTER
+                {
+                    break; // מסיים את החידה
+                }
+                else if ((c == 'H' || c == 'h') && ans.empty())
+                {
+                    // הצג רמז
+                    gotoxy(bx + 2, hintorResultLine);
+                    std::cout << std::string(50, ' ');
+                    gotoxy(bx + 2, hintorResultLine);
+                    std::cout << "Hint: " << r->getHint();
+                    gotoxy(cursorX + ans.length(), cursorY);
+					continue;
+                }
+                if (c == '\b') // BACKSPACE
+                {
+                    if (!ans.empty())
+                    {
+						ans.pop_back();
+						gotoxy(cursorX + ans.length(), cursorY);
+						std::cout << ' ';
+                        gotoxy(cursorX + ans.length(), cursorY);
+                    }
+                    continue;
+				}
+                if (ans.length()<40)
+                {
+                    ans.push_back(c);
+					gotoxy(cursorX + ans.length() - 1, cursorY);
+					std::cout << c;
+                }
+            }
+
+            // ------------------------
+            // STEP 4 – CHECK ANSWER
+            // ------------------------
+            bool correct = r->checkAnswer(ans.c_str());
+            //Clear hint line
+            gotoxy(bx + 2, hintorResultLine);
+            std::cout << std::string(50, ' ');
+
+            // Write feedback
+            gotoxy(bx + 2, hintorResultLine);
+
+
+            if (correct)
+            {
+                std::cout << "Correct! +100 points";
+                player.addPoints(100);
+                r->markAsSolved();
+
+                // remove '?'
+                screen.setCharAt(x, y, ' ');
+            }
+            else
+            {
+                std::cout << "Wrong! -1 life";
+                player.loseLife();
+
+                // put the riddle symbol back
+                screen.setCharAt(x, y, '?');
+            }
+
+            Sleep(700);
+            screen.closeAnimatedBox(bx, by, bw, bh);
+
+            // ALWAYS redraw map and player after closing box
+            player.stepBack(); // move player back to avoid re-triggering
+            screen.drawMap();
+            player.draw();
+
+            answered = true;
     }
-    else
-    {
-        cout << "Wrong! -1 life";
-        player.loseLife();
-        screen.setCharAt(x, y, '?');
-    }
-
-    Sleep(1200);
-
-    screen.closeAnimatedBox(bx, by, bw, bh);
-
-    // ───────────────────────────────────────────────
-    // FINAL REDRAW
-    // ───────────────────────────────────────────────
-    screen.drawMap();
-    player.draw();
 }
-
-void RiddleBank::clearInputBuffer()
-{
-    while(_kbhit()) {
-        _getch();
-	}
-}
-
-
