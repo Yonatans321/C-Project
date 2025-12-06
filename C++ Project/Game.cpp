@@ -231,7 +231,7 @@ bool Game::handleTile(Player& player)
         case '\\':
         case '/' :
             Switch::handleSwitch(player, currentScreen);
-            return true;
+            return false;
         }
         
         switch (targetCell)
@@ -262,7 +262,6 @@ bool Game::handleTile(Player& player)
             return true;
         }
         case '#': case 's':
-            player.stepBack();
             return true;
             break;
 

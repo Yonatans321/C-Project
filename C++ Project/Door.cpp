@@ -62,8 +62,6 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 	int dirX[] = { 1, -1, 0, 0 };
 	int dirY[] = { 0, 0, 1, -1 };
 
-	bool touchingDoor = false;
-
 	// Loop through each direction
 	for (int i = 0; i < 4; i++)
 	{
@@ -75,9 +73,8 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 		// Check if the cell is a door
 		if (isDoorChar(cell))
 		{
-			touchingDoor = true;
-			int doorIndex = cell - '0';
 
+			int doorIndex = cell - '0';
 			Door* door = screen.getDoor(checkPos);
 			if (door == nullptr) continue;
 
@@ -92,17 +89,16 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 			{
 				if (!Door::switchesAreOn)
 				{
-					if (!justWarned)
-					{
 						Screen::drawAnimatedBox(10, 5, 50, 12);
-						gotoxy(15, 7);
-						std::cout << "you cannot enter.\n All switcehs must be ON!";
-						Sleep(400);
+						gotoxy(13,7);
+						std::cout << "you cannot enter";
+						gotoxy(15, 9);
+						std::cout << "All switcehs must be ON!";
+						Sleep(1200);
 						Screen::closeAnimatedBox(10, 5, 50, 12);
 						screen.drawMap();
 						p.draw();
-						justWarned = true;
-					}
+						p.stepBack();
 					return false;
 				}
 				if (p.useKeyForDoor(cell))
@@ -114,17 +110,15 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 				}
 				else
 				{
-					if (!justWarned)
-					{
 						Screen::drawAnimatedBox(10, 5, 50, 12);
-						gotoxy(15, 7);
+						gotoxy(17, 7);
 						std::cout << "you need the correct key!";
-						Sleep(400);
+						Sleep(1100);
 						Screen::closeAnimatedBox(10, 5, 50, 12);
 						screen.drawMap();
 						p.draw();
-						justWarned = true;
-					}
+						p.stepBack();
+						return false;
 				}
 			}
 			
@@ -141,10 +135,6 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel)
 				return false;
 			}
 		}
-	}
-	if (!touchingDoor)
-	{
-		justWarned = false;
 	}
 	return false;
 }
