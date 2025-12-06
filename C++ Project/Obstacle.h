@@ -1,26 +1,26 @@
-//#pragma once
-//#include <vector>
-//class Player;
-//class Screen;
-//class Point;
-//
-//class Obstacle {
-//public:
-//
-//    // בודק ומבצע דחיפה — הפונקציה היחידה שהמשחק קורא
-//    static void tryPushObstacles(Player& p1, Player& p2, Screen& screen);
-//
-//private:
-//
-//    // האם השחקן עומד מול מכשול ויכול לתחיל דחיפה
-//    static bool playerIsAgainstObstacle(Player& p, Screen& screen, Point& obstaclePos);
-//
-//    // מחזיר true אם השחקן השני נמצא מאחור (בקו הדחיפה)
-//    static bool secondPlayerSupportsPush(Player& front, Player& back);
-//
-//    // אוסף את כל רצף ה־* קדימה לכיוון הדחיפה
-//    static std::vector<Point> collectChain(Point start, Player& p, Screen& screen);
-//
-//    // מזיז את השרשרת קדימה ברגע שיש מקום פנוי
-//    static void pushChainForward(const std::vector<Point>& chain, Player& p, Screen& screen);
-//};
+#pragma once
+#include <vector>
+
+class Player;
+class Screen;
+class Point;
+class Direction;
+
+class Obstacle {
+public:
+    // הפונקציה היחידה שהמשחק קורא מתוך handleTile
+    static void handleObstacle(Player& pFront, Player& pBack, Screen& screen);
+
+private:
+    // האם השחקן עומד מול מכשול — מאתר את מיקום הכוכבית הראשונה
+    static bool isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos);
+
+    // האם שני השחקנים ממוקמים נכון ודוחפים באותו כיוון
+    static bool playersAlignedAndPushing(Player& front, Player& back);
+
+    // אסוף רצף של כוכביות לכיוון הדחיפה
+    static std::vector<Point> collectChain(Point start, const Direction& dir, Screen& screen);
+
+    // דחיפת השרשרת קדימה
+    static void pushChain(const std::vector<Point>& chain, const Direction& dir, Screen& screen);
+};

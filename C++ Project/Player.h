@@ -17,12 +17,13 @@ private:
 	int itemId;
 	int points=0;
 	int lives=3;
-	Key* myKey;
+	Key* myKey= nullptr;
 	bool hasKey = false;
 	bool active = true;
 public:
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS])
-		:position(start_point), screen(nullptr), heldItem(0), itemId(-1)
+		:position(start_point), screen(nullptr), heldItem(0), itemId(-1),points(0),
+		lives(3),myKey(nullptr),hasKey(false),active(true)
 	{
 		for (size_t i = 0; i < NUM_KEYS; ++i) {
 			keys[i] = the_keys[i];
@@ -30,17 +31,18 @@ public:
 	}
 
 	// moving and drawing functions
-	void draw();
+	void draw(); // 
 	void move();
 	void keyPressed(char ch);
 	void erase() const;
 	int getX() const;
 	int getY() const;
 	char getChar() const;
-	Point getPosition() const { return position; }// get player's current position
+	const Point getPosition() const { return position; }// get player's current position
 	void setScreen(Screen& newScreen);// set player's current screen
 	void rememberPosition();
 	void stepBack();// move player back to previous position
+
 	// Item functions
 	bool hasItem() const;
 	bool hasItem(char item) const;
@@ -56,7 +58,15 @@ public:
 	void keyUsed();
 	//bool hasKeyForDoor(char doorChar) const;
 	
-	
+	//Directions functions
+	Direction getDirection() const
+	{
+		return position.getDirection();
+	}
+	Direction getOppositeDirection() const
+	{
+		return position.getOppositeDirection();
+	}
 	// Score and Lives functions
 	void addPoints(int pts);
 	void losePoints(int pts);
