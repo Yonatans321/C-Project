@@ -4,7 +4,7 @@ class Switch
 private:
 	enum State
 	{
-		OFF, // '\'
+		OFF, // '\\'
 		ON   // '/'
 	};
 	State state;
