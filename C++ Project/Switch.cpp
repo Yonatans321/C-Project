@@ -13,15 +13,19 @@ Switch::State Switch::stateFromChar(char c)
 void Switch::toggleSwitchAt(Point pos, Screen& screen)
 {
     char c = screen.getCharAt(pos.getX(), pos.getY());
-    State st = stateFromChar(c);
 
-    // הופכים
-    st = (st == OFF ? ON : OFF);
+    // רק OFF → ON (אין חזור)
+    if (c == '\\')
+    {
+        screen.setCharAt(pos.getX(), pos.getY(), '/');
 
-    // כותבים תו חדש למסך
-    screen.setCharAt(pos.getX(), pos.getY(), (st == OFF ? '\\' : '/'));
+        // ציור מחדש (ON = ירוק)
+        setColor(10);
+        gotoxy(pos.getX(), pos.getY());
+        std::cout << "/";
+        resetColor();
+    }
 }
-
 bool Switch::allSwitchesOn(const Screen& screen)
 {
     bool foundAnySwitch = false;

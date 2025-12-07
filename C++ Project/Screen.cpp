@@ -4,11 +4,8 @@
 #include <cstring>
 #include <windows.h>
 
-using namespace std;
 
-// =====================
-//   CONSTRUCTOR
-// =====================
+
 
 Screen::Screen()
 {
@@ -69,7 +66,7 @@ void Screen::drawMap() const
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
         gotoxy(0, y);
-        cout << screen[y];
+        std::cout << screen[y];
     }
 }
 
@@ -84,7 +81,7 @@ void Screen::setCharAt(int x, int y, char ch)
 
     screen[y][x] = ch;
     gotoxy(x, y);
-    cout << ch;
+    std::cout << ch;
 }
 
 void Screen::setCharAt(const Point& p, char ch)
@@ -95,7 +92,7 @@ void Screen::setCharAt(const Point& p, char ch)
 void Screen::drawStatusBar(char inventory, int health, int score)
 {
     gotoxy(0, MAP_HEIGHT);
-    cout << "Inventory: "
+    std::cout << "Inventory: "
         << inventory
         << "  Health: " << health
         << "  Score: " << score
@@ -110,11 +107,11 @@ void Screen::drawBox(int x, int y, int w, int h)
         for (int col = 0; col < w; col++)
         {
             if (row == 0 || row == h - 1)
-                cout << "-";
+                std::cout << "-";
             else if (col == 0 || col == w - 1)
-                cout << "|";
+                std::cout << "|";
             else
-                cout << " ";
+                std::cout << " ";
         }
     }
 }
@@ -125,7 +122,7 @@ void Screen::clearBox(int x, int y, int w, int h)
     {
         gotoxy(x, y + row);
         for (int col = 0; col < w; col++)
-            cout << " ";
+            std::cout << " ";
     }
 }
 
@@ -148,7 +145,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
     clearBox(x, y, w, h);
 }
 
-void Screen::printInBox(int x, int y, const string& msg)
+void Screen::printInBox(int x, int y, const std::string& msg)
 {
     int idx = 0;
     const int innerW = 50;
@@ -159,18 +156,18 @@ void Screen::printInBox(int x, int y, const string& msg)
         gotoxy(x + 2, y + 2 + row);
         for (int col = 0; col < innerW && idx < msg.length(); col++)
         {
-            cout << msg[idx++];
+            std::cout << msg[idx++];
         }
     }
 }
 
-void Screen::showMessage(const string& msg)
+void Screen::showMessage(const std::string& msg)
 {
     int x = 20, y = 10, w = 40, h = 5;
 
     drawAnimatedBox(x, y, w, h);
     gotoxy(x + 2, y + 2);
-    cout << msg;
+    std::cout << msg;
     Sleep(1200);
     closeAnimatedBox(x, y, w, h);
 }

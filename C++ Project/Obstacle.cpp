@@ -5,9 +5,6 @@
 #include "Direction.h"
 #include <vector>
 
-// ======================================================
-//            פונקציה ראשית שהמשחק קורא
-// ======================================================
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
     Point obs(0, 0);
@@ -30,9 +27,7 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
     }
 }
 
-// ======================================================
-//        בדיקה אם שחקן עומד מול כוכבית
-// ======================================================
+
 bool Obstacle::isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos)
 {
     Point pos = p.getPosition();
@@ -48,9 +43,6 @@ bool Obstacle::isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos)
     return false;
 }
 
-// ======================================================
-//     בדיקה אם שני השחקנים מיושרים ויכולים לדחוף יחד
-// ======================================================
 bool Obstacle::playersAlignedAndPushing(Player& front, Player& back)
 {
     Direction df = front.getDirection();
@@ -75,9 +67,6 @@ bool Obstacle::playersAlignedAndPushing(Player& front, Player& back)
         expectedBack.getY() == back.getY());
 }
 
-// ======================================================
-//        איסוף השרשרת של המכשולים (***)
-// ======================================================
 std::vector<Point> Obstacle::collectChain(Point start, const Direction& dir, Screen& screen)
 {
     std::vector<Point> chain;
@@ -96,9 +85,7 @@ std::vector<Point> Obstacle::collectChain(Point start, const Direction& dir, Scr
     return chain;
 }
 
-// ======================================================
-//                 דחיפת כל השרשרת קדימה
-// ======================================================
+
 void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, Screen& screen)
 {
     if (chain.empty()) return;

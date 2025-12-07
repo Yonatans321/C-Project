@@ -6,7 +6,20 @@
 #include "Obstacle.h"
 #include "Switch.h"
 
-using std::cout;
+
+Game::Game()
+    : player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
+        { 'W','D','X','A','S','E' }),
+    player2(Point(77, 2, Direction::directions[Direction::STAY], '$'),
+        { 'I','L','M','J','K','O' })
+{
+    hideCursor();
+    currStatus = GameModes::MENU;
+
+    gameScreens[0].loadMap(0);
+    player1.setScreen(gameScreens[0]);
+    player2.setScreen(gameScreens[0]);
+}
 
 void Game::showMenu()
 {
@@ -73,7 +86,7 @@ void Game::initLevel()
     player1.activate();
     player2.activate();
     
-    if (activeDoor!=0)
+    if (activeDoor >= '1' && activeDoor <= '9')
     {
         placePlayersAtEntrance();
     }
@@ -308,11 +321,11 @@ bool Game::checkLevel()
         else if (activeDoor == '3')
         {
             showWinScreen();
-            activeDoor = 0;
+            activeDoor = ' ';
             return true;
         }
-        activeDoor = 0;
         initLevel();
+        activeDoor = ' ';
     }
     return false;
 }
@@ -367,7 +380,7 @@ void Game::placePlayersAtEntrance()
 void Game::resetGame()
 {
     currentLevel = 0;
-    activeDoor = 0;
+    activeDoor = ' ';
     Door::switchesAreOn = false;
 
     // לאפס מערך דלתות פתוחות
