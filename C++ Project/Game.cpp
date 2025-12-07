@@ -8,28 +8,6 @@
 
 using std::cout;
 
-// ============================
-//       CONSTRUCTOR
-// ============================
-
-Game::Game()
-    : player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
-        { 'W','D','X','A','S','E' }),
-    player2(Point(77, 2, Direction::directions[Direction::STAY], '$'),
-        { 'I','L','M','J','K','O' })
-{
-    hideCursor();
-    currStatus = GameModes::MENU;
-    
-	gameScreens[0].loadMap(0);
-	player1.setScreen(gameScreens[0]);
-	player2.setScreen(gameScreens[0]);
-}
-
-// ============================
-//     SHOW MAIN MENU
-// ============================
-
 void Game::showMenu()
 {
     while (_kbhit()) _getch();
@@ -66,9 +44,6 @@ void Game::showMenu()
     while (_kbhit()) _getch();
 }
 
-// ============================
-//       INSTRUCTIONS
-// ============================
 
 void Game::showInstructions()
 {
@@ -80,10 +55,6 @@ void Game::showInstructions()
 
     currStatus = GameModes::MENU;
 }
-
-// ============================
-//       INIT LEVEL
-// ============================
 
 void Game::initLevel()
 {
@@ -101,6 +72,16 @@ void Game::initLevel()
 	// Reset players' positions
     player1.activate();
     player2.activate();
+    
+    if (activeDoor!=0)
+    {
+        placePlayersAtEntrance();
+    }
+    else
+    {
+        player1.setPosition(Point(2, 2, Direction::directions[Direction::STAY], '&'));
+        player2.setPosition(Point(77, 2, Direction::directions[Direction::STAY], '$'));
+    }
 
     player1.draw();
     player2.draw();
@@ -110,10 +91,6 @@ void Game::initLevel()
         Door::allSwitchesAreOn();
     }
 }
-
-// ============================
-//        GAME LOOP
-// ============================
 
 void Game::gameLoop()
 {
@@ -200,16 +177,11 @@ void Game::gameLoop()
             currStatus = GameModes::MENU; // מעדכן סטטוס לתפריט ראשי
             break;                    // יוצא מיידית מהלולאה
         }
-
-
     
         Sleep(80);
     }
 }
 
-// ============================
-//       HANDLE TILE
-// ============================
 
 bool Game::handleTile(Player& player)
 {
@@ -222,27 +194,6 @@ bool Game::handleTile(Player& player)
 
     switch (cell)
     {
-    //case '?':
-    //    riddleBank.handleRiddle(player, currentScreen, currentLevel);
-    //    break;
-   
-
-    //default:
-    //    break;
-    //}
-   
-    //switch (targetCell)
-    //{
-    //case '1': case '2': case '3': case '4': case '5':
-    //case '6': case '7': case '8': case '9':
-    //{
-    //    bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);
-    //    if (doorOpened)
-    //    {
-    //        player.setPosition(targetPos);
-    //        return true;
-    //    }
-    //}
     case '?':
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
@@ -251,6 +202,7 @@ bool Game::handleTile(Player& player)
         player.GrabItem('K', 0);
         currentScreen.setCharAt(pos, ' ');
         break;
+
     case '\\':
     case '/':
         Switch::handleSwitch(player, currentScreen);
@@ -284,21 +236,16 @@ bool Game::handleTile(Player& player)
         player.setPosition(targetPos);
         return true;
     }
+
     case '#': case 's':
         return true;
         break;
 
-    default:
-        break;
     }
 
     return false; // לא היה אירוע מיוחד
     
 }
-
-// ============================
-//       WIN SCREEN
-// ============================
 
 void Game::showWinScreen()
 {
@@ -326,12 +273,14 @@ void Game::run()
         }
         else if (currStatus == GameModes::NEW_GAME)
         {
+            resetGame();
             initLevel();
             gameLoop(); 
 
             currStatus = GameModes::MENU;
         }
     }
+    UIScreens::showExitMessage();
 }
 
 // =========================
@@ -362,9 +311,78 @@ bool Game::checkLevel()
             activeDoor = 0;
             return true;
         }
-
         activeDoor = 0;
         initLevel();
     }
     return false;
+}
+
+void Game::placePlayersAtEntrance()
+{
+    Screen& currentScreen = gameScreens[currentLevel];
+
+    int lowestDoor = 10; // גדול מכל דלת אפשרית
+    Point lowestDoorPos;
+    bool found = false;
+
+    // סורקים את כל החדר
+    for (int y = 0; y < Screen::MAP_HEIGHT; y++)
+    {
+        for (int x = 0; x < Screen::WIDTH; x++)
+        {
+            char c = currentScreen.getCharAt(x, y);
+            if (c >= '1' && c <= '9')
+            {
+                int id = c - '0';
+                if (id < lowestDoor)
+                {
+                    lowestDoor = id;
+                    lowestDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
+                    found = true;
+                }
+            }
+        }
+    }
+
+    if (!found)
+        return; // אין דלתות בכלל
+
+    // מציבים את השחקנים בצמוד לדלת — מימין לה
+    int px = lowestDoorPos.getX();
+    int py = lowestDoorPos.getY();
+
+    // שחקן 1
+    Point p1(px + 1, py, Direction::directions[Direction::STAY], '$');
+    player1.setPosition(p1);
+
+    // שחקן 2 לידו
+    Point p2(px + 2, py, Direction::directions[Direction::STAY], '&');
+    player2.setPosition(p2);
+
+    player1.draw();
+    player2.draw();
+}
+
+
+void Game::resetGame()
+{
+    currentLevel = 0;
+    activeDoor = 0;
+    Door::switchesAreOn = false;
+
+    // לאפס מערך דלתות פתוחות
+    for (int i = 0; i < 10; i++)
+        Door::openDoors[i] = false;
+
+    // לטעון מחדש את כל המסכים
+    for (int i = 0; i < 3; i++)   // כמה מסכים שיש לך
+        gameScreens[i].loadMap(i);
+
+    // לאפס שחקנים
+    player1.activate();
+    player2.activate();
+
+    player1.setPosition(Point(2, 2, Direction::directions[Direction::STAY], '&'));
+    player2.setPosition(Point(77, 2, Direction::directions[Direction::STAY], '$'));
+
 }
