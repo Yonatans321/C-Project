@@ -48,6 +48,7 @@ public:
 	bool hasItem(char item) const;
 	char getHeldItem() const;
 	int getItemId() const;
+	void dropHeldItem();
 	void DropItem();
 	void GrabItem(char item, int id = -1);
 	void setPosition(const Point& pos);// set player's position

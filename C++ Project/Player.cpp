@@ -11,7 +11,6 @@ void Player::draw() { // draw player at current position
 	position.draw();
 }
 void Player::erase() const { // erase player from current position
-	if (active)
 	position.erase();
 }
 int Player::getX() const { // get player's X position
@@ -50,10 +49,18 @@ void Player::stepBack() { // move player back to previous position
 }
 
 // change direction based on key pressed - Taken from lab 4
-void Player::keyPressed(char ch) {
+void Player::keyPressed(char ch) 
+{
+	char lower = std::tolower(ch);
+	if (lower==std::tolower(keys[5])&& heldItem !=0)
+	{
+		dropHeldItem();
+		return;
+	}
 	size_t index = 0;
 	for (char key : keys) {
-		if (std::tolower(key) == std::tolower(ch)) {
+		if (std::tolower(key) == std::tolower(ch))
+		{
 			position.changeDirection(Direction::directions[index]);
 			break;
 		}
@@ -141,3 +148,57 @@ bool Player::isDead() const
 void Player::setPosition(const Point& pos) {
 	position = pos;
 }
+
+void Player::dropHeldItem()
+{
+	if (heldItem == 0 || screen == nullptr)
+		return;
+
+	int dropX, dropY;
+	Direction direction = position.getDirection();
+
+	// אם השחקן עומד במקום
+	if (direction.getX()==0 && direction.getY()==0)
+	{
+		// ברירת מחדל: זריקה ימינה
+		dropX = position.getX() + 1;
+		dropY = position.getY();
+		dropX = position.getX() + 1;
+		dropY = position.getY();
+
+		// אם התא תפוס — שמאלה
+		if (screen->getCharAt(dropX, dropY) != ' ')
+		{
+			dropX = position.getX() - 1;
+			dropY = position.getY();
+		}
+
+		// אם גם שם תפוס, ננסה למטה
+		if (screen->getCharAt(dropX, dropY) != ' ')
+		{
+			dropX = position.getX();
+			dropY = position.getY() + 1;
+		}
+
+		// ואם עדיין תפוס — ננסה למעלה
+		if (screen->getCharAt(dropX, dropY) != ' ')
+		{
+			dropX = position.getX();
+			dropY = position.getY() - 1;
+		}
+	}
+	else
+	{
+		// אם השחקן בתנועה — מניח במקום הקודם
+		dropX = prevPos.getX();
+		dropY = prevPos.getY();
+	}
+
+	// מניח את החפץ במפה
+	screen->setCharAt(dropX, dropY, heldItem);
+
+	// ריקון היד
+	DropItem();
+}
+
+// YAM MADAR

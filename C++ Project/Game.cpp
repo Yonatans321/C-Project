@@ -15,8 +15,10 @@ Game::Game()
 {
     hideCursor();
     currStatus = GameModes::MENU;
-
-    gameScreens[0].loadMap(0);
+    for (int i = 0;i < MAX_LEVELS;i++)
+    {
+        gameScreens[i].loadMap(i);
+    }
     player1.setScreen(gameScreens[0]);
     player2.setScreen(gameScreens[0]);
 }
@@ -74,7 +76,6 @@ void Game::initLevel()
     Screen& currentScreen = gameScreens[currentLevel];
 
     cls();
-    currentScreen.loadMap(currentLevel);
     currentScreen.drawMap();
     riddleBank.attachPositionToRoom(currentScreen);
 
