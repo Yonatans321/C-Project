@@ -275,7 +275,7 @@ bool Game::handleTile(Player& player)
         return true;
     }
 
-    case '#': case 's':
+    case 's':
         return true;
         break;
 
@@ -350,9 +350,7 @@ bool Game::checkLevel()
     }
     return false;
 }
-/// <summary>
-/// / yam madar
-/// </summary>
+
 void Game::placePlayersAtEntrance()
 {
     Screen& currentScreen = gameScreens[currentLevel];

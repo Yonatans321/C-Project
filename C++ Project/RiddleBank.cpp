@@ -52,14 +52,14 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
-    int nextRiddleIndex = 0;
+    size_t nextRiddleIndex = 0;
 
     // קח את מימדי המפה מתוך Screen
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
     // מצא את החידה הראשונה שעדיין לא הוצמדה למיקום
-    for (int i = 0; i < riddleCount; ++i)
+    for (size_t i = 0; i < riddleCount; ++i)
     {
         Point p = riddles[i].getPosition();
         if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved())

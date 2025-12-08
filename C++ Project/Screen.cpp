@@ -176,7 +176,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
 
 void Screen::printInBox(int x, int y, const std::string& msg)
 {
-    int idx = 0;
+    size_t idx = 0;
     const int innerW = 50;
     const int innerH = 10;
 
