@@ -222,33 +222,13 @@ bool Game::handleTile(Player& player)
 
     switch (cell)
     {
-    //case '?':
-    //    riddleBank.handleRiddle(player, currentScreen, currentLevel);
-    //    break;
    
-
-    //default:
-    //    break;
-    //}
-   
-    //switch (targetCell)
-    //{
-    //case '1': case '2': case '3': case '4': case '5':
-    //case '6': case '7': case '8': case '9':
-    //{
-    //    bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);
-    //    if (doorOpened)
-    //    {
-    //        player.setPosition(targetPos);
-    //        return true;
-    //    }
-    //}
     case '?':
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
 
     case 'K':
-        player.GrabItem('K', 0);
+        player.GrabItem('K', currentLevel+1);
         currentScreen.setCharAt(pos, ' ');
         break;
     case '\\':

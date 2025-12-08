@@ -3,6 +3,7 @@
 #include "Direction.h"
 #include "Screen.h"
 #include "Door.h"
+#include "Key.h"
 
 // moving and drawing functions
 void Player::draw() { // draw player at current position

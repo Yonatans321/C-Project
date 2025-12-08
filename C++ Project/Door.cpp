@@ -77,12 +77,28 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 			int doorIndex = cell - '0';
 			Door* door = screen.getDoor(checkPos);
 			if (door == nullptr) continue;
-
 			bool doorCanPass = false;
+			if (doorIndex <= currentLevel)
+			{
+				doorCanPass = true;
+			}
+			if (doorIndex != (currentLevel + 1))
+			{
+				if (door->isOpen() || openDoors[doorIndex] == true)
+				{
+					doorCanPass = true;
+				}
+				
+			}
+			
+			
+
+			
 			// Check if the door is already open	
 			if (door->isOpen()||openDoors[doorIndex]==true)
 			{
 				doorCanPass = true;
+
 			}
 			// Try to use key for the door
 			else
