@@ -6,6 +6,7 @@
 #include "Obstacle.h"
 #include "Switch.h"
 
+bool Game::pauseRequestedFromRiddle = false;
 
 Game::Game()
     : player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
@@ -106,14 +107,57 @@ void Game::initLevel()
     }
 }
 
+void Game::handlePause(Screen& currentScreen, bool& gameRunning)
+{
+    UIScreens::showPauseScreen();
+    while (_kbhit()) _getch();
+
+    bool paused = true;
+    while (paused)
+    {
+        if (_kbhit())
+        {
+            char c = _getch();
+            if (c == 27)
+                paused = false;
+            else if (c == 'H' || c == 'h')
+            {
+                currStatus = GameModes::MENU;
+                gameRunning = false;
+                return;
+            }
+        }
+        Sleep(50);
+    }
+
+    while (_kbhit()) _getch();
+    currentScreen.drawMap();
+    player1.draw();
+    player2.draw();
+}
 void Game::gameLoop()
 {
     bool gameRunning = true;
 
     while (gameRunning)
     {
+        if (pauseRequestedFromRiddle)
+        {
+            pauseRequestedFromRiddle = false;
+            Screen& cs = gameScreens[currentLevel];
+            handlePause(cs, gameRunning);
+            while (_kbhit()) _getch();
+            if (!gameRunning)
+            {
+                break;
+            }
+            cls();
+            cs.drawMap();
+            player1.draw();
+            player2.draw();
+        }
         Screen& currentScreen = gameScreens[currentLevel];
-
+        
         // Handle input
         if (_kbhit())
         {
@@ -122,41 +166,18 @@ void Game::gameLoop()
             // PAUSE → Escape key
             if (ch == 27) // להחליף בקבוע ESC ( יותר קריא בשביל בודק התרגליים)
             {
-                UIScreens::showPauseScreen();
-                while (_kbhit()) _getch();
-
-                bool paused = true;
-
-                while (paused)
-                {
-                    if (_kbhit())
-                    {
-                        char c = _getch();
-
-                        if (c == 27)          // ESC → return to game
-                        {
-                            paused = false;
-                        }
-                        else if (c == 'H' || c == 'h') // go to menu
-                        {
-                            currStatus = GameModes::MENU;
-                            paused = false;
-                            gameRunning = false;
-                        }
-                    }
-
-                    Sleep(50);
-                }
-
-                while (_kbhit()) _getch();
+                handlePause(currentScreen, gameRunning);
+                 while (_kbhit()) _getch();
 
                 if (!gameRunning)
                     break;
 
-                cls();
+                // Redraw after pause
                 currentScreen.drawMap();
                 player1.draw();
                 player2.draw();
+
+
             }
             else
             {
@@ -297,10 +318,6 @@ void Game::run()
     UIScreens::showExitMessage();
 }
 
-// =========================
-//          CHECK LEVEL
-// ============================
-
 bool Game::checkLevel()
 {
     if (!player1.isActive() && !player2.isActive())
@@ -335,11 +352,10 @@ void Game::placePlayersAtEntrance()
 {
     Screen& currentScreen = gameScreens[currentLevel];
 
-    int lowestDoor = 10; // גדול מכל דלת אפשרית
+    int lowestDoor = 10; 
     Point lowestDoorPos;
     bool found = false;
 
-    // סורקים את כל החדר
     for (int y = 0; y < Screen::MAP_HEIGHT; y++)
     {
         for (int x = 0; x < Screen::WIDTH; x++)

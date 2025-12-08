@@ -68,6 +68,12 @@ void Switch::clearBarriers(Screen& screen)
 void Switch::handleSwitch(Player& player, Screen& screen)
 {
     Point pos = player.getPosition();
+    char c = screen.getCharAt(pos.getX(), pos.getY());
+
+    if (c=='/')
+    {
+        return;
+    }
 
     // 1. הופכים את הסוויצ'
     toggleSwitchAt(pos, screen);

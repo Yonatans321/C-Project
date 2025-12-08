@@ -11,13 +11,11 @@ static constexpr char START_KEY = '1';
 static constexpr char INSTRUCTIONS_KEY = '8';
 static constexpr char EXIT_KEY = '9';
 
-// class to contorl the the game
-
 class Game {
 private:
 	// Levels
 	static constexpr int MAX_LEVELS = 4;    
-	std::array<Screen, MAX_LEVELS> gameScreens;
+	std::array <Screen, MAX_LEVELS> gameScreens;
 	
     int currentLevel = 0;
 	char activeDoor = ' '; // to track last door used
@@ -39,8 +37,11 @@ private:
     void placePlayersAtEntrance();
     void resetGame();
 
+    void handlePause(Screen& currentScreen, bool& gameRunning);
+
 public:
     Game(); 
     void run(); 
     bool checkLevel();
+    static bool pauseRequestedFromRiddle;
 };

@@ -137,35 +137,38 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     screen.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
     gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
-
-    char choice = _getch();
-    if (choice == 'N' || choice == 'n')
+    
+    while (true)
     {
-        screen.closeAnimatedBox(bx, by, bw, bh);
-        player.stepBack(); // move player back to avoid re-triggering
-        // מחזיר את ה-? לגביו
-        screen.setCharAt(x, y, '?');
+        char choice = _getch();
+        // ESC → pause
+        if (choice == 27)
+        {
+            Game::pauseRequestedFromRiddle = true;
+            screen.closeAnimatedBox(bx, by, bw, bh);
+            player.stepBack();
+            return;
+        }
+        if (choice == 'N' || choice == 'n')
+        {
+            screen.closeAnimatedBox(bx, by, bw, bh);
+            player.stepBack(); // move player back to avoid re-triggering
+            // מחזיר את ה-? לגביו
+            screen.setCharAt(x, y, '?');
 
-        // מצייר מחדש את המפה והשחקן
-        screen.drawMap();
-        player.draw();
+            // מצייר מחדש את המפה והשחקן
+            screen.drawMap();
+            player.draw();
 
-        return;
+            return;
+        }
+
+        if (choice == 'Y' || choice == 'y')
+        {
+            break;
+        }
     }
-
-    if (choice != 'Y' && choice != 'y')
-    {
-        screen.closeAnimatedBox(bx, by, bw, bh);
-        screen.drawMap();
-        player.draw();
-        return;
-    }
-
     screen.closeAnimatedBox(bx, by, bw, bh);
-
-    // ==========================================
-    // STEP 2 – SHOW RIDDLE (+ HINT OPTION)
-    // ==========================================
 
     screen.drawAnimatedBox(bx, by, bw, bh);
 
@@ -218,7 +221,14 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             while (true)
             {
                 char c = _getch();
-
+                // ESC → pause the game
+                if (c == 27)
+                {
+                    Game::pauseRequestedFromRiddle = true;
+                    screen.closeAnimatedBox(bx, by, bw, bh);
+                    player.stepBack();
+                    return;
+                } 
                 if (c == '\r')   // ENTER
                 {
                     break; // מסיים את החידה

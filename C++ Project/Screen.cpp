@@ -65,10 +65,28 @@ void Screen::drawMap() const
 
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
-        gotoxy(0, y);
-        std::cout << screen[y];
+        for (int x = 0; x < WIDTH; x++)
+        {
+            char c = screen[y][x];
+            gotoxy(x, y);
+
+            // צבעים לסוויצ'ים:
+            if (c == '\\')       // OFF
+                setColor(COLOR_LIGHT_RED);    // אדום
+            else if (c == '/')  // ON
+                setColor(COLOR_LIGHT_GREEN);    // ירוק
+            else if (c == 's')  // temp wall
+                setColor(COLOR_YELLOW);
+            else
+                resetColor();
+
+            std::cout << c;
+        }
     }
+
+    resetColor();
 }
+
 
 // =====================
 //   DRAWING HELPERS

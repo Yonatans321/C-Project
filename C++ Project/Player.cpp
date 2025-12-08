@@ -6,13 +6,32 @@
 #include "Key.h"
 
 // moving and drawing functions
-void Player::draw() { // draw player at current position
+ // draw player at current position
+void Player::draw() {
 	if (active) 
 	position.draw();
 }
-void Player::erase() const { // erase player from current position
+// erase player from current position
+void Player::erase() const
+{
+	int x = position.getX();
+	int y = position.getY();
+
+	char tile = screen->getCharAt(x, y);
+
+	// אם התו במפה הוא switch – לא מוחקים את המפה
+	if (tile == '/' || tile == '\\')
+	{
+		// אבל כן צריך למחוק את ה-& מהמסך
+		gotoxy(x, y);
+		std::cout << tile; // מצייר מחדש את ה-switch מהמסך, בלי לגעת במפה
+		return;
+	}
+
+	// אחרת מוחקים כרגיל
 	position.erase();
 }
+
 int Player::getX() const { // get player's X position
 	return position.getX();
 }

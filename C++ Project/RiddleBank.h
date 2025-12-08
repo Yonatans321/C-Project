@@ -5,7 +5,6 @@
 #include "Rooms.h"
 #include "Screen.h"
 
-class Game; // forward decleration
 // Stores and manages multiple riddles
 // Possible outcomes when asking or checking a riddle
 
@@ -14,10 +13,6 @@ enum class RiddleOutcome {
     Incorrect,
     AlreadySolved,
     NotFound
-};
-enum class RiddleFlow {
-    Continue,
-    PauseRequested
 };
 
 class RiddleBank
