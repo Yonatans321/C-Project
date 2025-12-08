@@ -19,12 +19,12 @@ public:
 	bool isOpen() const;
 	int getDestinationLevel() const;
 	void setDestinationLevel(int level);
-
+	//DOOR LOGIC
 	bool tryOpen(int keyId);
 	bool canPass() const;
 	static bool isDoorChar(char c);
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor);
-	//static bool handleDoor(Player& p, Screen& screen, int& currentLevel);
+
 	static Point findLocation(const Screen& screen, int doorIndex);
 	static void allSwitchesAreOn();
 };
