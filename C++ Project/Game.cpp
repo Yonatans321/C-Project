@@ -350,7 +350,9 @@ bool Game::checkLevel()
     }
     return false;
 }
-
+/// <summary>
+/// / yam madar
+/// </summary>
 void Game::placePlayersAtEntrance()
 {
     Screen& currentScreen = gameScreens[currentLevel];
