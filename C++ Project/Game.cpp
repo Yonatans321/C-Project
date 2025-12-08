@@ -237,7 +237,7 @@ bool Game::handleTile(Player& player)
         break;
 
     case 'K':
-        player.GrabItem('K', 0);
+        player.GrabItem('K', currentLevel+1);
         currentScreen.setCharAt(pos, ' ');
         break;
 
