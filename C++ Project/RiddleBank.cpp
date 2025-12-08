@@ -1,4 +1,5 @@
 ﻿#include "RiddleBank.h"
+#include "Game.h" 
 #include <iostream>
 #include <string>
 #include <conio.h>
@@ -138,7 +139,6 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
 
     char choice = _getch();
-
     if (choice == 'N' || choice == 'n')
     {
         screen.closeAnimatedBox(bx, by, bw, bh);
