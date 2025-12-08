@@ -21,7 +21,7 @@ class RiddleBank
 private:
 	static constexpr size_t MAX_RIDDLES = 10;
 	Riddle riddles[MAX_RIDDLES];
-	int riddleCount = 0;
+	size_t riddleCount = 0;
 
 public:
 	// Constructor////
