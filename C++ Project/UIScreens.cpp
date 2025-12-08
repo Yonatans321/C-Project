@@ -4,8 +4,6 @@
 #include "Utils.h"
 #include <windows.h>
 
-    using namespace std;
-
 // פונקציית עזר להדפסה (נשארת אותו דבר)
 void UIScreens::printScreen(const char** screen)
 {
@@ -13,7 +11,7 @@ void UIScreens::printScreen(const char** screen)
     for (int i = 0; i < HEIGHT; i++)
     {
         gotoxy(0, i);
-        cout << screen[i];
+        std::cout << screen[i];
     }
 }
 
@@ -60,31 +58,31 @@ void UIScreens::showInstructions()
 {
     static const char* INSTRUCTIONS_SCREEN[HEIGHT] =
     {
-        "                                                                                ", // 1
-        "                                GAME INSTRUCTIONS                               ", // 2
-        "                                                                                ", // 3
-        "  A puzzle maze built for two players. Cooperate, explore, solve challenges,     ", // 4
-        "  and escape together — because alone you won't survive (or think clearly).      ", // 5
-        "                                                                                ", // 6
-        "   PLAYER 1 ($)              |                PLAYER 2 (&)                      ", // 7
-        "   W - Up                    |                I - Up                            ", // 8
-        "   X - Down                  |                M - Down                          ", // 9
-        "   A - Left                  |                J - Left                          ", // 10
-        "   D - Right                 |                L - Right                         ", // 11
-        "   S - Stay                  |                K - Stay                          ", // 12
-        "   E - Action                |                O - Action                        ", // 13
-        "                                                                                ", // 14
-        "   ITEMS                     |                ELEMENTS                           ", // 15
-        "   K - Key       | Opens doors. Simple.                                          ", // 16
-        "   * - Obstacle  | Push together / spring-boost to move it.                      ", // 17
-        "   ! - Torch     | Use it wisely... I'm scared of the dark.                      ", // 18
-        "   ? - Riddle    | Solve it or stare at it awkwardly.                            ", // 19
-        "   # - Spring    | Launches you like a cartoon hero.                             ", // 20
-        "   /\\ - Switch  | ON/OFF. Surprisingly dramatic click.                          ", // 21
-        "   S  - Signal   | Whatever the switch activates.                                 ", // 22
+        "                                                                                ", // 0
+        "                          G A M E   I N S T R U C T I O N S                      ", // 1
+        "                                                                                ", // 2
+        "  A cooperative maze for two players. Push, pull, think, panic together          ", // 3
+        "  because teamwork makes the dream work (and prevents unnecessary respawns).     ", // 4
+        "                                                                                ", // 5
+        "   PLAYER 1 ($)                             PLAYER 2 (&)                         ", // 6
+        "   W - Up        D - Right                 I - Up        L - Right               ", // 7
+        "   X - Down      A - Left                  M - Down      J - Left                ", // 8
+        "   S - Stay      E - Action                K - Stay      O - Action              ", // 9
+        "                                                                                ", // 10
+        "   ITEMS & ELEMENTS                                                             ", // 11
+        "                                                                                ", // 12
+        "   K    - Key         | Opens doors.you didnt expect something special...       ", // 13
+        "   *    - Obstacle    | Push together (or cry).                                  ", // 14
+        "   @    - Bomb        | Big boom. Try not to be in the blast radius.             ", // 15
+        "   !    - Torch       | Lights the way. Batteries not included.                  ", // 16
+        "   ?    - Riddle      | Solve it or stare until it solves you.                   ", // 17
+        "   #    - Spring      | Launches you like you're in a cartoon.                   ", // 18
+        "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
+        "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
+        "                                                                                ", // 21
+        "                     Press ANY key to return to the Main Menu...                ", // 22
         "                                                                                ", // 23
-        "                       Press ANY key to return to the Main Menu                 ", // 24
-        "                                                                                "  // 25 (נוספה)
+        "                                                                                "  // 24
     };
 
     printScreen(INSTRUCTIONS_SCREEN);
@@ -166,10 +164,10 @@ void UIScreens::showWinScreen()
 void UIScreens::showExitMessage()
 {
     cls();
-    cout << "\n\n";
-    cout << "=============================================\n";
-    cout << "           THANKS FOR PLAYING! :)\n";
-    cout << "=============================================\n\n";
+    std::cout << "\n\n";
+    std::cout << "=============================================\n";
+    std::cout << "           THANKS FOR PLAYING! :)\n";
+    std::cout << "=============================================\n\n";
 
     Sleep(1200); // רגע קטן לראות את ההודעה ואז סוגרים
 }

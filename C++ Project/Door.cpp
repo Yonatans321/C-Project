@@ -5,7 +5,7 @@
 
 bool Door::switchesAreOn = false;
 
-static bool openDoors[10] = { false }; // static array to track open doors
+bool Door::openDoors[10] = { false }; // static array to track open doors
 static bool justWarned = false;
 
 int Door::getId() const
@@ -178,4 +178,3 @@ void Door::allSwitchesAreOn()
 	switchesAreOn = true;
 }
 
-///GUY PALATIN

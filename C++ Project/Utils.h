@@ -10,4 +10,6 @@ void setScreen(int width, int height);
 
 void setColor(int color);
 
+void resetColor();
+
 void clearInputBuffer();
