@@ -289,13 +289,17 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                 player.loseLife();
                 if (player.getLives() <= 0)
                 {
-                    player.addLives(); // החזרת חיים
+                    player.addLives(); 
 
-                    // הודעה חמודה בשורת הסטטוס
-                    gotoxy(40, Screen::MAP_HEIGHT + 1);
+					// special message for no lives left
+                    std::string msg = "No lives left :( granting 1 bonus life :)";
+                    gotoxy(34, Screen::MAP_HEIGHT + 1);
                     setColor(COLOR_LIGHT_RED);
-                    std::cout << ">> No lives left :( granting 1 bonus life :)";
+                    std::cout << msg;
+					Sleep(2000);
+                    gotoxy(34, Screen::MAP_HEIGHT + 1);
                     resetColor();
+					std::cout << std::string(msg.length(), ' ');
                 }
 
                 // put the riddle symbol back
