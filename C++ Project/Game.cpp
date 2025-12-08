@@ -155,6 +155,8 @@ void Game::gameLoop()
             cs.drawMap();
             player1.draw();
             player2.draw();
+
+            cs.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(),player2.getHeldItem(), player2.getLives(), player2.getScore());
         }
         Screen& currentScreen = gameScreens[currentLevel];
         
@@ -176,8 +178,7 @@ void Game::gameLoop()
                 currentScreen.drawMap();
                 player1.draw();
                 player2.draw();
-
-
+                currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(),player2.getHeldItem(), player2.getLives(), player2.getScore());
             }
             else
             {
@@ -205,6 +206,8 @@ void Game::gameLoop()
 
         player1.draw();
         player2.draw();
+
+        currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
 
         if (checkLevel() == true)
         {

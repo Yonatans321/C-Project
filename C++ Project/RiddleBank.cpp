@@ -287,6 +287,16 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             {
                 std::cout << "Wrong! -1 life";
                 player.loseLife();
+                if (player.getLives() <= 0)
+                {
+                    player.addLives(); // החזרת חיים
+
+                    // הודעה חמודה בשורת הסטטוס
+                    gotoxy(40, Screen::MAP_HEIGHT + 1);
+                    setColor(COLOR_LIGHT_RED);
+                    std::cout << ">> No lives left :( granting 1 bonus life :)";
+                    resetColor();
+                }
 
                 // put the riddle symbol back
                 screen.setCharAt(x, y, '?');

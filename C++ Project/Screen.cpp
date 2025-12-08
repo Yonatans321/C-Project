@@ -1,4 +1,4 @@
-
+ï»¿
 #include "Screen.h"
 #include "Rooms.h"
 #include <cstring>
@@ -61,21 +61,19 @@ void Screen::loadMap(int level)
 
 void Screen::drawMap() const
 {
-    cls();
-
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
+        gotoxy(0, y);
+
         for (int x = 0; x < WIDTH; x++)
         {
             char c = screen[y][x];
-            gotoxy(x, y);
 
-            // öáòéí ìñååéö'éí:
-            if (c == '\\')       // OFF
-                setColor(COLOR_LIGHT_RED);    // àãåí
-            else if (c == '/')  // ON
-                setColor(COLOR_LIGHT_GREEN);    // éøå÷
-            else if (c == 's')  // temp wall
+            if (c == '\\')
+                setColor(COLOR_LIGHT_RED);
+            else if (c == '/')
+                setColor(COLOR_LIGHT_GREEN);
+            else if (c == 's')
                 setColor(COLOR_YELLOW);
             else
                 resetColor();
@@ -86,6 +84,7 @@ void Screen::drawMap() const
 
     resetColor();
 }
+
 
 
 // =====================
@@ -107,16 +106,28 @@ void Screen::setCharAt(const Point& p, char ch)
     setCharAt(p.getX(), p.getY(), ch);
 }
 
-void Screen::drawStatusBar(char inventory, int health, int score)
+void Screen::drawStatusBar(
+    char inv1, int lives1, int score1,
+    char inv2, int lives2, int score2)
 {
+    // ×©×—×§×Ÿ 1 â€“ ×©×•×¨×” ×¨××©×•× ×”
     gotoxy(0, MAP_HEIGHT);
-    std::cout << "Inventory: "
-        << inventory
-        << "  Health: " << health
-        << "  Score: " << score
+    setColor(COLOR_LIGHT_CYAN);
+    std::cout
+        << "P1 & -  Lives: " << lives1
+        << "   Inv: " << (inv1 == 0 ? '-' : inv1)
+        << "  Score: " << score1
         << "                                        ";
-}
 
+    // ×©×—×§×Ÿ 2 â€“ ×©×•×¨×” ×©× ×™×™×”
+    gotoxy(0, MAP_HEIGHT + 1);
+    std::cout
+        << "P2 $ -  Lives: " << lives2
+        << "    Inv: " << (inv2 == 0 ? '-' : inv2)
+        << "    Score: " << score2
+        << "                                        ";
+    resetColor();
+}
 void Screen::drawBox(int x, int y, int w, int h)
 {
     for (int row = 0; row < h; row++)

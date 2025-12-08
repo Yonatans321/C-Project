@@ -163,6 +163,7 @@ int Player::getLives() const
 bool Player::isDead() const
 {
 	return lives <= 0;
+
 }
 void Player::setPosition(const Point& pos) {
 	position = pos;

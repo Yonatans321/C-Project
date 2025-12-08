@@ -29,8 +29,7 @@ public:
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
-	void drawStatusBar(char inventory, int health, int score);
-	static void drawBox(int x, int y, int width, int height);
+	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2);static void drawBox(int x, int y, int width, int height);
 	static void clearBox(int x, int y, int width, int height);
 	static void drawAnimatedBox(int x, int y, int w, int h);
 	static void closeAnimatedBox(int x, int y, int w, int h);
