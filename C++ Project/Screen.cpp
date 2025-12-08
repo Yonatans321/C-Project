@@ -114,17 +114,17 @@ void Screen::drawStatusBar(
     gotoxy(0, MAP_HEIGHT);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
-        << "P1 & -  Lives: " << lives1
-        << "   Inv: " << (inv1 == 0 ? '-' : inv1)
-        << "  Score: " << score1
+        << "P1 & - Lives: " << lives1
+        << "  Inv: " << (inv1 == 0 ? '-' : inv1)
+        << " Score: " << score1
         << "                                        ";
 
     // שחקן 2 – שורה שנייה
     gotoxy(0, MAP_HEIGHT + 1);
     std::cout
-        << "P2 $ -  Lives: " << lives2
-        << "    Inv: " << (inv2 == 0 ? '-' : inv2)
-        << "    Score: " << score2
+        << "P2 $ - Lives: " << lives2
+        << "  Inv: "  << (inv2 == 0 ? '-' : inv2)
+        << " Score: " << score2
         << "                                        ";
     resetColor();
 }
@@ -176,7 +176,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
 
 void Screen::printInBox(int x, int y, const std::string& msg)
 {
-    int idx = 0;
+    size_t idx = 0;
     const int innerW = 50;
     const int innerH = 10;
 
