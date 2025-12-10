@@ -169,7 +169,9 @@ void Game::gameLoop()
             if (ch == 27) // להחליף בקבוע ESC ( יותר קריא בשביל בודק התרגליים)
             {
                 handlePause(currentScreen, gameRunning);
-                 while (_kbhit()) _getch();
+                // clean inpur buffer()
+                 while (_kbhit()) 
+                     auto i=_getch();
 
                 if (!gameRunning)
                     break;
