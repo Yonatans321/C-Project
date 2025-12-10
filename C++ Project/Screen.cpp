@@ -115,16 +115,16 @@ void Screen::drawStatusBar(
     setColor(COLOR_LIGHT_CYAN);
     std::cout
         << "P1 & - Lives: " << lives1
-        << "  Inv: " << (inv1 == 0 ? '-' : inv1)
-        << " Score: " << score1
+        << "  Inv:" << (inv1 == 0 ? '-' : inv1)
+        << "  Score: " << score1
         << "                                        ";
 
     // שחקן 2 – שורה שנייה
     gotoxy(0, MAP_HEIGHT + 1);
     std::cout
         << "P2 $ - Lives: " << lives2
-        << "  Inv: "  << (inv2 == 0 ? '-' : inv2)
-        << " Score: " << score2
+        << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
+        << "  Score: " << score2
         << "                                        ";
     resetColor();
 }
