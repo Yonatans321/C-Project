@@ -5,17 +5,20 @@
 #include "Door.h"
 #include "Obstacle.h"
 #include "Switch.h"
+#include "Utils.h"
 
-bool Game::pauseRequestedFromRiddle = false;
 
-Game::Game()
-    : player1(Point(2, 2, Direction::directions[Direction::STAY], '&'),
+bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
+
+Game::Game() // initializer list
+    : player1(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'),
         { 'W','D','X','A','S','E' }),
-    player2(Point(77, 2, Direction::directions[Direction::STAY], '$'),
+    player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
         { 'I','L','M','J','K','O' })
 {
-    hideCursor();
+	hideCursor();// hide cursor at the start of the game
     currStatus = GameModes::MENU;
+	// Load all maps
     for (int i = 0;i < MAX_LEVELS;i++)
     {
         gameScreens[i].loadMap(i);
@@ -26,7 +29,7 @@ Game::Game()
 
 void Game::showMenu()
 {
-    while (_kbhit()) _getch();
+    clearInputBuffer();
     UIScreens::showMenu();
 
     bool menu = true;
@@ -57,22 +60,19 @@ void Game::showMenu()
         }
     }
 
-    while (_kbhit()) _getch();
+	clearInputBuffer();// clear any extra input
 }
 
 
 void Game::showInstructions()
 {
     UIScreens::showInstructions();
-    while (_kbhit()) _getch(); // פונקציית עזר CLEANBUFFER ב UTILLS להוסיףףףףףףף
-    //[[maybe_unused]]
-    auto i =_getch();  // Press any key לעשות פונקציית עזר WAIT FOR KEY שיבינו מה עושים
-    while (_kbhit()) _getch();
-
+	waitForKey(); // wait for any key press
+   
     currStatus = GameModes::MENU;
 }
 
-void Game::initLevel()
+void Game::initLevel(int specificDoor)
 {
     Screen& currentScreen = gameScreens[currentLevel];
 
@@ -90,12 +90,12 @@ void Game::initLevel()
     
     if (activeDoor >= '1' && activeDoor <= '9')
     {
-        placePlayersAtEntrance();
+        placePlayersAtEntrance(specificDoor);
     }
     else
     {
-        player1.setPosition(Point(2, 2, Direction::directions[Direction::STAY], '&'));
-        player2.setPosition(Point(77, 2, Direction::directions[Direction::STAY], '$'));
+        player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
+        player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'));
     }
 
     player1.draw();
@@ -110,7 +110,7 @@ void Game::initLevel()
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
     UIScreens::showPauseScreen();
-    while (_kbhit()) _getch();
+    clearInputBuffer();
 
     bool paused = true;
     while (paused)
@@ -118,7 +118,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
         if (_kbhit())
         {
             char c = _getch();
-            if (c == 27)
+            if (c == ESC)
                 paused = false;
             else if (c == 'H' || c == 'h')
             {
@@ -127,10 +127,10 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
                 return;
             }
         }
-        Sleep(50);
+        Sleep(GAME_DELAY);
     }
 
-    while (_kbhit()) _getch();
+    clearInputBuffer();
     currentScreen.drawMap();
     player1.draw();
     player2.draw();
@@ -146,7 +146,7 @@ void Game::gameLoop()
             pauseRequestedFromRiddle = false;
             Screen& cs = gameScreens[currentLevel];
             handlePause(cs, gameRunning);
-            while (_kbhit()) _getch();
+            clearInputBuffer();
             if (!gameRunning)
             {
                 break;
@@ -166,10 +166,10 @@ void Game::gameLoop()
             char ch = _getch();
 
             // PAUSE → Escape key
-            if (ch == 27) // להחליף בקבוע ESC ( יותר קריא בשביל בודק התרגליים)
+            if (ch == ESC) 
             {
                 handlePause(currentScreen, gameRunning);
-                 while (_kbhit()) _getch();
+                clearInputBuffer();
 
                 if (!gameRunning)
                     break;
@@ -211,109 +211,107 @@ void Game::gameLoop()
 
         if (checkLevel() == true)
         {
-            gameRunning = false;      // עוצר את הלולאה
-            currStatus = GameModes::MENU; // מעדכן סטטוס לתפריט ראשי
-            break;                    // יוצא מיידית מהלולאה
+			gameRunning = false;      // level completed
+			currStatus = GameModes::MENU; // return to menu
+			break;                    // exit game loop
         }
     
-        Sleep(80);
+        Sleep(GAME_DELAY);
     }
 }
 
 
-bool Game::handleTile(Player& player)
+bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
+	// get reference to the other player
     Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
     Point targetPos = pos;
     targetPos.move();
     char cell = currentScreen.getCharAt(pos);
     char targetCell = currentScreen.getCharAt(targetPos);
-
+    
     switch (cell)
     {
-    case '?':
+	case '?':// riddle
         riddleBank.handleRiddle(player, currentScreen, currentLevel);
         break;
 
-    case 'K':
+	case 'K':// key
         player.GrabItem('K', currentLevel+1);
         currentScreen.setCharAt(pos, ' ');
         break;
 
+    // switch
     case '\\':
     case '/':
         Switch::handleSwitch(player, currentScreen);
         return false;
     }
 
-    switch (targetCell)
+	switch (targetCell)// check target cell
     {
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);
+		bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);// try to handle door
         if (doorOpened)
         {
-
-            player.setPosition(targetPos);
+			player.setPosition(targetPos);// move player through door
             return true;
         }
         break;
 
     }
-    case '*':
+	case '*':// obstacle
     {
-        Obstacle::handleObstacle(player1, player2, currentScreen);
+		Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
 
-        char afterPush = currentScreen.getCharAt(targetPos);
+		char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
 
         if (afterPush == '*')
-            return true;    // עדיין חסום → אל תזוז ואל תחזיר אחורה
+			return true;    // cannot move, obstacle not moved
 
-        player.setPosition(targetPos);
+		player.setPosition(targetPos);// move player into obstacle's previous position
         return true;
     }
 
-    case 's':
+	case 's':// switch wall
         return true;
         break;
 
     }
 
-    return false; // לא היה אירוע מיוחד
+	return false; // the player can move
     
 }
 
 void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
-    _getch();
+	waitForKey(); // wait for any key press
 }
 
-// =========================
-//          RUN
-// ============================
 
-void Game::run()
+void Game::run() // main game loop
 {
     while (currStatus != GameModes::EXIT)
     {
         if (currStatus == GameModes::MENU)
         {
-            cls();
-            while (_kbhit()) _getch();
-            showMenu();
+			cls();// clear screen
+			clearInputBuffer();// clear any extra input
+			showMenu();// show menu
         }
         else if (currStatus == GameModes::INSTRUCTIONS)
         {
             showInstructions();
         }
-        else if (currStatus == GameModes::NEW_GAME)
+		else if (currStatus == GameModes::NEW_GAME) // start new game
         {
-            resetGame();
-            initLevel();
-            gameLoop(); 
+			resetGame();// reset game state
+			initLevel();// initialize first level
+			gameLoop(); //  start game loop
 
             currStatus = GameModes::MENU;
         }
@@ -321,74 +319,90 @@ void Game::run()
     UIScreens::showExitMessage();
 }
 
-bool Game::checkLevel()
+bool Game::checkLevel() // check if level is completed
 {
-    if (!player1.isActive() && !player2.isActive())
+	if (!player1.isActive() && !player2.isActive()) // both players went through a door
     {
-        if (activeDoor == '1')
-        {
-            if (currentLevel == 0)
-                currentLevel = 1;
-            else if (currentLevel == 1)
-                currentLevel = 0;
-        }
-        else if (activeDoor == '2')
-        {
-            if (currentLevel == 1)
-                currentLevel = 2;
-            else if (currentLevel == 2)
-                currentLevel = 1;
-        }
-        else if (activeDoor == '3')
+		int doorId = activeDoor - '0'; // convert char to int
+		int targetDoor = -1; // door to place players at
+
+		if (activeDoor == '3') // final door (for now)
         {
             showWinScreen();
             activeDoor = ' ';
             return true;
         }
-        initLevel();
+
+		if (doorId == currentLevel + 1) // going to next level
+        {
+            currentLevel++;
+            targetDoor = -1;
+        }
+		else if (doorId == currentLevel) // going back to previous level
+        {
+			currentLevel--;
+            targetDoor = doorId;
+        }
+        
+		initLevel(targetDoor); // initialize new level
         activeDoor = ' ';
     }
     return false;
 }
 
-void Game::placePlayersAtEntrance()
+void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
 {
     Screen& currentScreen = gameScreens[currentLevel];
 
-    int lowestDoor = 10; 
-    Point lowestDoorPos;
+	int lowestDoor = 10; // higher than any door id
+    Point targetDoorPos;
     bool found = false;
 
+	// Search for doors in the current screen
     for (int y = 0; y < Screen::MAP_HEIGHT; y++)
     {
         for (int x = 0; x < Screen::WIDTH; x++)
         {
-            char c = currentScreen.getCharAt(x, y);
+			char c = currentScreen.getCharAt(x, y);// get character at position
             if (c >= '1' && c <= '9')
             {
                 int id = c - '0';
-                if (id < lowestDoor)
+                if (specificDoor != -1)
+                {
+					if (id == specificDoor)// found the specific door
+                    {
+						targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
+						found = true;  // mark as found
+						goto EndSearch;// exit both loops (AI suggested)
+                    }
+                }
+				else if (id < lowestDoor) // find the lowest door id    
                 {
                     lowestDoor = id;
-                    lowestDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
+                    targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
                     found = true;
                 }
             }
         }
     }
+    
+EndSearch:// exit point for goto (AI suggested)
+	if (!found) return;
 
-    if (!found)
-        return; // אין דלתות בכלל
+	placeNextToDoor(targetDoorPos); // place players next to the found door
+      
+}
 
-    // מציבים את השחקנים בצמוד לדלת — מימין לה
-    int px = lowestDoorPos.getX();
-    int py = lowestDoorPos.getY();
+void Game::placeNextToDoor(const Point& targetDoorPos)
+{
+    int px = targetDoorPos.getX();
+    int py = targetDoorPos.getY();
 
-    // שחקן 1
+    // player 1
     Point p1(px + 1, py, Direction::directions[Direction::STAY], '$');
     player1.setPosition(p1);
 
-    // שחקן 2 לידו
+    // player 2
     Point p2(px + 2, py, Direction::directions[Direction::STAY], '&');
     player2.setPosition(p2);
 
@@ -396,26 +410,19 @@ void Game::placePlayersAtEntrance()
     player2.draw();
 }
 
-
 void Game::resetGame()
 {
+	// reset game state
     currentLevel = 0;
     activeDoor = ' ';
     Door::switchesAreOn = false;
 
-    // לאפס מערך דלתות פתוחות
+	// reset doors
     for (int i = 0; i < 10; i++)
         Door::openDoors[i] = false;
 
-    // לטעון מחדש את כל המסכים
-    for (int i = 0; i < 3; i++)   // כמה מסכים שיש לך
+	// reload maps
+    for (int i = 0; i < MAX_LEVELS; i++)   
         gameScreens[i].loadMap(i);
-
-    // לאפס שחקנים
-    player1.activate();
-    player2.activate();
-
-    player1.setPosition(Point(2, 2, Direction::directions[Direction::STAY], '&'));
-    player2.setPosition(Point(77, 2, Direction::directions[Direction::STAY], '$'));
 
 }

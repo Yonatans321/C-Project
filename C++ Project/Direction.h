@@ -3,7 +3,7 @@
 
 class Direction {
 	int dirx, diry;
-	friend class Point;
+	friend class Point; 
 public:
 	enum { UP, RIGHT, DOWN, LEFT, STAY, NUM_DIRECTIONS };
 	static const Direction directions[NUM_DIRECTIONS];
