@@ -14,10 +14,10 @@ static const char* const ROOM0[ROOM_HEIGHT] =
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
     "W    W     W                 s                                                 W", // 1 
     "W    W     W   WWWWWWWWWW    s          WWWWWWWWWWW                            W", // 2
-    "W    W       ?  W      W     s          W          W                           W", // 3
-    "W    W     W           W     s          W     \\   W                           W", // 4
-    "W    W     WWW \\      W     s          W          W                           W", // 5
-    "W    W     W   W       W     s          W          W                           W", // 6
+    "W    W       ?  W       W    s          W          W                           W", // 3
+    "W    W     W            W    s          W     \\    W                           W", // 4
+    "W    W     WWW \\        W    s          W          W                           W", // 5
+    "W    W     W   W        W    s          W          W                           W", // 6
     "W    W     W   WWWWWWWWWW    s          WWWWW?WWWWWW                           W", // 7
     "W    W     W                 s                                                 W", // 8
     "W    W     W                 s                                                 W", // 9
@@ -31,8 +31,8 @@ static const char* const ROOM0[ROOM_HEIGHT] =
     "W    W     W           WWWWWWWWWW                                              W", // 17
     "W    W     W      WWWW                                                         W", // 18
     "W    W     WWWWWWWW  W                         W                     ***  WWW  W", // 19
-    "W    W               W                                              W   * *  * W", // 20
-    "W   ? \\         W    W                                             W ***KWWW  W", // 21
+    "W    W               W                                              W   **    * W", // 20
+    "W   ? \\          W    W                                             W ** KWWW  W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
 
@@ -72,7 +72,7 @@ static const char* const ROOM1[ROOM_HEIGHT] =
 static const char* const ROOM2[ROOM_HEIGHT] =
 {
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-    "W    2     W                \\W                \\W                          ?\\W", // 1
+    "W    2     W                 \\W                 \\W                           ?\\W", // 1
     "W          W        WW          W              WWWWW            WW             W", // 2
     "WWWWWWW?WWWWWWWWWWWW  W?WWWWWWWWWWWWWWWWW?WWWWW   WWWWWWWWWWWW  WWWWWWWW*WWWWWWW", // 3
     "W                  W                  WW                W                      W", // 4

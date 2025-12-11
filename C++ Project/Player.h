@@ -60,7 +60,7 @@ public:
 
 	// Key functions
 	void setKey(bool val) { hasKey = val; }
-	bool useKeyForDoor(char doorChar);
+	bool useKeyForDoor(char doorChar) const;
 	void keyUsed();
 	//bool hasKeyForDoor(char doorChar) const;
 	

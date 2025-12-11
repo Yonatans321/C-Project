@@ -5,9 +5,10 @@
 #define COLOR_LIGHT_GREEN  10
 #define COLOR_LIGHT_RED    12
 void gotoxy(int x, int y);// go to the position x,y in the screen
+
 extern bool ColorsEnabled;
 
-void gotoxy(int x, int y);
+void hideCursor(); //hide the console cursor
 
 void cls();// clear the screen
 

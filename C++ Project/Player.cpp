@@ -124,7 +124,7 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 	heldItem = item;
 	itemId = id;
 }
-bool Player::useKeyForDoor(char doorChar)  // use key for a door
+bool Player::useKeyForDoor( char doorChar) const  // use key for a door
 { // check if player hasn't a key
 	if (heldItem == 'K')
 	{
