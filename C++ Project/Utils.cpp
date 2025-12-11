@@ -8,6 +8,8 @@
 using std::cout; 
 using std::endl;   
 
+bool ColorsEnabled = true;
+
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
     std::cout.flush();
@@ -41,7 +43,10 @@ void setScreen(int width, int height) {
 }
 //AI generated function to change text color in console
 void setColor(int color) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    if (ColorsEnabled)
+    {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
 }
 void resetColor() {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
@@ -49,7 +54,7 @@ void resetColor() {
 
 void clearInputBuffer()
 {
-    while (_kbhit()) _getch();
+    while (_kbhit()) auto i = _getch();
 }
 
 void waitForKey()

@@ -52,6 +52,10 @@ void Game::showMenu()
                 menu = false;
                 break;
 
+            case Colors_ON_OFF: // Colors ON/OFF
+                ColorsEnabled = !ColorsEnabled;
+                UIScreens::showMenu(); 
+                break;
             case EXIT_KEY:
                 currStatus = GameModes::EXIT;
                 menu = false;

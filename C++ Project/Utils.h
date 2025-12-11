@@ -5,6 +5,8 @@
 #define COLOR_LIGHT_GREEN  10
 #define COLOR_LIGHT_RED    12
 
+extern bool ColorsEnabled;
+
 void gotoxy(int x, int y);
 
 void hideCursor();

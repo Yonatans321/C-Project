@@ -20,6 +20,7 @@ private:
     static constexpr char START_KEY = '1';
     static constexpr char INSTRUCTIONS_KEY = '8';
     static constexpr char EXIT_KEY = '9';
+    static constexpr char Colors_ON_OFF = '2';
 
     // Levels
     static constexpr int MAX_LEVELS = 4;
