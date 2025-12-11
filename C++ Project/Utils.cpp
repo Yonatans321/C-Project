@@ -5,6 +5,9 @@
 #include <conio.h>
 #include <limits>
 
+using std::cout; 
+using std::endl;   
+
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
     std::cout.flush();
@@ -46,7 +49,13 @@ void resetColor() {
 
 void clearInputBuffer()
 {
-    std::cin.clear();
-    while (std::cin.peek() == '\n')
-        std::cin.ignore();
+    while (_kbhit()) _getch();
 }
+
+void waitForKey()
+    {
+    
+        clearInputBuffer(); 
+		auto i = _getch();
+               
+    }

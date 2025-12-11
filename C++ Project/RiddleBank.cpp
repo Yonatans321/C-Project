@@ -25,7 +25,7 @@ RiddleBank::RiddleBank() : riddleCount(0)
 }
 Riddle* RiddleBank::getRiddleById(int riddleID)
 {
-    for (size_t i = 0; i <riddleCount; ++i) {
+    for (size_t i = 0; i < riddleCount; ++i) {
 
         if (riddles[i].getRiddleID() == riddleID) {
             return &riddles[i];
@@ -52,14 +52,14 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
-    int nextRiddleIndex = 0;
+    size_t nextRiddleIndex = 0;
 
     // קח את מימדי המפה מתוך Screen
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
     // מצא את החידה הראשונה שעדיין לא הוצמדה למיקום
-    for (int i = 0; i < riddleCount; ++i)
+    for (size_t i = 0; i < riddleCount; ++i)
     {
         Point p = riddles[i].getPosition();
         if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved())
@@ -289,13 +289,17 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                 player.loseLife();
                 if (player.getLives() <= 0)
                 {
-                    player.addLives(); // החזרת חיים
+                    player.addLives(); 
 
-                    // הודעה חמודה בשורת הסטטוס
-                    gotoxy(40, Screen::MAP_HEIGHT + 1);
+					// special message for no lives left
+                    std::string msg = "No lives left :( granting 1 bonus life :)";
+                    gotoxy(34, Screen::MAP_HEIGHT + 1);
                     setColor(COLOR_LIGHT_RED);
-                    std::cout << ">> No lives left :( granting 1 bonus life :)";
+                    std::cout << msg;
+					Sleep(2000);
+                    gotoxy(34, Screen::MAP_HEIGHT + 1);
                     resetColor();
+					std::cout << std::string(msg.length(), ' ');
                 }
 
                 // put the riddle symbol back

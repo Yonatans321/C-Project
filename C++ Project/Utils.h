@@ -18,3 +18,5 @@ void setColor(int color);
 void resetColor();
 
 void clearInputBuffer();
+
+void waitForKey();

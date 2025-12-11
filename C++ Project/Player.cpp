@@ -19,16 +19,24 @@ void Player::erase() const
 
 	char tile = screen->getCharAt(x, y);
 
-	// אם התו במפה הוא switch – לא מוחקים את המפה
+	//if on a switch - redraw the switch
 	if (tile == '/' || tile == '\\')
 	{
-		// אבל כן צריך למחוק את ה-& מהמסך
+		//
 		gotoxy(x, y);
-		std::cout << tile; // מצייר מחדש את ה-switch מהמסך, בלי לגעת במפה
+		if (tile == '/')
+		{
+			setColor(COLOR_LIGHT_GREEN); // COLOR GREEN
+		}
+		else 
+		{
+			setColor(COLOR_LIGHT_RED);  // COLOR RED
+		}
+		std::cout << tile; //paint the switch
+		resetColor();
 		return;
 	}
 
-	// אחרת מוחקים כרגיל
 	position.erase();
 }
 
