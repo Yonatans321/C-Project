@@ -90,7 +90,7 @@ static const char* const ROOM2[ROOM_HEIGHT] =
     "W            WW**WWWWW                                  W     W                W", // 16
     "W                  WWW                              W               W          W", // 17
     "W                  WWW                              WW             WW          W", // 18
-    "W        WWWWWWWWWWWWWWWWWWWWWW                      WWWWWWWWWWWWWWW           W", // 19
+    "W        WWWWWWWWWWWWWWWWWWWWWW             W        WWWWWWWWWWWWWWW           W", // 19
     "W        W                    W                                                W", // 20
     "W        s         3         sss                                               W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
