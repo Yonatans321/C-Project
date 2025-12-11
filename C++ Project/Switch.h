@@ -8,25 +8,25 @@ class Switch
 public:
     enum State { OFF, ON };
 
-    // קובע האם התו הוא סוויצ'
+    //determines if the char is switch
     static bool isSwitch(char c);
 
-    // מפענח מצב מתוך תו
+    // decoder of switch state from char
     static State stateFromChar(char c);
 
-    // משנה את הסוויצ' עצמו
+    // changes the switch position
     static void toggleSwitchAt(Point pos, Screen& screen);
 
-    // הפונקציה שה-Game קורא — עושה הכל
+	// responsible for handling the switch logic
     static void handleSwitch(Player& player, Screen& screen);
-
+    // checks if there is any switch on the screen
     static bool exists(const Screen& screen);
 
 private:
-    // בדיקה האם כל הסוויצ'ים ON
+    //checks if all switches are on
     static bool allSwitchesOn(const Screen& screen);
 
-    // מוחקת מחסומי 's'
+    // deletes all the 's' barriers from the screen
     static void clearBarriers(Screen& screen);
 
 };

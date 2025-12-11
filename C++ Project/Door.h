@@ -18,20 +18,19 @@ public:
 	static bool openDoors[10];
 
 	//GET DATA
-	int getId() const;
-	bool isOpen() const;
-	int getDestinationLevel() const;
-	void setDestinationLevel(int level);
+	int getId() const { return id; }
+	bool isOpen() const { return open; }
+	int getDestinationLevel() const { return destinationLevel; }
+	void setDestinationLevel(int level) { destinationLevel = level; }
 
 	//DOOR LOGIC
 	bool tryOpen(int keyId);
-	bool canPass() const;
-	static bool isDoorChar(char c);
+	bool canPass() const { return open; }
+	static bool isDoorChar(char c) { return (c >= '1' && c <= '9'); }
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor);
 
-   //HELPER FUNCTIONS
-	static Point findLocation(const Screen& screen, int doorIndex);
-	static void allSwitchesAreOn();
+   //SET AWITCHES ON
+	static void allSwitchesAreOn() { switchesAreOn = true; }
 
 };
 

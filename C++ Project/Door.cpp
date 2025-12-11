@@ -3,28 +3,25 @@
 #include <Windows.h>
 #include "Screen.h"
 
-
+// Static member initialization
 bool Door::switchesAreOn = false;
 bool Door::openDoors[10] = { false }; // static array to track open doors
 static bool justWarned = false;
 
-int Door::getId() const { return id; }
-
-bool Door::isOpen() const { return open; }
-
-int Door::getDestinationLevel() const { return destinationLevel; }
-
-void Door::setDestinationLevel(int level){ destinationLevel = level; }
-
-
+//DOOR LOGIC
 bool Door::tryOpen(int keyId)
-
 {
-	if (open){ return true; }
+	if (open)// the door is already open
+	{
+		return true;
+	}
 
-	if (!switchesAreOn){ return false; }
+	if (!switchesAreOn) // switches are not all on
+	{
+		return false; 
+	}
 
-	if (keyId == id)
+	if (keyId == id) // macthed key for door
 	{
 		open = true;
 		return true;
@@ -32,18 +29,12 @@ bool Door::tryOpen(int keyId)
 	return false;
 }
 
-bool Door::canPass() const{ return open; }
-
-void Door::allSwitchesAreOn() {switchesAreOn = true;}
-
-bool Door::isDoorChar(char c){ return (c >= '1' && c <= '9'); }
-
-
+// Handle door interaction for the player
 bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor)
 {
-	if (!p.isActive()) return false;
+	if (!p.isActive()) return false; // do nothing if player is inactive
 
-	Point playerPos = p.getPosition();
+	Point playerPos = p.getPosition(); // get player's current position
 
 	// Check directions of the player
 	int dirX[] = { 1, -1, 0, 0 };
@@ -53,7 +44,7 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 	for (int i = 0; i < 4; i++)
 	{
 		Point checkPos = playerPos;
-		checkPos.set(playerPos.getX() + dirX[i], playerPos.getY() + dirY[i]);
+		checkPos.set(playerPos.getX() + dirX[i], playerPos.getY() + dirY[i]);// position next to player
 
 		char cell = screen.getCharAt(checkPos);
 
@@ -61,15 +52,15 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 		if (isDoorChar(cell))
 		{
 			int doorIndex = cell - '0';
-			Door* door = screen.getDoor(checkPos);
+			Door* door = screen.getDoor(checkPos);// get door object
 			if (door == nullptr) continue;
 
 			bool doorCanPass = false;
-			if (doorIndex <= currentLevel)
+			if (doorIndex <= currentLevel)// door to previous or current level	
 			{
 				doorCanPass = true;
 			}
-			if (doorIndex != (currentLevel + 1))
+			if (doorIndex != (currentLevel + 1)) // door to future level
 			{
 				if (door->isOpen() || openDoors[doorIndex] == true)
 				{
@@ -85,26 +76,27 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 			// Try to use key for the door
 			else
 			{
+				// Check if switches are on
 				if (!Door::switchesAreOn)
 				{
-					Screen::drawAnimatedBox(10, 5, 50, 12);
+					Screen::drawAnimatedBox(10, 5, 50, 12);// draw message box
 					gotoxy(13, 7);
 					std::cout << "you cannot enter";
 					gotoxy(15, 9);
 					std::cout << "All switcehs must be ON!";
 					Sleep(1200);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
-					p.stepBack();
+					p.stepBack();// move player back
 					screen.drawMap();
 					p.draw();
 					return false;
 				}
 
-				if (p.useKeyForDoor(cell))
+				if (p.useKeyForDoor(cell))// check if player has the correct key
 				{
-					door->tryOpen(doorIndex);
-					openDoors[doorIndex] = true;
-					p.keyUsed();
+					door->tryOpen(doorIndex);// open the door
+					openDoors[doorIndex] = true;// mark door as open
+					p.keyUsed();// mark key as used
 					doorCanPass = true;
 				}
 				else
@@ -134,19 +126,6 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 	return false;
 }
 
-Point Door::findLocation(const Screen& screen, int doorIndex)
-{
-	char targetChar = '0' + doorIndex;
-	for (int y = 0; y < 23; y++) {
-		for (int x = 0; x < 80; x++) {
-			if (screen.getCharAt(x, y) == targetChar) {
-				return Point(x, y, Direction::directions[Direction::STAY], targetChar);
-			}
-		}
-	}
-
-	return Point(-1, -1, Direction::directions[Direction::STAY], ' ');
-}
 
 
 

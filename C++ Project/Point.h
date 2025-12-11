@@ -7,9 +7,8 @@ class Point {
 	int x, y;
 	Direction dir = Direction::directions[Direction::RIGHT];
 	char ch;
-	// option 1:
-		// enum {MAX_X = 80, MAX_Y = 25};
-	// option 2:
+	
+	// screen boundries
 	static constexpr int MAX_X = 79;
 	static constexpr int MAX_Y = 24;
 

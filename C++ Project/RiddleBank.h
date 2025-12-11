@@ -18,6 +18,7 @@ enum class RiddleOutcome {
 class RiddleBank
 {
 private:
+    static constexpr int ESC = 27;
 	static constexpr size_t MAX_RIDDLES = 10;
 	Riddle riddles[MAX_RIDDLES];
 	size_t riddleCount = 0;
@@ -44,6 +45,6 @@ public:
     // Non-interactive check: supply an answer string and receive outcome.
     RiddleOutcome checkAnswerFor(int riddleID, const std::string& answer);
 
-   
+	// Interactive handling of a riddle when a player steps on a riddle tile
     void handleRiddle(Player& player, Screen& screen, int level);
 };

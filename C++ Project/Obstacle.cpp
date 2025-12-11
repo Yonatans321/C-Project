@@ -3,22 +3,23 @@
 #include "Screen.h"
 #include "Point.h"
 #include "Direction.h"
-#include <vector>
 
+
+// Handle obstacle interaction for two players
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
-    Point obs(0, 0);
+    Point obs(0, 0); // to store obstaclr position
 
-    // בדיקה אם p1 הוא הדוחף המוביל
+	// Check if player 1 is facing an obstacle and if players are aligned for pushing
     if (isFacingObstacle(p1, screen, obs) && playersAlignedAndPushing(p1, p2))
     {
-        auto chain = collectChain(obs, p1.getDirection(), screen);
-        if (!chain.empty())
-            pushChain(chain, p1.getDirection(), screen);
+        auto chain = collectChain(obs, p1.getDirection(), screen); //collect obstacle chain
+        if (!chain.empty()) // if chain is not empty 
+            pushChain(chain, p1.getDirection(), screen); // push it
         return;
     }
 
-    // בדיקה אם p2 הוא הדוחף המוביל
+    // Check if player 2 is facing an obstacle and if players are aligned for pushing
     if (isFacingObstacle(p2, screen, obs) && playersAlignedAndPushing(p2, p1))
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
@@ -27,65 +28,65 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
     }
 }
 
-
-bool Obstacle::isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos)
+// check if the player is facing an obstacle
+bool Obstacle::isFacingObstacle(const Player& p, Screen& screen, Point& obstaclePos)
 {
+	// Calculate the position in front of the player    
     Point pos = p.getPosition();
     Direction dir = p.getDirection();
 
-    Point forward(pos.getX() + dir.getX(), pos.getY() + dir.getY());
+    Point forward(pos.getX() + dir.getX(), pos.getY() + dir.getY()); //pos in front of player
 
-    if (screen.getCharAt(forward.getX(), forward.getY()) == '*')
+    if (screen.getCharAt(forward.getX(), forward.getY()) == '*') // check if obstacle
     {
-        obstaclePos = forward;
+        obstaclePos = forward; // store obstacle position
         return true;
     }
     return false;
 }
-
-bool Obstacle::playersAlignedAndPushing(Player& front, Player& back)
+// check if both player are aligned and pushing
+bool Obstacle::playersAlignedAndPushing(const Player& front, Player& back)
 {
+    // get ditrection of both players
     Direction df = front.getDirection();
     Direction db = back.getDirection();
 
-    // חייבים לדחוף באותו כיוון
-    if (df.getX() != db.getX() || df.getY() != db.getY())
+    // not pushing in same direction
+	if (df.getX() != db.getX() || df.getY() != db.getY()) 
         return false;
-
-    // השחקן האחורי חייב לזוז (לא STAY)
     if (db.getX() == 0 && db.getY() == 0)
         return false;
 
-    // בדיקה שהשחקן האחורי צמוד ממש מאחור
+    // check direction from back to front 
     Point fp = front.getPosition();
     Direction opp = front.getOppositeDirection();
 
+    // expected pos of back player
     Point expectedBack(fp.getX() + opp.getX(),
         fp.getY() + opp.getY());
 
     return (expectedBack.getX() == back.getX() &&
         expectedBack.getY() == back.getY());
 }
-
-std::vector<Point> Obstacle::collectChain(Point start, const Direction& dir, Screen& screen)
+// collect the chain of obstacles
+std::vector<Point> Obstacle::collectChain( Point start, const Direction& dir,const Screen& screen)
 {
-    std::vector<Point> chain;
+    std::vector<Point> chain; // store obstacle chain
     Point cur = start;
-
+	// collect obstacles in the direction
     while (screen.getCharAt(cur.getX(), cur.getY()) == '*')
     {
         chain.push_back(cur);
         cur = Point(cur.getX() + dir.getX(), cur.getY() + dir.getY());
     }
-
-    // אם התא שאחרי לא ריק — אי אפשר לזוז
+	// check if next position is empty
     if (screen.getCharAt(cur.getX(), cur.getY()) != ' ')
         return {};
 
     return chain;
 }
 
-
+// push the chain of obstacles
 void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, Screen& screen)
 {
     if (chain.empty()) return;
@@ -93,7 +94,7 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
     Point newSpot(chain.back().getX() + dir.getX(),
         chain.back().getY() + dir.getY());
 
-    // דוחפים מהסוף להתחלה
+    // move obstacle from end to start
     for (int i = chain.size() - 1; i >= 0; i--)
     {
         Point from = chain[i];

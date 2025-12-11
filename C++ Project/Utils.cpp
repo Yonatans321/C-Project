@@ -16,7 +16,7 @@ void gotoxy(int x, int y) {
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-
+//Taken from lab exercise 10.11.25
 void hideCursor() {
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
@@ -24,7 +24,7 @@ void hideCursor() {
     cursorInfo.bVisible = FALSE; // Hide the cursor
     SetConsoleCursorInfo(consoleHandle, &cursorInfo);
 }
-
+//Taken from lab exercise 10.11.25
 void cls() {
     system("cls");
 }
@@ -46,16 +46,14 @@ void setColor(int color) {
 void resetColor() {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
 }
-
+// clear the input from any previous key presses
 void clearInputBuffer()
 {
     while (_kbhit()) _getch();
 }
-
+// wait for a key press from the user
 void waitForKey()
     {
-    
         clearInputBuffer(); 
-		auto i = _getch();
-               
+		auto i = _getch();            
     }

@@ -113,11 +113,8 @@ char Player::getHeldItem() const { // get the held item
 int Player::getItemId() const { // get the held item id
 	return itemId;
 }
-void Player::DropItem() { // drop the held item
-	if (myKey != nullptr) {
-		delete myKey;
-		myKey = nullptr;
-	}
+void Player::DropItem() // drop the held item 
+{ 
 	heldItem = 0;
 	itemId = -1;
 }
@@ -141,6 +138,7 @@ void Player::keyUsed() { // remove the used key
 	
 	DropItem();
 }
+// points and life functions
 void Player::addPoints(int pts)
 {
 	points += pts;
@@ -176,7 +174,7 @@ bool Player::isDead() const
 void Player::setPosition(const Point& pos) {
 	position = pos;
 }
-
+//item function to drop and hold
 void Player::dropHeldItem()
 {
 	if (heldItem == 0 || screen == nullptr)
@@ -185,30 +183,29 @@ void Player::dropHeldItem()
 	int dropX, dropY;
 	Direction direction = position.getDirection();
 
-	// אם השחקן עומד במקום
+	// if the player is not moving
 	if (direction.getX()==0 && direction.getY()==0)
 	{
-		// ברירת מחדל: זריקה ימינה
+		// default to right
 		dropX = position.getX() + 1;
 		dropY = position.getY();
-		dropX = position.getX() + 1;
-		dropY = position.getY();
+		
 
-		// אם התא תפוס — שמאלה
+		// if right blocked - try left
 		if (screen->getCharAt(dropX, dropY) != ' ')
 		{
 			dropX = position.getX() - 1;
 			dropY = position.getY();
 		}
 
-		// אם גם שם תפוס, ננסה למטה
+		//if still blocked -  try down
 		if (screen->getCharAt(dropX, dropY) != ' ')
 		{
 			dropX = position.getX();
 			dropY = position.getY() + 1;
 		}
 
-		// ואם עדיין תפוס — ננסה למעלה
+		// if still blocked -  try up
 		if (screen->getCharAt(dropX, dropY) != ' ')
 		{
 			dropX = position.getX();
@@ -217,16 +214,15 @@ void Player::dropHeldItem()
 	}
 	else
 	{
-		// אם השחקן בתנועה — מניח במקום הקודם
+		// if moving - drop in the previous position
 		dropX = prevPos.getX();
 		dropY = prevPos.getY();
 	}
 
-	// מניח את החפץ במפה
+	// put the item on the screen
 	screen->setCharAt(dropX, dropY, heldItem);
 
-	// ריקון היד
+	// drop from the player
 	DropItem();
 }
 
-// YAM MADAR
