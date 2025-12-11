@@ -1,35 +1,35 @@
 ﻿#include "Switch.h"
 
-bool Switch::isSwitch(char c)
+bool Switch::isSwitch(char c) //determines if the char is switch
 {
     return c == '\\' || c == '/';
 }
 
-Switch::State Switch::stateFromChar(char c)
+Switch::State Switch::stateFromChar(char c) // decoder of switch state from char
 {
     return (c == '\\' ? OFF : ON);
 }
 
-void Switch::toggleSwitchAt(Point pos, Screen& screen)
+void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch position
 {
     char c = screen.getCharAt(pos.getX(), pos.getY());
 
-    // רק OFF → ON (אין חזור)
+    // only OFF to ON
     if (c == '\\')
     {
         screen.setCharAt(pos.getX(), pos.getY(), '/');
 
-        // ציור מחדש (ON = ירוק)
+		// ON display
         setColor(10);
         gotoxy(pos.getX(), pos.getY());
         std::cout << "/";
         resetColor();
     }
 }
-bool Switch::allSwitchesOn(const Screen& screen)
+bool Switch::allSwitchesOn(const Screen& screen) //checks if ALL switches are on
 {
     bool foundAnySwitch = false;
-
+    // scan the screen for switches
     for (int y = 0; y < screen.getHeight(); y++)
     {
         for (int x = 0; x < screen.getWidth(); x++)
@@ -45,14 +45,12 @@ bool Switch::allSwitchesOn(const Screen& screen)
             }
         }
     }
-
-    // לא מצאנו אפילו Switch אחד → אין צורך להתנות
-    if (!foundAnySwitch)
+    if (!foundAnySwitch) // if no switche found
         return true;
 
-    return true; // כל הסוויצ'ים ON
+    return true; //all the switches are ON
 }
-
+// deletes all the 's' barriers from the screen
 void Switch::clearBarriers(Screen& screen)
 {
     for (int y = 0; y <screen.getHeight(); y++)
@@ -64,7 +62,7 @@ void Switch::clearBarriers(Screen& screen)
         }
     }
 }
-
+// responsible for handling the switch logic
 void Switch::handleSwitch(Player& player, Screen& screen)
 {
     Point pos = player.getPosition();
@@ -75,18 +73,18 @@ void Switch::handleSwitch(Player& player, Screen& screen)
         return;
     }
 
-    // 1. הופכים את הסוויצ'
+	// change the switch position
     toggleSwitchAt(pos, screen);
 
-    // 2. האם כל ה-switch ON?
+	// checks if all switches are ON
     if (allSwitchesOn(screen))
     {
-        clearBarriers(screen);    // מוחק את כל ה־s
-        Door::allSwitchesAreOn();    // מסמן לדלת שאפשר לפתוח עם מפתח
+        clearBarriers(screen);    //deletes all th 's' narriers
+        Door::allSwitchesAreOn();    //can open the doors (if have the right key)
     }
 }
 
-bool Switch::exists(const Screen& screen)
+bool Switch::exists(const Screen& screen)  // checks if there is any switch on the screen
 {
     for (int y = 0; y < screen.getHeight(); y++)
     {

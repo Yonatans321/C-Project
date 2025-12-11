@@ -23,6 +23,7 @@ Game::Game() // initializer list
     {
         gameScreens[i].loadMap(i);
     }
+	// Assign initial screen to players
     player1.setScreen(gameScreens[0]);
     player2.setScreen(gameScreens[0]);
 }
@@ -106,7 +107,7 @@ void Game::initLevel(int specificDoor)
         Door::allSwitchesAreOn();
     }
 }
-
+// Handle pause function
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
     UIScreens::showPauseScreen();
@@ -135,6 +136,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     player1.draw();
     player2.draw();
 }
+// Main game loop
 void Game::gameLoop()
 {
     bool gameRunning = true;

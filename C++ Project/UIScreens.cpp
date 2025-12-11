@@ -4,7 +4,7 @@
 #include "Utils.h"
 #include <windows.h>
 
-// פונקציית עזר להדפסה (נשארת אותו דבר)
+// prints the given screen to console
 void UIScreens::printScreen(const char** screen)
 {
     cls();
@@ -15,11 +15,11 @@ void UIScreens::printScreen(const char** screen)
     }
 }
 
-// ================= MENU ==================
+// MENU 
 
 void UIScreens::showMenu()
 {
-    // המערך מוגדר כאן בפנים כ-static
+    //the menu screen design
     static const char* MENU_SCREEN[HEIGHT] =
     {
         "                                                                                ",
@@ -52,7 +52,7 @@ void UIScreens::showMenu()
     printScreen(MENU_SCREEN);
 }
 
-// ================= INSTRUCTIONS ==================
+//instructions screen
 
 void UIScreens::showInstructions()
 {
@@ -88,7 +88,7 @@ void UIScreens::showInstructions()
     printScreen(INSTRUCTIONS_SCREEN);
 }
 
-// ================= PAUSE ==================
+// pause screen
 
 void UIScreens::showPauseScreen()
 {
@@ -124,7 +124,7 @@ void UIScreens::showPauseScreen()
     printScreen(PAUSE_SCREEN);
 }
 
-// ================= WIN ==================
+// win screen
 
 void UIScreens::showWinScreen()
 {
@@ -169,5 +169,5 @@ void UIScreens::showExitMessage()
     std::cout << "           THANKS FOR PLAYING! :)\n";
     std::cout << "=============================================\n\n";
 
-    Sleep(1200); // רגע קטן לראות את ההודעה ואז סוגרים
+    Sleep(1200); // time to read the massage
 }
