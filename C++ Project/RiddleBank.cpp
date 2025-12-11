@@ -23,6 +23,7 @@ RiddleBank::RiddleBank() : riddleCount(0)
 	riddles[riddleCount++] = Riddle(9, "what has a head and a tail but no body?", "Coin", "possibility of 50% to guess it");
 	riddles[riddleCount++] = Riddle(10, "who will win the world cup 2026?", "Argentina", "They've won in 2022...");
 }
+// Retrieve a riddle by its ID (returns nullptr if not found)
 Riddle* RiddleBank::getRiddleById(int riddleID)
 {
     for (size_t i = 0; i < riddleCount; ++i) {
@@ -54,21 +55,21 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
 {
     size_t nextRiddleIndex = 0;
 
-    // קח את מימדי המפה מתוך Screen
+    // get screen dimensions
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
-    // מצא את החידה הראשונה שעדיין לא הוצמדה למיקום
+    // find the first unsolved riddle 
     for (size_t i = 0; i < riddleCount; ++i)
     {
         Point p = riddles[i].getPosition();
-        if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved())
+        if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved()) // not assigned yet
         {
             nextRiddleIndex = i;
             break;
         }
     }
-
+    // scan the screen to get '?' positions
     for (int y = 0; y < H; ++y)
     {
         for (int x = 0; x < W; ++x)
@@ -77,7 +78,7 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
 
             if (c == '?')
             {
-                while (nextRiddleIndex < riddleCount)
+				while (nextRiddleIndex < riddleCount)// find the next unsolved riddle without position  
                 {
                     Point p = riddles[nextRiddleIndex].getPosition();
 
@@ -93,14 +94,14 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
                 if (nextRiddleIndex >= riddleCount)
                     return;
 
-                // תן לחידה את הקואורדינטות של ה-'?'
+				// give this riddle the position
                 riddles[nextRiddleIndex].setPosition(Point(x, y));
                 nextRiddleIndex++;
             }
         }
     }
 }
-
+// AI generated function to check the answer for a given riddle ID
 RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
     Riddle* r = getRiddleById(riddleID);
@@ -130,10 +131,8 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
     const int bx = 15, by = 5, bw = 50, bh = 12;
 
-    // ==========================================
-    // STEP 1 – YES/NO (NO HINT HERE)
-    // ==========================================
-
+    
+    // YES/NO question
     screen.drawAnimatedBox(bx, by, bw, bh);
     gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
     gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
@@ -142,7 +141,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     {
         char choice = _getch();
         // ESC → pause
-        if (choice == 27)
+        if (choice == ESC)
         {
             Game::pauseRequestedFromRiddle = true;
             screen.closeAnimatedBox(bx, by, bw, bh);
@@ -153,10 +152,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         {
             screen.closeAnimatedBox(bx, by, bw, bh);
             player.stepBack(); // move player back to avoid re-triggering
-            // מחזיר את ה-? לגביו
+            //bring the '?' back
             screen.setCharAt(x, y, '?');
 
-            // מצייר מחדש את המפה והשחקן
+            // draw map and player again
             screen.drawMap();
             player.draw();
 
@@ -198,9 +197,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
     int  answerLine = line + 1;
     int answerInputLine = line + 2;
-    int hintorResultLine = line + 3;
-
-    // ==========================================
+    int hintorResultLine = line + 3; 
     bool answered = false;
 
     while (!answered)
@@ -222,7 +219,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             {
                 char c = _getch();
                 // ESC → pause the game
-                if (c == 27)
+                if (c == ESC)
                 {
                     Game::pauseRequestedFromRiddle = true;
                     screen.closeAnimatedBox(bx, by, bw, bh);
@@ -231,11 +228,11 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                 } 
                 if (c == '\r')   // ENTER
                 {
-                    break; // מסיים את החידה
+                    break; // end riddle input
                 }
                 else if ((c == 'H' || c == 'h') && ans.empty())
                 {
-                    // הצג רמז
+                    // show hint
                     gotoxy(bx + 2, hintorResultLine);
                     std::cout << std::string(50, ' ');
                     gotoxy(bx + 2, hintorResultLine);
@@ -262,17 +259,13 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                 }
             }
 
-            // ------------------------
-            // STEP 4 – CHECK ANSWER
-            // ------------------------
+            // CHECK ANSWER
             bool correct = r->checkAnswer(ans.c_str());
             //Clear hint line
             gotoxy(bx + 2, hintorResultLine);
             std::cout << std::string(50, ' ');
 
-            // Write feedback
-            gotoxy(bx + 2, hintorResultLine);
-
+            gotoxy(bx + 2, hintorResultLine);// Write feedback
 
             if (correct)
             {
@@ -301,15 +294,13 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                     resetColor();
 					std::cout << std::string(msg.length(), ' ');
                 }
-
-                // put the riddle symbol back
-                screen.setCharAt(x, y, '?');
+                screen.setCharAt(x, y, '?'); // put the riddle symbol back
             }
 
             Sleep(700);
             screen.closeAnimatedBox(bx, by, bw, bh);
 
-            // ALWAYS redraw map and player after closing box
+            //redraw map and player
             player.stepBack(); // move player back to avoid re-triggering
             screen.drawMap();
             player.draw();

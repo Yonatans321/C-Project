@@ -1,6 +1,7 @@
 #pragma once
-#include <vector>
+#include <vector>// for std::vector
 
+//forward declarations
 class Player;
 class Screen;
 class Point;
@@ -8,19 +9,19 @@ class Direction;
 
 class Obstacle {
 public:
-    // הפונקציה היחידה שהמשחק קורא מתוך handleTile
+	// Handle obstacle interaction for two players
     static void handleObstacle(Player& pFront, Player& pBack, Screen& screen);
 
 private:
-    // האם השחקן עומד מול מכשול — מאתר את מיקום הכוכבית הראשונה
-    static bool isFacingObstacle(Player& p, Screen& screen, Point& obstaclePos);
+    // do the player face an obstacle
+    static bool isFacingObstacle(const Player& p, Screen& screen, Point& obstaclePos);
 
-    // האם שני השחקנים ממוקמים נכון ודוחפים באותו כיוון
-    static bool playersAlignedAndPushing(Player& front, Player& back);
+    // do both players align and push
+    static bool playersAlignedAndPushing(const Player& front, Player& back);
 
-    // אסוף רצף של כוכביות לכיוון הדחיפה
-    static std::vector<Point> collectChain(Point start, const Direction& dir, Screen& screen);
+    // collect the chain of obstacles
+    static std::vector<Point> collectChain(Point start, const Direction& dir, const Screen& screen);
 
-    // דחיפת השרשרת קדימה
+    // push the chain of obstacles
     static void pushChain(const std::vector<Point>& chain, const Direction& dir, Screen& screen);
 };

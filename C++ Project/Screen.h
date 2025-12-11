@@ -13,7 +13,7 @@ public:
 	static constexpr int HEIGHT = 25;
 	static constexpr int MAP_HEIGHT = 23;
 	static constexpr int NUM_MAPS = 4;
-	//Point findDoorLocation(int doorIndex);
+	
 private:
 	char screen[MAP_HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
@@ -47,7 +47,5 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	/*void draw() const;
-	void loadData(int mapIndex);
-	void setDoor(int id, int destlevel);*/
+	
 };

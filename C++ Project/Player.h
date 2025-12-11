@@ -1,30 +1,34 @@
 #pragma once
 #include "Point.h"
-#include <cstddef>// for size_t
+#include <cstddef> //for size_t
 
-class Screen; // forward declaration
-class Key;    // forward declaration
+// forward declarations
+class Screen; 
+class Key;   
 
 class Player
 {
 private:
-	static constexpr size_t NUM_KEYS = 6;
-	Point position;
-	Point prevPos;
-	char keys[NUM_KEYS];
-	Screen* screen;
-	char heldItem;
-	int itemId;
-	int points=0;
-	int lives=3;
-	Key* myKey= nullptr;
-	bool hasKey = false;
-	bool active = true;
+	static constexpr size_t NUM_KEYS = 6; //numbers of controlled keys
+	Point position; // current pos
+	Point prevPos; // prev pos
+	char keys[NUM_KEYS]; // keys for controlling player
+	Screen* screen;// current screen
+	char heldItem; // current held item
+	int itemId; // id of the held item
+	int points=0; // score
+	int lives=3; // lives
+	Key* myKey= nullptr; // player's key
+	bool hasKey = false; // does the player have a key
+	bool active = true;// does the player is active
+
 public:
+	//constructor
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS])
 		:position(start_point), screen(nullptr), heldItem(0), itemId(-1),points(0),
 		lives(3),myKey(nullptr),hasKey(false),active(true)
 	{
+		// initialize control keys
 		for (size_t i = 0; i < NUM_KEYS; ++i) {
 			keys[i] = the_keys[i];
 		}

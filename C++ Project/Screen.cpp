@@ -1,11 +1,7 @@
-﻿
-#include "Screen.h"
+﻿#include "Screen.h"
 #include "Rooms.h"
 #include <cstring>
 #include <windows.h>
-
-
-
 
 Screen::Screen()
 {
@@ -18,10 +14,7 @@ Screen::Screen()
         doors[i] = Door();
 }
 
-// =====================
 //   LOAD MAP
-// =====================
-
 void Screen::loadMap(int level)
 {
     const char* const* src = nullptr;
@@ -55,10 +48,7 @@ void Screen::loadMap(int level)
 }
 
 
-// =====================
 //   DRAW MAP
-// =====================
-
 void Screen::drawMap() const
 {
     for (int y = 0; y < MAP_HEIGHT; y++)
@@ -87,10 +77,8 @@ void Screen::drawMap() const
 
 
 
-// =====================
-//   DRAWING HELPERS
-// =====================
 
+//   DRAWING HELPERS
 void Screen::setCharAt(int x, int y, char ch)
 {
     if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
@@ -105,24 +93,24 @@ void Screen::setCharAt(const Point& p, char ch)
 {
     setCharAt(p.getX(), p.getY(), ch);
 }
-
+// DRAW STATUS BAR
 void Screen::drawStatusBar(
     char inv1, int lives1, int score1,
     char inv2, int lives2, int score2)
 {
-    // שחקן 1 – שורה ראשונה
+    // player 1 - first line
     gotoxy(0, MAP_HEIGHT);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
-        << "P1 & - Lives: " << lives1
+        << "P1 $ - Lives: " << lives1
         << "  Inv:" << (inv1 == 0 ? '-' : inv1)
         << "  Score: " << score1
         << "                                        ";
 
-    // שחקן 2 – שורה שנייה
+    // player 2 - second line
     gotoxy(0, MAP_HEIGHT + 1);
     std::cout
-        << "P2 $ - Lives: " << lives2
+        << "P2 & - Lives: " << lives2
         << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
         << "  Score: " << score2
         << "                                        ";
@@ -144,7 +132,7 @@ void Screen::drawBox(int x, int y, int w, int h)
         }
     }
 }
-
+//CLEAR BOX
 void Screen::clearBox(int x, int y, int w, int h)
 {
     for (int row = 0; row < h; row++)
@@ -154,7 +142,7 @@ void Screen::clearBox(int x, int y, int w, int h)
             std::cout << " ";
     }
 }
-
+// DRAW ANIMATED BOX
 void Screen::drawAnimatedBox(int x, int y, int w, int h)
 {
     for (int i = 0; i <= h; i += 2)
@@ -163,7 +151,7 @@ void Screen::drawAnimatedBox(int x, int y, int w, int h)
         Sleep(30);
     }
 }
-
+// CLOSE ANIMATED BOX
 void Screen::closeAnimatedBox(int x, int y, int w, int h)
 {
     for (int i = h; i >= 0; i -= 2)
@@ -173,7 +161,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
     }
     clearBox(x, y, w, h);
 }
-
+// PRINT SOME TXT IN BOX
 void Screen::printInBox(int x, int y, const std::string& msg)
 {
     size_t idx = 0;
@@ -201,33 +189,30 @@ void Screen::showMessage(const std::string& msg)
     closeAnimatedBox(x, y, w, h);
 }
 
-// =====================
 //   MAP LOGIC
-// =====================
-
 char Screen::getCharAt(int x, int y) const
 {
     if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
         return ' ';
     return screen[y][x];
 }
-
+//overload getcharat
 char Screen::getCharAt(const Point& p) const
 {
     return getCharAt(p.getX(), p.getY());
 }
-
+// checks if wall
 bool Screen::isWall(const Point& p) const
 {
     char c = getCharAt(p);
     return (c == 'W' || c == 'w');
 }
-
+// checks if obstacle
 bool Screen::isObstacle(const Point& p) const
 {
     return getCharAt(p) == '*';
 }
-
+// get door at point
 Door* Screen::getDoor(const Point& p)
 {
     char ch = getCharAt(p);
@@ -241,6 +226,7 @@ Door* Screen::getDoor(const Point& p)
 
     return nullptr;
 }
+// MAP DATA
 const char* Screen::getMapRow(int row) const
 {
     if (row < 0 || row >= MAP_HEIGHT)
