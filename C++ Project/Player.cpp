@@ -174,7 +174,7 @@ bool Player::isDead() const
 void Player::setPosition(const Point& pos) {
 	position = pos;
 }
-//item function to drop and hold
+//item function to drop item
 void Player::dropHeldItem()
 {
 	if (heldItem == 0 || screen == nullptr)
@@ -218,11 +218,15 @@ void Player::dropHeldItem()
 		dropX = prevPos.getX();
 		dropY = prevPos.getY();
 	}
-
-	// put the item on the screen
-	screen->setCharAt(dropX, dropY, heldItem);
-
-	// drop from the player
-	DropItem();
+	// check if drop position is empty
+	if (screen->getCharAt(dropX, dropY) == ' ') {
+		// put the item on the screen
+		screen->setCharAt(dropX, dropY, heldItem);
+		DropItem();// drop from the player
+	}
+	
+	
 }
+
+
 

@@ -22,6 +22,7 @@ private:
 	bool hasKey = false; // does the player have a key
 	bool active = true;// does the player is active
 
+	bool isValidDropSpot(int x, int y) const;
 public:
 	//constructor
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS])
