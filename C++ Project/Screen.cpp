@@ -161,7 +161,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
     }
     clearBox(x, y, w, h);
 }
-// PRINT SOME TXT IN BOX
+// PRINT SOME TXT IN BOX (helped by AI)
 void Screen::printInBox(int x, int y, const std::string& msg)
 {
     size_t idx = 0;
@@ -177,7 +177,7 @@ void Screen::printInBox(int x, int y, const std::string& msg)
         }
     }
 }
-
+// SHOW MESSAGE (helped by AI)
 void Screen::showMessage(const std::string& msg)
 {
     int x = 20, y = 10, w = 40, h = 5;

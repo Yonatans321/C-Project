@@ -1,10 +1,10 @@
 #pragma once
 // declare the color constants
+static constexpr int COLOR_YELLOW = 14;
+static constexpr int COLOR_LIGHT_CYAN = 11;
+static constexpr int COLOR_LIGHT_GREEN = 10;
+static constexpr int COLOR_LIGHT_RED = 12;
 
-constexpr int COLOR_YELLOW = 14;
-constexpr int COLOR_LIGHT_CYAN = 11;
-constexpr int COLOR_LIGHT_GREEN = 10;
-constexpr int COLOR_LIGHT_RED = 12;
 void gotoxy(int x, int y);// go to the position x,y in the screen
 
 extern bool ColorsEnabled;
