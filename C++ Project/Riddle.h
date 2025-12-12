@@ -24,5 +24,6 @@ public:
 	const char* getHint() const;
 	Point getPosition() const;
 	void setPosition(const Point& p);
+	void resetRiddle();
 };
 

@@ -56,3 +56,7 @@ void Riddle::setPosition(const Point& p)
 {
     pos = p;
 }
+void Riddle::resetRiddle() {
+    solved = false;       
+    pos = Point(0, 0);
+}

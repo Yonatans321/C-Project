@@ -102,7 +102,7 @@ void Screen::drawStatusBar(
     gotoxy(0, MAP_HEIGHT);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
-        << "P1 $ - Lives: " << lives1
+        << "P1 & - Lives: " << lives1
         << "  Inv:" << (inv1 == 0 ? '-' : inv1)
         << "  Score: " << score1
         << "                                        ";
@@ -110,7 +110,7 @@ void Screen::drawStatusBar(
     // player 2 - second line
     gotoxy(0, MAP_HEIGHT + 1);
     std::cout
-        << "P2 & - Lives: " << lives2
+        << "P2 $ - Lives: " << lives2
         << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
         << "  Score: " << score2
         << "                                        ";
