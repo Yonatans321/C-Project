@@ -41,31 +41,30 @@ static const char* const ROOM0[ROOM_HEIGHT] =
 
 static const char* const ROOM1[ROOM_HEIGHT] =
 {
-   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-"W      1     W                    W                    W                       W", // 1
-"W            W     WWWWWWWWWW     W     WWWWWWWWWW     W     WWWWWWWWWWWWW     W", // 2
-"W   ****** W     W        W     W     W        W     W     W           W     W", // 3
-"W   * * W     W    ?   W     W     W    K   W     W     W     2     W     W", // 4
-"W   * * WWWWWWW        WWWWWWW     W        WWWWWWW     W           W     W", // 5
-"W   * * W                    W     \\      W    W", // 6  <-- שים לב: יש פה רווח אקסטרה בגלל הלוכסן
-"W   ****** WWWWWWW        WWWWWWWWWWWWWWWWWWWWWWWWWWWW     WWWWWWWWWWWWW     W", // 7
-"W            W     W        W             ss             W                     W", // 8
-"WWWWWWWWWWWWWW     W        W             ss             W     WWWWWWWWWWWWWWWWW", // 9
-"W                  W        W             ss             W     W               W", // 10
-"W    WWWWWWWWWWWWWWW        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W               W", // 11
-"W    W                                                         W               W", // 12
-"W    W    WWWWWWWWWWWWWWWWWWWWWW    WWWWWWWWWWWWWWWWWWWWWWWWWWWW    WWWWWWW    W", // 13
-"W    W    W                    W    W                              W      W    W", // 14
-"W    W    W      *** W    W            ?                 W      W    W", // 15
-"W    W    W      *K* W    W                              W      W    W", // 16
-"W    W    W      *** W    W    WWWWWWWWWWWWWWWWWWWWWWWWWWW      W    W", // 17
-"W    W    WWWWWWWWWWWWWWWWWWWWWW    W    W              W                 W    W", // 18
-"W    W                              W    W      3       W     ******* W    W", // 19
-"W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW    W              W     * * W    W", // 20
-"W ?                                      W              W     * * W    W", // 21
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
+    "W      1           W                                                           W", // 1
+    "W                  W?WWWWWWWWWWWWW*WWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
+    "W          W       W        W  *   W                       WWW                 W", // 3
+    "W        WW WWWW   W        W\\WW  W WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWW", // 4
+    "W        WW   \\W W         WWWWWWWW                  WWW                      W", // 5
+    "W        WW*WWWWW*W         WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWWW W", // 6
+    "W        W     *  W         W                         WWW                      W", // 7
+    "W        WW WWWWW W         W WWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWW", // 8
+    "W    WWWWWWWWWW  W          W             *              WW?WWWWWWWWWWWWWWWWWWWW", // 9
+    "W                  W        WWWWWWWWWWWWWWWWWWWWWWWWWWW\\ W WWWWWWWWWWWWWWWWWWWW", // 10
+    "W**WWWWWWWWWWWWWWWWW        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 11
+    "W    W                      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 12
+    "W    W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 13
+    "W    W    W                    *    *            *  *         WWWWWWWWWWWWWWWWWW", // 14
+    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW***WWWWWWWWWWWWWWWWWWWWWWWWWWW", // 15
+    "W    W    W******K WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   s       *                 W", // 16
+    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWW  W", // 17
+    "W    W    WWWWWWWWWWWWWWWWWWWWWW    *      s      WWW     s                    W", // 18
+    "W    W                              W      s              s                    W", // 19
+    "WWWW?WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     s              s                    W", // 20
+    "W            *  *  *                       s      2       s                    W", // 21
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
-
 
 // ROOM 2
 
@@ -95,4 +94,5 @@ static const char* const ROOM2[ROOM_HEIGHT] =
     "W        s         3         sss                                               W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
+
 
