@@ -37,7 +37,7 @@ static const char* const ROOM0[ROOM_HEIGHT] =
 };
 
 
-// ROOM 1
+/// ROOM 1
 
 static const char* const ROOM1[ROOM_HEIGHT] =
 {
