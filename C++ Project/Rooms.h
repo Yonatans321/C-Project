@@ -43,12 +43,12 @@ static const char* const ROOM1[ROOM_HEIGHT] =
 {
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
     "W      1           W                                                           W", // 1
-    "W                  W?WWWWWWWWWWWWW*WWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
-    "W          W       W        W  *   W                       WWW                 W", // 3
-    "W        WW WWWW   W        W\\WW  W WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWW", // 4
-    "W        WW   \\W W         WWWWWWWW                  WWW                      W", // 5
-    "W        WW*WWWWW*W         WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWWW W", // 6
-    "W        W     *  W         W                         WWW                      W", // 7
+    "W                  W?WWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
+    "W          W       W        W  *  * W                      WWW                 W", // 3
+    "W        WW WWWW   W        W\\ WW  WW    WWWWWWWWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWW", // 4
+    "W        WW   \\W  W         WWWWWWW                   WWW                      W", // 5
+    "W        WW*WWWWW*W         WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWW  W", // 6
+    "W        W     *  W         W                          WW                      W", // 7
     "W        WW WWWWW W         W WWWWWWWWWWWWWWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWWWWW", // 8
     "W    WWWWWWWWWW   W         W             *               W?WWWWWWWWWWWWWWWWWWWW", // 9
     "W                  W        WWWWWWWWWWWWWWWWWWWWWWWWWWW\\ W  WWWWWWWWWWWWWWWWWWW", // 10
@@ -58,7 +58,7 @@ static const char* const ROOM1[ROOM_HEIGHT] =
     "W    W    W                    *    *            *            WWWWWWWWWWWWWWWWWW", // 14
     "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWWWWW", // 15
     "W    W    W ** **K WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW***s       *                 W", // 16
-    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWW  W", // 17
+    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWW   W", // 17
     "W    W    WWWWWWWWWWWWWWWWWWWWWW    *      s      WWW     s                    W", // 18
     "W    W                              W      s              s                    W", // 19
     "WWWW?WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     s              s                    W", // 20
