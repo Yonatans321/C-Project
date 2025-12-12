@@ -43,10 +43,10 @@ static const char* const ROOM1[ROOM_HEIGHT] =
 {
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
     "W      1           W                                                           W", // 1
-    "W                  W?WWWWWWWWWWWWW*WWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
-    "W          W       W        W  *   W                       WWW                 W", // 3
+    "W                  W?WWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
+    "W          W       W        W  *  * W                       WWW                 W", // 3
     "W        WW WWWW   W        W\\WW  W WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWW", // 4
-    "W        WW   \\W W         WWWWWWWW                  WWW                      W", // 5
+    "W        WW   \\W W         WWWWWW W                  WWW                      W", // 5
     "W        WW*WWWWW*W         WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWWW W", // 6
     "W        W     *  W         W                         WWW                      W", // 7
     "W        WW WWWWW W         W WWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWW", // 8

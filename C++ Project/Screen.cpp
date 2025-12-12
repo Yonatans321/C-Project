@@ -59,19 +59,10 @@ void Screen::drawMap() const
         {
             char c = screen[y][x];
 
-            if (c == '\\')
-                setColor(COLOR_LIGHT_RED);
-            else if (c == '/')
-                setColor(COLOR_LIGHT_GREEN);
-            else if (c == 's')
-                setColor(COLOR_YELLOW);
-            else
-                resetColor();
-
+            applyColor(c);
             std::cout << c;
         }
     }
-
     resetColor();
 }
 
@@ -86,7 +77,10 @@ void Screen::setCharAt(int x, int y, char ch)
 
     screen[y][x] = ch;
     gotoxy(x, y);
+
+    applyColor(ch);
     std::cout << ch;
+    resetColor();
 }
 
 void Screen::setCharAt(const Point& p, char ch)
@@ -241,4 +235,41 @@ int Screen::getWidth() const
 int Screen::getHeight() const
 {
     return MAP_HEIGHT;
+}
+
+void Screen::applyColor(char c) const
+{
+    switch (c)
+    {
+    case '\\':   // switch OFF
+        setColor(COLOR_LIGHT_RED);
+        break;
+
+    case '/':    // switch ON
+        setColor(COLOR_LIGHT_GREEN);
+        break;
+
+    case 's':    // temporary wall
+        setColor(COLOR_YELLOW);
+        break;
+
+    case '*':    // obstacle
+        setColor(COLOR_GRAY);
+        break;
+
+    case '?':    // riddle
+        setColor(COLOR_LIGHT_PURPLE);
+        break;
+
+    case 'K':    // key
+        setColor(COLOR_GOLD);
+        break;
+
+    default:
+        if (c >= '1' && c <= '9')   // door
+            setColor(COLOR_LIGHT_CYAN);
+        else
+            resetColor();
+        break;
+    }
 }

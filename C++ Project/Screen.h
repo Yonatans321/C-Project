@@ -48,4 +48,5 @@ public:
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
 	
+	void applyColor(char c) const;
 };

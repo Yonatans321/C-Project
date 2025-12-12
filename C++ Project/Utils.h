@@ -4,6 +4,9 @@ static constexpr int COLOR_YELLOW = 14;
 static constexpr int COLOR_LIGHT_CYAN = 11;
 static constexpr int COLOR_LIGHT_GREEN = 10;
 static constexpr int COLOR_LIGHT_RED = 12;
+static constexpr int COLOR_GRAY = 8;              // obstacles
+static constexpr int COLOR_LIGHT_PURPLE = 1;     // riddles '?'
+static constexpr int COLOR_GOLD = 6;              // keys 'K'
 
 void gotoxy(int x, int y);// go to the position x,y in the screen
 
