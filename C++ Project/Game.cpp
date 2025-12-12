@@ -37,7 +37,7 @@ void Game::showMenu()
 
     while (menu)
     {
-        if (_kbhit())//(helped by AI)
+        if (_kbhit())
         {
             char input = _getch();
 
@@ -166,7 +166,7 @@ void Game::gameLoop()
         }
         Screen& currentScreen = gameScreens[currentLevel];
         
-        // Handle input (helped by AI)
+        // Handle input 
         if (_kbhit())
         {
             char ch = _getch();
