@@ -29,7 +29,7 @@ bool Door::tryOpen(int keyId)
 	return false;
 }
 
-// Handle door interaction for the player
+// Handle door interaction for the player (helped by AI)
 bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor)
 {
 	if (!p.isActive()) return false; // do nothing if player is inactive

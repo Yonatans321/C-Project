@@ -37,7 +37,7 @@ void Game::showMenu()
 
     while (menu)
     {
-        if (_kbhit())
+        if (_kbhit())//(helped by AI)
         {
             char input = _getch();
 
@@ -76,14 +76,14 @@ void Game::showInstructions()
    
     currStatus = GameModes::MENU;
 }
-
+// Initialize level 
 void Game::initLevel(int specificDoor)
 {
     Screen& currentScreen = gameScreens[currentLevel];
 
     cls();
     currentScreen.drawMap();
-    riddleBank.attachPositionToRoom(currentScreen);
+	riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
 
     // Assign screen to players
     player1.setScreen(currentScreen);
@@ -140,7 +140,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     player1.draw();
     player2.draw();
 }
-// Main game loop
+// Main game loop 
 void Game::gameLoop()
 {
     bool gameRunning = true;
@@ -166,7 +166,7 @@ void Game::gameLoop()
         }
         Screen& currentScreen = gameScreens[currentLevel];
         
-        // Handle input
+        // Handle input (helped by AI)
         if (_kbhit())
         {
             char ch = _getch();
@@ -364,7 +364,7 @@ void Game::placePlayersAtEntrance(int specificDoor) // place players next to the
     Point targetDoorPos;
     bool found = false;
 
-	// Search for doors in the current screen
+	// Search for doors in the current screen (helped by AI)
     for (int y = 0; y < Screen::MAP_HEIGHT; y++)
     {
         for (int x = 0; x < Screen::WIDTH; x++)
@@ -379,7 +379,7 @@ void Game::placePlayersAtEntrance(int specificDoor) // place players next to the
                     {
 						targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
 						found = true;  // mark as found
-						goto EndSearch;// exit both loops (AI suggested)
+						goto EndSearch;// exit both loops (helped by AI)
                     }
                 }
 				else if (id < lowestDoor) // find the lowest door id    
@@ -392,7 +392,7 @@ void Game::placePlayersAtEntrance(int specificDoor) // place players next to the
         }
     }
     
-EndSearch:// exit point for goto (AI suggested)
+EndSearch:// exit point for goto (helped by AI)
 	if (!found) return;
 
 	placeNextToDoor(targetDoorPos); // place players next to the found door

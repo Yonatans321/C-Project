@@ -50,7 +50,7 @@ void UIScreens::showMenu()
     };
 
     printScreen(MENU_SCREEN);
-    gotoxy(0, 14);  // שורה בדיוק מתחת ל-TIP (TIP הוא שורה 13)
+    gotoxy(0, 14);  
     std::cout << "                            [2] Colors: "
         << (ColorsEnabled ? "ON" : "OFF");
 }

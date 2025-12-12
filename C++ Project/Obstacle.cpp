@@ -5,7 +5,7 @@
 #include "Direction.h"
 
 
-// Handle obstacle interaction for two players
+// Handle obstacle interaction for two players (helped by AI)
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
     Point obs(0, 0); // to store obstaclr position
@@ -28,7 +28,7 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
     }
 }
 
-// check if the player is facing an obstacle
+// check if the player is facing an obstacle (helped by AI)
 bool Obstacle::isFacingObstacle(const Player& p, Screen& screen, Point& obstaclePos)
 {
 	// Calculate the position in front of the player    
@@ -44,7 +44,7 @@ bool Obstacle::isFacingObstacle(const Player& p, Screen& screen, Point& obstacle
     }
     return false;
 }
-// check if both player are aligned and pushing
+// check if both player are aligned and pushing (helped by AI)
 bool Obstacle::playersAlignedAndPushing(const Player& front, Player& back)
 {
     // get ditrection of both players
@@ -68,7 +68,7 @@ bool Obstacle::playersAlignedAndPushing(const Player& front, Player& back)
     return (expectedBack.getX() == back.getX() &&
         expectedBack.getY() == back.getY());
 }
-// collect the chain of obstacles
+// collect the chain of obstacles (helped by AI)
 std::vector<Point> Obstacle::collectChain( Point start, const Direction& dir,const Screen& screen)
 {
     std::vector<Point> chain; // store obstacle chain
