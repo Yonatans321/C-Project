@@ -51,7 +51,7 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
     return nullptr; // Not found
 }
 // AI generated function to attach positions to unsolved riddles based on '?' locations on the screen
-void RiddleBank::attachPositionToRoom(Screen& screen)
+void RiddleBank::attachPositionToRoom(Screen& screen) 
 {
     size_t nextRiddleIndex = 0;
 
