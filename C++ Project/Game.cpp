@@ -37,7 +37,7 @@ void Game::showMenu()
 
     while (menu)
     {
-        if (_kbhit())//(helped by AI)
+        if (_kbhit())
         {
             char input = _getch();
 
@@ -166,7 +166,7 @@ void Game::gameLoop()
         }
         Screen& currentScreen = gameScreens[currentLevel];
         
-        // Handle input (helped by AI)
+        // Handle input 
         if (_kbhit())
         {
             char ch = _getch();
@@ -405,11 +405,11 @@ void Game::placeNextToDoor(const Point& targetDoorPos)
     int py = targetDoorPos.getY();
 
     // player 1
-    Point p1(px + 1, py, Direction::directions[Direction::STAY], '$');
+    Point p1(px + 1, py, Direction::directions[Direction::STAY], '&');
     player1.setPosition(p1);
 
     // player 2
-    Point p2(px + 2, py, Direction::directions[Direction::STAY], '&');
+    Point p2(px + 2, py, Direction::directions[Direction::STAY], '$');
     player2.setPosition(p2);
 
     player1.draw();
@@ -422,6 +422,9 @@ void Game::resetGame()
     currentLevel = 0;
     activeDoor = ' ';
     Door::switchesAreOn = false;
+
+	// reset riddles
+    riddleBank.resetAllRiddles();
 
 	// reset doors
     for (int i = 0; i < 10; i++)

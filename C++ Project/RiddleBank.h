@@ -47,4 +47,6 @@ public:
 
 	// Interactive handling of a riddle when a player steps on a riddle tile
     void handleRiddle(Player& player, Screen& screen, int level);
+
+    void resetAllRiddles();
 };

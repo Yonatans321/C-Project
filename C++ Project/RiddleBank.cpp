@@ -308,3 +308,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             answered = true;
     }
 }
+void RiddleBank::resetAllRiddles()
+{
+    for (size_t i = 0; i < riddleCount; ++i)
+    {
+        riddles[i].resetRiddle();
+    }
+}
