@@ -143,7 +143,7 @@ void UIScreens::showWinScreen()
         "               You solved puzzles, pushed obstacles, flipped switches,           ",
         "               collected keys, avoided disasters, and escaped the maze!          ",
         "                                                                                ",
-        "                     (Honestly? I didn't think you'd make it.)                   ",
+        "                     (Honestly? I didn't think you'd make it:)                   ",
         "                                                                                ",
         "                                                                                ",
         "                                                                                ",
