@@ -1,0 +1,113 @@
+Text Adventure Game - Exercise 1
+Course: C++ 2026A - MTA
+
+Students:
+- Yonathan Shalem - 314831983
+- Omer Bacher - 318913712
+
+
+1. Project Overview
+
+This project implements a cooperative two-player text adventure game played in the console.
+Both players are controlled by the user and must work together in order to progress through
+multiple rooms and reach the final screen.
+
+The game includes interactive elements such as doors, switches, obstacles and riddles.
+Progression is based on cooperation, correct actions, and solving challenges designed into
+each room.
+
+
+2. How to Solve the Game
+
+The game is solved by progressing through the rooms in the correct order while using
+cooperation between the two players.
+
+Doors and Progression:
+- All doors require a key in order to be opened.
+- Each door leads to the next screen in the game.
+- A door can only be used after all required conditions in the room are met.
+
+Switches and Temporary Walls:
+- Switches must be activated by stepping on them.
+- All switches in the room must be ON in order to allow door opening.
+- Temporary walls (marked as 's') block paths and are removed only after all switches are ON.
+
+Obstacles:
+- Obstacles ('*') block movement.
+- An obstacle can be pushed only when both players move in the same direction and toward
+  the obstacle.
+- Cooperation between both players is required to clear paths.
+
+Riddles:
+- Riddles are marked with '?'.
+- When stepping on a riddle, the player may choose whether to solve it or not.
+- Correct answer:
+  - Removes the riddle from the map.
+  - Grants 100 points.
+- Wrong answer:
+  - Causes the player to lose a life.
+- Riddles include optional hints that can be requested during gameplay.
+- If a player loses all lives, a message is displayed and the game handles this state safely.
+
+
+3. Bonus Features Implemented
+
+We request bonus points for the following features:
+
+- Color-enhanced gameplay:
+  The game uses colors to improve visual clarity and user feedback, including player status,
+  interactive elements and on-screen messages.
+
+- Animated text boxes and visual feedback:
+  The game uses animated text boxes for riddles, messages and feedback.
+  Animations are integrated smoothly into the game flow and enhance the user experience.
+
+- Riddle hints system:
+  Each riddle includes optional hints that can be requested by the player during interaction,
+  improving usability without revealing the solution.
+
+- Switch-based room logic with temporary walls:
+  Rooms include switch-controlled temporary walls ('s') that are dynamically removed only
+  after all switches are activated, creating more complex and interactive puzzles.
+
+
+Additional Notes:
+- The game logic avoids recursive menu/game calls.
+- External or AI-assisted code is documented in comments where required.
+- All design decisions follow the exercise requirements.
+
+
+Appendix A – Riddle Answers (For Evaluation)
+
+The following section lists the correct answers for the riddles included in the game.
+This appendix is provided to allow easier evaluation of the exercise.
+
+Riddle 1:
+Answer: 7
+
+Riddle 2:
+Answer: 012
+
+Riddle 3:
+Answer: 0
+
+Riddle 4:
+Answer: 3
+
+Riddle 5:
+Answer: 5
+
+Riddle 6:
+Answer: 2
+
+Riddle 7:
+Answer: 10
+
+Riddle 8:
+Answer: Keyboard
+
+Riddle 9:
+Answer: Coin
+
+Riddle 10:
+Answer: Argentina
