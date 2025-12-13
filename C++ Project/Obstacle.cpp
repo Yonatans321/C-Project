@@ -6,25 +6,48 @@
 
 
 // Handle obstacle interaction for two players (helped by AI)
+// pushing rules:
+// 1 obstacle  -> 1 player
+// 2 obstacles -> 2 aligned players
+
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
-    Point obs(0, 0); // to store obstaclr position
+    Point obs;
 
-	// Check if player 1 is facing an obstacle and if players are aligned for pushing
-    if (isFacingObstacle(p1, screen, obs) && playersAlignedAndPushing(p1, p2))
+    if (isFacingObstacle(p1, screen, obs))
     {
-        auto chain = collectChain(obs, p1.getDirection(), screen); //collect obstacle chain
-        if (!chain.empty()) // if chain is not empty 
-            pushChain(chain, p1.getDirection(), screen); // push it
+        auto chain = collectChain(obs, p1.getDirection(), screen);
+        int count = chain.size();
+
+        if (count == 1)
+        {
+            pushChain(chain, p1.getDirection(), screen);
+            return;
+        }
+        if (count == 2 && playersAlignedAndPushing(p1, p2))
+        {
+            pushChain(chain, p1.getDirection(), screen);
+            return;
+        }
         return;
     }
 
-    // Check if player 2 is facing an obstacle and if players are aligned for pushing
-    if (isFacingObstacle(p2, screen, obs) && playersAlignedAndPushing(p2, p1))
+    if (isFacingObstacle(p2, screen, obs))
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
-        if (!chain.empty())
+        int count = chain.size();
+
+        if (count == 1)
+        {
             pushChain(chain, p2.getDirection(), screen);
+            return;
+        }
+
+        if (count == 2 && playersAlignedAndPushing(p2, p1))
+        {
+            pushChain(chain, p2.getDirection(), screen);
+            return;
+        }
     }
 }
 
@@ -45,7 +68,7 @@ bool Obstacle::isFacingObstacle(const Player& p, Screen& screen, Point& obstacle
     return false;
 }
 // check if both player are aligned and pushing (helped by AI)
-bool Obstacle::playersAlignedAndPushing(const Player& front, Player& back)
+bool Obstacle::playersAlignedAndPushing(const Player& front,const Player& back)
 {
     // get ditrection of both players
     Direction df = front.getDirection();
