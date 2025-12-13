@@ -17,7 +17,7 @@ private:
     static bool isFacingObstacle(const Player& p, Screen& screen, Point& obstaclePos);
 
     // do both players align and push
-    static bool playersAlignedAndPushing(const Player& front, Player& back);
+    static bool playersAlignedAndPushing(const Player& front,const Player& back);
 
     // collect the chain of obstacles
     static std::vector<Point> collectChain(Point start, const Direction& dir, const Screen& screen);
