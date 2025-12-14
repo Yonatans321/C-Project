@@ -22,6 +22,9 @@ RiddleBank::RiddleBank() : riddleCount(0)
     riddles[riddleCount++] = Riddle(8,"what has keys but can't open locks?","Keyboard", "you are using it right now...");
 	riddles[riddleCount++] = Riddle(9, "what has a head and a tail but no body?", "Coin", "possibility of 50% to guess it");
 	riddles[riddleCount++] = Riddle(10, "who will win the world cup 2026?", "Argentina", "They've won in 2022...");
+    riddles[riddleCount++] = Riddle(11, "How much will you give us on this project?", "100", "please we worked really hard! :)");
+    riddles[riddleCount++] = Riddle(12, "Quick Math : 1*2*3*4*5*6", "720", "Really? Boaz will be disapoointed");
+    riddles[riddleCount++] = Riddle(13, "what is the sum of numbers between 1-100", "5050", "50 precent both players you will get this");
 }
 // Retrieve a riddle by its ID (returns nullptr if not found)
 Riddle* RiddleBank::getRiddleById(int riddleID)
@@ -51,52 +54,36 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
     return nullptr; // Not found
 }
 // AI generated function to attach positions to unsolved riddles based on '?' locations on the screen
-void RiddleBank::attachPositionToRoom(Screen& screen) 
+void RiddleBank::attachPositionToRoom(Screen& screen)
 {
-    size_t nextRiddleIndex = 0;
-
-    // get screen dimensions
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
-    // find the first unsolved riddle 
-    for (size_t i = 0; i < riddleCount; ++i)
-    {
-        Point p = riddles[i].getPosition();
-        if (p.getX() == 0 && p.getY() == 0 && !riddles[i].isSolved()) // not assigned yet
-        {
-            nextRiddleIndex = i;
-            break;
-        }
-    }
-    // scan the screen to get '?' positions
+	// for each '?' on the screen
     for (int y = 0; y < H; ++y)
     {
         for (int x = 0; x < W; ++x)
         {
-            char c = screen.getCharAt(x, y);
+            if (screen.getCharAt(x, y) != '?')
+                continue;
 
-            if (c == '?')
+			//check if a riddle is already assigned here
+            if (getRiddleAt(x, y) != nullptr)
+                continue;
+
+			// find an unsolved riddle without a position
+            for (size_t i = 0; i < riddleCount; ++i)
             {
-				while (nextRiddleIndex < riddleCount)// find the next unsolved riddle without position  
-                {
-                    Point p = riddles[nextRiddleIndex].getPosition();
+                if (riddles[i].isSolved())
+                    continue;
 
-                    if (p.getX() == 0 && p.getY() == 0 &&
-                        !riddles[nextRiddleIndex].isSolved())
-                    {
-                        break;
-                    }
+                Point p = riddles[i].getPosition();
+                if (p.getX() != 0 || p.getY() != 0)
+                    continue;
 
-                    nextRiddleIndex++;
-                }
-
-                if (nextRiddleIndex >= riddleCount)
-                    return;
-
-				// give this riddle the position
-                riddles[nextRiddleIndex].setPosition(Point(x, y));
-                nextRiddleIndex++;
+                
+                riddles[i].setPosition(Point(x, y));
+                break;
             }
         }
     }

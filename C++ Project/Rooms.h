@@ -32,7 +32,7 @@ static const char* const ROOM0[ROOM_HEIGHT] =
     "W    W     W      WWWW                                     WWWWWWWWW*WWWWWWWWW W", // 18
     "W    W     WWWWWWWW  W                         W           WWWWWWW        **   W", // 19
     "W    W               W                                     WWWWWWWWW WWWWWWWWW W", // 20
-    "W   ? \\          W    W                                   WWWWWWWWW WWWWWWWWW W", // 21
+    "W   ? \\          W    W                                   WWWWWWWWW WWWWWWWWW  W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
 
@@ -56,7 +56,7 @@ static const char* const ROOM1[ROOM_HEIGHT] =
     "W    W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 13
     "W    W    W                    *                 *            WWWWWWWWWWWWWWWWWW", // 14
     "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWWWWW", // 15
-    "W    W    W ** **K WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW***s       **                 W", // 16
+    "W    W    WWWWWW*K WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*s       **                W", // 16
     "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWW   W", // 17
     "W    W    WWWWWWWWWWWWWWWWWWWWWW   **      s      WWW     s                    W", // 18
     "W    W                              W      s              s                    W", // 19
@@ -74,7 +74,7 @@ static const char* const ROOM2[ROOM_HEIGHT] =
     "W          W        WW          W              WWWWW             W      *      W", // 2
     "WWWWWWW?WWWWWWWWWWWW  W?WWWWWWWWWWWWWWWWW?WWWWW   WWWWWWWWWWWW  WWWWWWWW WWWWWWW", // 3
     "W                  W                  W W               W  W                   W", // 4
-    "WWWWWWW****WWWWWWW*W       WWW        W WWWWWWW***WWWWWWWWW WW**WWWWWWWWWWWWWWWW", // 5
+    "WWWWWWW*WWWWWWWWWW*W       WWW        W WWWWWWWWW*WWWWWWWWW WWW*WWWWWWWWWWWWWWWW", // 5
     "W                  W**WWWWW   WWWWWWWWW                 W                  W   W", // 6
     "W                  W                  W WWWWWWWWW WWWWWWWWW   W   WWW**WWWW   WW", // 7
     "WW****WWWWWWWWWWWWWW  WWWWW  WWWWWWWWWW*WWWWWW  WWWWWWWWWW * WWWWWW**WWWWW  WWWW", // 8
