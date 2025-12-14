@@ -19,7 +19,7 @@ class RiddleBank
 {
 private:
     static constexpr int ESC = 27;
-	static constexpr size_t MAX_RIDDLES = 10;
+	static constexpr size_t MAX_RIDDLES = 14;
 	Riddle riddles[MAX_RIDDLES];
 	size_t riddleCount = 0;
 
