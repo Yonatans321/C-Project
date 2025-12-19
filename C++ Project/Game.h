@@ -5,6 +5,8 @@
 #include "RiddleBank.h"
 #include "UIScreens.h"
 #include "Utils.h"
+#include "Bomb.h"
+
 
 class Game {
 private:
@@ -48,6 +50,12 @@ private:
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
     void handlePause(Screen& currentScreen, bool& gameRunning);
 	bool checkLevel();// check if level is completed
+
+    Bomb* activeBomb = nullptr;
+    bool isBombTickerActive = false;
+    int bombTimer = 0;
+    Point bombPos;
+    
 public:
     Game(); 
     void run(); 

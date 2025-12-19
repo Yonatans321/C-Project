@@ -3,6 +3,8 @@
 #include <conio.h>
 #include "Utils.h"
 #include <windows.h>
+#include "Screen.h"
+
 
 // prints the given screen to console
 void UIScreens::printScreen(const char** screen)
@@ -173,4 +175,20 @@ void UIScreens::showExitMessage()
     std::cout << "=============================================\n\n";
 
     Sleep(1200); // time to read the massage
+}
+
+
+void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
+    Screen::drawAnimatedBox(10, 5, 50, 12);
+    gotoxy(13, 7);
+    std::cout << "Inventory Full!";
+    gotoxy(13, 9);
+    std::cout << "You can only carry one item at a time.";
+    gotoxy(13, 11);
+    std::cout << "Press any key to continue...";
+    _getch(); 
+    Screen::closeAnimatedBox(10, 5, 50, 12);
+
+    
+    currentScreen.drawMap();
 }

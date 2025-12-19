@@ -147,7 +147,7 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
-        if (pauseRequestedFromRiddle)
+        if (pauseRequestedFromRiddle) // stop in the middle of riddle
         {
             pauseRequestedFromRiddle = false;
             Screen& cs = gameScreens[currentLevel];
@@ -162,17 +162,18 @@ void Game::gameLoop()
             player1.draw();
             player2.draw();
 
-            cs.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(),player2.getHeldItem(), player2.getLives(), player2.getScore());
+            cs.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
         }
+
         Screen& currentScreen = gameScreens[currentLevel];
-        
+
         // Handle input 
         if (_kbhit())
         {
             char ch = _getch();
 
             // PAUSE → Escape key
-            if (ch == ESC) 
+            if (ch == ESC)
             {
                 handlePause(currentScreen, gameRunning);
                 clearInputBuffer();
@@ -184,7 +185,7 @@ void Game::gameLoop()
                 currentScreen.drawMap();
                 player1.draw();
                 player2.draw();
-                currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(),player2.getHeldItem(), player2.getLives(), player2.getScore());
+                currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
             }
             else
             {
@@ -192,7 +193,19 @@ void Game::gameLoop()
                 player2.keyPressed(ch);
             }
         }
-        
+
+        // --- Bomb Creation Logic ---
+        // Check if any player requested to drop a bomb via flag
+        if (player1.hasDroppedBomb() && activeBomb == nullptr)
+        {
+            activeBomb = new Bomb(player1.getLastDropPos());
+            player1.clearBombRequest();
+        }
+        else if (player2.hasDroppedBomb() && activeBomb == nullptr)
+        {
+            activeBomb = new Bomb(player2.getLastDropPos());
+            player2.clearBombRequest();
+        }
 
         // Update players
         player1.erase();
@@ -213,15 +226,27 @@ void Game::gameLoop()
         player1.draw();
         player2.draw();
 
+        // --- Bomb Update Logic ---
+        // Tick the bomb independently of keyboard input
+        if (activeBomb != nullptr)
+        {
+            // Execute bomb logic from Bomb.cpp (timer update and explosion)
+            if (activeBomb->tick(currentScreen, player1, player2))
+            {
+                delete activeBomb; // Explosion finished, clean memory
+                activeBomb = nullptr;
+            }
+        }
+
         currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
 
         if (checkLevel() == true)
         {
-			gameRunning = false;      // level completed
-			currStatus = GameModes::MENU; // return to menu
-			break;                    // exit game loop
+            gameRunning = false;      // level completed
+            currStatus = GameModes::MENU; // return to menu
+            break;                    // exit game loop
         }
-    
+
         Sleep(GAME_DELAY);
     }
 }
@@ -236,7 +261,15 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     targetPos.move();
     char cell = currentScreen.getCharAt(pos);
     char targetCell = currentScreen.getCharAt(targetPos);
-    
+
+    if (targetCell == 'K' || targetCell == '@') {
+        if (player.getHeldItem() != ' ' && player.getHeldItem() != 0) {
+            UIScreens::showInventoryFullMessage(gameScreens[currentLevel]);
+            player.stepBack();
+            player.draw();
+            return true;
+        }
+    }
     switch (cell)
     {
 	case '?':// riddle
@@ -244,10 +277,21 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         break;
 
 	case 'K':// key
-        player.GrabItem('K', currentLevel+1);
-        currentScreen.setCharAt(pos, ' ');
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
+            player.GrabItem('K', currentLevel + 1);
+            currentScreen.setCharAt(pos, ' ');
+        }
+        else
+            return true;
         break;
-
+        case '@':// bomb
+            if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
+                player.GrabItem('@');
+                currentScreen.setCharAt(pos, ' ');
+            }
+            else
+                return true;
+            break; 
     // switch
     case '\\':
     case '/':
@@ -423,6 +467,9 @@ void Game::resetGame()
     activeDoor = ' ';
     Door::switchesAreOn = false;
 
+    player1.resetStats();
+    player2.resetStats();
+
 	// reset riddles
     riddleBank.resetAllRiddles();
 
@@ -435,3 +482,4 @@ void Game::resetGame()
         gameScreens[i].loadMap(i);
 
 }
+

@@ -224,7 +224,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                     std::cout << std::string(50, ' ');
                     gotoxy(bx + 2, hintorResultLine);
                     std::cout << "Hint: " << r->getHint();
-                    gotoxy(cursorX + ans.length(), cursorY);
+                    gotoxy(cursorX + (int)ans.length(), cursorY);
 					continue;
                 }
                 if (c == '\b') // BACKSPACE
@@ -232,16 +232,16 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
                     if (!ans.empty())
                     {
 						ans.pop_back();
-						gotoxy(cursorX + ans.length(), cursorY);
+						gotoxy(cursorX + (int)ans.length(), cursorY);
 						std::cout << ' ';
-                        gotoxy(cursorX + ans.length(), cursorY);
+                        gotoxy(cursorX + (int)ans.length(), cursorY);
                     }
                     continue;
 				}
                 if (ans.length()<40)
                 {
                     ans.push_back(c);
-					gotoxy(cursorX + ans.length() - 1, cursorY);
+					gotoxy(cursorX + (int)ans.length() - 1, cursorY);
 					std::cout << c;
                 }
             }

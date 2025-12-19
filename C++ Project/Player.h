@@ -1,10 +1,12 @@
 #pragma once
 #include "Point.h"
+#include "Bomb.h"
 #include <cstddef> //for size_t
 
 // forward declarations
 class Screen; 
 class Key;   
+class Bomb;   
 
 class Player
 {
@@ -22,6 +24,8 @@ private:
 	bool hasKey = false; // does the player have a key
 	bool active = true;// does the player is active
 
+	bool bombDroppedRequest = false; // דגל חדש
+	Point lastDropPos;               // המיקום שב
 	
 public:
 	//constructor
@@ -62,7 +66,7 @@ public:
 	void setKey(bool val) { hasKey = val; }
 	bool useKeyForDoor(char doorChar) const;
 	void keyUsed();
-	//bool hasKeyForDoor(char doorChar) const;
+	
 	
 	//Directions functions
 	Direction getDirection() const
@@ -73,6 +77,11 @@ public:
 	{
 		return position.getOppositeDirection();
 	}
+	// Add this method to the public section of the Player class
+void setDirection(const Direction& dir) {
+	position.changeDirection(dir); 
+}
+
 	// Score and Lives functions
 	void addPoints(int pts);
 	void losePoints(int pts);
@@ -86,5 +95,11 @@ public:
 	bool isActive() const { return active; }
 	void setInactive() { active = false; }
 	void activate() {active = true;}
+
+	bool hasDroppedBomb() const { return bombDroppedRequest; }
+	Point getLastDropPos() const { return lastDropPos; }
+	void clearBombRequest() { bombDroppedRequest = false; }
+
+	void resetStats() { lives = 3; points = 0; }
 };
 
