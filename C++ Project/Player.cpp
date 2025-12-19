@@ -220,12 +220,19 @@ void Player::dropHeldItem()
 	}
 	// check if drop position is empty
 	if (screen->getCharAt(dropX, dropY) == ' ') {
-		// put the item on the screen
-		screen->setCharAt(dropX, dropY, heldItem);
+		if (getHeldItem() == '@')
+		{
+			bombDroppedRequest = true;
+			lastDropPos = Point(dropX, dropY);
+		}
+		else
+		{
+			// put the item on the screen
+			screen->setCharAt(dropX, dropY, heldItem);
+		}
+		
 		DropItem();// drop from the player
-	}
-	
-	
+	}	
 }
 
 

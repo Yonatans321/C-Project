@@ -1,0 +1,60 @@
+#include "Bomb.h"
+#include "Screen.h"
+#include "Player.h"
+#include <cmath> // For std::abs
+
+// Update signature to match Bomb.h (3 arguments)
+void Bomb::explode(Screen& screen, Player& p1, Player& p2)
+{
+    // 1. Remove the bomb from logical map and physical screen
+    screen.setCharAt(position, ' ');
+    position.draw(' ');
+
+    int centerX = position.getX();
+    int centerY = position.getY();
+
+    // 2. Destroy 'w' walls and '*' obstacles in range 1 (3x3 area)
+    for (int y = -3; y <= 3; y++)
+    {
+        for (int x = -3; x <= 3; x++)
+        {
+            if (x == 0 && y == 0) continue; // Skip the center
+
+            int targetX = centerX + x;
+            int targetY = centerY + y;
+
+            char targetChar = screen.getCharAt(targetX, targetY);
+            if (targetChar == 'w' || targetChar == '*')
+            {
+                screen.setCharAt(targetX, targetY, ' ');
+                Point(targetX, targetY).draw(' ');
+            }
+        }
+    }
+
+    // 3. Check for player damage in range 3 (Chebyshev distance)
+    // If player is within 3 cells (including diagonals), they lose a life
+    if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
+        p1.loseLife();
+    }
+    if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
+        p2.loseLife();
+    }
+}
+
+// Update signature to match Bomb.h (3 arguments)
+bool Bomb::tick(Screen& screen, Player& p1, Player& p2)
+{
+    // Decrease internal timer
+    timer--;
+
+    // Redraw the bomb icon so it doesn't disappear when players move over it
+    position.draw('@');
+
+    if (timer <= 0)
+    {
+        explode(screen, p1, p2); // Trigger explosion with player references
+        return true;     // Bomb has finished its life cycle
+    }
+    return false;        // Bomb is still active
+}

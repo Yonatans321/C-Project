@@ -17,7 +17,7 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
     if (isFacingObstacle(p1, screen, obs))
     {
         auto chain = collectChain(obs, p1.getDirection(), screen);
-        int count = chain.size();
+        size_t count = chain.size();
 
         if (count == 1)
         {
@@ -35,7 +35,7 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
     if (isFacingObstacle(p2, screen, obs))
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
-        int count = chain.size();
+        int count = (int)chain.size();
 
         if (count == 1)
         {
@@ -118,7 +118,7 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
         chain.back().getY() + dir.getY());
 
     // move obstacle from end to start
-    for (int i = chain.size() - 1; i >= 0; i--)
+    for (int i =(int)chain.size() - 1; i >= 0; i--)
     {
         Point from = chain[i];
         Point to = (i == chain.size() - 1) ? newSpot : chain[i + 1];

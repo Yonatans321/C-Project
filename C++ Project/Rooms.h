@@ -12,27 +12,27 @@ static constexpr int ROOM_HEIGHT = 23;
 static const char* const ROOM0[ROOM_HEIGHT] =
 {//  01234567890123456789012345678901234567890123456789012345678901234567890123456789
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-    "W    W     W                 s                                                 W", // 1 
-    "W    W     W   WWWWWWWWWW    s          WWWWWWWWWWW                            W", // 2
-    "W    W       ?  W       W    s          W          W                           W", // 3
-    "W    W     W            W    s          W     \\    W                           W", // 4
-    "W    W     WWW \\        W    s          W          W                           W", // 5
-    "W    W     W   W        W    s          W          W                           W", // 6
-    "W    W     W   WWWWWWWWWW    s          WWWWW?WWWWWW                           W", // 7
-    "W    W     W                 s                                                 W", // 8
-    "W    W     W                 s                                                 W", // 9
-    "W    W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWssssssssssssssssssssssW", // 10
-    "W    W     W                                                                   W", // 11
-    "W    W     W                                                                   W", // 12
-    "W    W     W           WWWWWWWWWW                                              W", // 13
-    "W    W     W            * *     W                          WWWWWWWWWWWWWWWWWWW W", // 14
-    "W    W     W           W        W                          WWWWWWWWW WWWWWWWWW W", // 15
-    "W    W     W           W     1  W                          WWWWWWWWW WWWWWWWWW*W", // 16
-    "W    W     W           WWWWWWWWWW                          WK       *WWWWWWWWW*W", // 17
-    "W    W     W      WWWW                                     WWWWWWWWW*WWWWWWWWW W", // 18
-    "W    W     WWWWWWWW  W                         W           WWWWWWW        **   W", // 19
-    "W    W               W                                     WWWWWWWWW WWWWWWWWW W", // 20
-    "W   ? \\          W    W                                   WWWWWWWWW WWWWWWWWW  W", // 21
+    "W   w      w                 s                                                 W", // 1 
+    "W   w      w   wwwwwwwwww    s          wwwwwwwwwww                            W", // 2
+    "W   w       ?   w       w    s          w          w                           W", // 3
+    "W   w      w            w    s          w     \\    w                           W", // 4
+    "W   w      www \\        w    s          w          w                           W", // 5
+    "W   w      w   w        w    s          w          w                           W", // 6
+    "W  @w      w   wwwwwwwwww    s          wwwww?wwwwww                           W", // 7
+    "W   w      w                 s                                                 W", // 8
+    "W   w      w                 s                                                 W", // 9
+    "W   w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwssssssssssssssssssssssW", // 10
+    "W   w      w                                                                   W", // 11
+    "W   w      w                                                                   W", // 12
+    "W   w      w           wwwwwwwwww                                              W", // 13
+    "W   w      w            * *     w                          wwwwwwwwwwwwwwwwwww W", // 14
+    "W   w      w           w        w                          wwwwwwwww wwwwwwwww W", // 15
+    "W   w      w           w     1  w                          wwwwwwwww wwwwwwwww*W", // 16
+    "W   w      w           wwwwwwwwww                          wK       *wwwwwwwww*W", // 17
+    "W   w      w      wwww                                     wwwwwwwww*wwwwwwwww W", // 18
+    "W   w      wwwwwwww  w                         w           wwwwwww        **   W", // 19
+    "W   w                w                                     wwwwwwwww wwwwwwwww w", // 20
+    "W   ? \\          w    w                                   wwwwwwwww wwwwwwwww  W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
 
@@ -41,26 +41,26 @@ static const char* const ROOM0[ROOM_HEIGHT] =
 static const char* const ROOM1[ROOM_HEIGHT] =
 {
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-    "W      1           W                                                           W", // 1
-    "W                  W?WWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWW WWWW", // 2
-    "W          W       W        W     * W                      WWW                 W", // 3
-    "W        WW WWWW   W        W\\ WW  WW    WWWWWWWWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWW", // 4
-    "W        WW   \\W* W         WWWWWWW                   WWW                      W", // 5
-    "W       WWW*WWWWW*W         WWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWWWWW  W", // 6
-    "W     WW     * *  W         W                          WW                      W", // 7
-    "W       WWW WWWWW W         W WWWWWWWWWWWWWWWWWWWWWWWWWWWWW  WWWWWWWWWWWWWWWWWWWW", // 8
-    "W    WWWWWWWWWWWW W         W           * *               W?WWWWWWWWWWWWWWWWWWWW", // 9
-    "W                WWW        WWWWWWWWWWWWWWWWWWWWWWWWWWW\\ W   WWWWWWWWWWWWWWWWWWW", // 10
-    "W*WWWWWWWWWWWWWWWWWW        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 11
-    "W*WWWW                      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 12
-    "W    W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW WWWWWWWWWWWWWWWWWWWW", // 13
-    "W    W    W                    *                 *            WWWWWWWWWWWWWWWWWW", // 14
-    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWWWWW", // 15
-    "W    W    WWWWWW*K WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*s       **                W", // 16
-    "W    W    W      WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWW   W", // 17
-    "W    W    WWWWWWWWWWWWWWWWWWWWWW   **      s      WWW     s                    W", // 18
-    "W    W                              W      s              s                    W", // 19
-    "WWWW?WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     s              s                    W", // 20
+    "W      1           w                                                           W", // 1
+    "W                  w?wwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwww wwwW", // 2
+    "W          w       w        w     * w                      www                 W", // 3
+    "W        ww wwww   w        w\\ ww  ww   wwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwW", // 4
+    "W        ww   \\w* w         wwwwwww@                  www                      W", // 5
+    "W       www*wwwww*w         wwwwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwww  W", // 6
+    "W     ww     * *  w         w                          ww@                     W", // 7
+    "W       www wwwww w         w wwwwwwwwwwwwwwwwwwwwwwwwwwwww  wwwwwwwwwwwwwwwwwwW", // 8
+    "W    wwwwwwwwwwww w         w           * *               w?wwwwwwwwwwwwwwwwwwwW", // 9
+    "W                www        wwwwwwwwwwwwwwwwwwwwwwwwwww\\ w   wwwwwwwwwwwwwwwwwwW", // 10
+    "W*wwwwwwwwwwwwwwwwww        wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwW", // 11
+    "W*wwww                      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwW", // 12
+    "W    w    wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwW", // 13
+    "W    w    w                    *                 *            wwwwwwwwwwwwwwwwwW", // 14
+    "W    w    w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww   wwwwwwwwwwwwwwwwwwwwwwwwwwW", // 15
+    "W    w    wwwwww*K wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww*s       **                W", // 16
+    "W    w    w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww   wwwwwwwwwwwwwwwwwwwwwww   W", // 17
+    "W    w    wwwwwwwwwwwwwwwwwwwwww   **      s      www     s                    W", // 18
+    "W    w                              w      s              s                    W", // 19
+    "Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s              s                    W", // 20
     "W            *  *                          s      2       s                    W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };
