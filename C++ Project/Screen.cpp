@@ -1,7 +1,9 @@
 ﻿#include "Screen.h"
 #include "Rooms.h"
+#include "Player.h"
 #include <cstring>
 #include <windows.h>
+#include <cmath>
 
 Screen::Screen()
 {
@@ -82,7 +84,54 @@ void Screen::setCharAt(int x, int y, char ch)
     std::cout << ch;
     resetColor();
 }
+void Screen::setDark(bool isDark)
+{
+    dark = isDark;
+}
+bool Screen::isDark() const
+{
+    return dark;
+}
 
+void Screen::drawMapWithTorch(const Player& p1, const Player& p2) const
+{
+	const int R = 1; // radius of light
+
+	for (int y = 0; y < MAP_HEIGHT; y++) // for each row
+    {
+        gotoxy(0, y);
+		for (int x = 0; x < WIDTH; x++) // for each column
+        {
+			char c = screen[y][x]; // get the character at (x, y)
+            bool lit = false;
+
+			if (p1.hasItem('!')) // if player 1 has torch
+			{ // check if (x, y) is within radius R of player 1
+                if (std::abs(x - p1.getX()) <= R &&
+                    std::abs(y - p1.getY()) <= R)
+                    lit = true;
+            }
+
+			if (p2.hasItem('!')) // if player 2 has torch
+			{ // check if (x, y) is within radius R of player 2
+                if (std::abs(x - p2.getX()) <= R &&
+                    std::abs(y - p2.getY()) <= R)
+                    lit = true;
+            }
+
+			if (lit) // if the position is lit
+            {
+                applyColor(c);
+                std::cout << c;
+            }
+            else
+            {
+                std::cout << ' ';
+            }
+        }
+    }
+    resetColor();
+}
 void Screen::setCharAt(const Point& p, char ch)
 {
     setCharAt(p.getX(), p.getY(), ch);
@@ -263,6 +312,12 @@ void Screen::applyColor(char c) const
 
     case 'K':    // key
         setColor(COLOR_GOLD);
+        break;
+	case '@':    // Bomb
+        setColor(COLOR_CYAN);
+        break;
+	case '!':    // Torch
+        setColor(COLOR_RED);
         break;
 
     default:

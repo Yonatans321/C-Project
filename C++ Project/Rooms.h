@@ -60,7 +60,7 @@ static const char* const ROOM1[ROOM_HEIGHT] =
     "W    w    w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww   wwwwwwwwwwwwwwwwwwwwwww   W", // 17
     "W    w    wwwwwwwwwwwwwwwwwwwwww   **      s      www     s                    W", // 18
     "W    w                              w      s              s                    W", // 19
-    "Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s              s                    W", // 20
+    "Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s  !           s                    W", // 20
     "W            *  *                          s      2       s                    W", // 21
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"  // 22
 };

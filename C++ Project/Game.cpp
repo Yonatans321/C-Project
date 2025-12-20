@@ -6,7 +6,7 @@
 #include "Obstacle.h"
 #include "Switch.h"
 #include "Utils.h"
-
+#include "Torch.h"
 
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 
@@ -82,7 +82,12 @@ void Game::initLevel(int specificDoor)
     Screen& currentScreen = gameScreens[currentLevel];
 
     cls();
-    currentScreen.drawMap();
+	if (currentLevel == 2) // level 3 is dark
+		currentScreen.setDark(true); // set dark
+    else
+		currentScreen.setDark(false); // other levels are not dark
+
+	Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
 	riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
 
     // Assign screen to players
@@ -136,7 +141,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     }
 
     clearInputBuffer();
-    currentScreen.drawMap();
+	Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
     player1.draw();
     player2.draw();
 }
@@ -158,7 +163,7 @@ void Game::gameLoop()
                 break;
             }
             cls();
-            cs.drawMap();
+			Torch::handleTorch(player1, player2, cs); // handle torch lighting
             player1.draw();
             player2.draw();
 
@@ -182,7 +187,7 @@ void Game::gameLoop()
                     break;
 
                 // Redraw after pause
-                currentScreen.drawMap();
+				Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
                 player1.draw();
                 player2.draw();
                 currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
@@ -279,6 +284,15 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 	case 'K':// key
         if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
             player.GrabItem('K', currentLevel + 1);
+            currentScreen.setCharAt(pos, ' ');
+        }
+        else
+            return true;
+        break;
+    case '!': // Torch
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+        {
+            player.GrabItem('!');
             currentScreen.setCharAt(pos, ' ');
         }
         else

@@ -6,6 +6,8 @@
 #include "Door.h"
 #include "Utils.h"
 
+class Player; // forward declaration
+
 // class to manage the screen layout and interactions
 class Screen {
 public:
@@ -17,7 +19,8 @@ public:
 private:
 	char screen[MAP_HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
-
+	
+	bool dark = false; // is the screen dark
 	static const char* const MAP_LAYOUTS[NUM_MAPS][MAP_HEIGHT];
 public:
 	Screen();
@@ -25,6 +28,10 @@ public:
 	// Map drawing
 	void loadMap(int level);
 	void drawMap() const;
+
+	void drawMapWithTorch(const Player& p1, const Player& p2) const;
+	bool isDark() const;
+	void setDark(bool isDark);
 
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
