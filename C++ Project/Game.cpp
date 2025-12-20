@@ -469,6 +469,7 @@ void Game::resetGame()
 
     player1.resetStats();
     player2.resetStats();
+	
 
 	// reset riddles
     riddleBank.resetAllRiddles();

@@ -77,10 +77,8 @@ public:
 	{
 		return position.getOppositeDirection();
 	}
-	// Add this method to the public section of the Player class
-void setDirection(const Direction& dir) {
-	position.changeDirection(dir); 
-}
+	
+    void setDirection(const Direction& dir) {position.changeDirection(dir);}
 
 	// Score and Lives functions
 	void addPoints(int pts);
@@ -100,6 +98,6 @@ void setDirection(const Direction& dir) {
 	Point getLastDropPos() const { return lastDropPos; }
 	void clearBombRequest() { bombDroppedRequest = false; }
 
-	void resetStats() { lives = 3; points = 0; }
+	void resetStats() { heldItem = 0; lives = 3; points = 0; }
 };
 
