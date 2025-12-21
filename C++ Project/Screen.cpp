@@ -1,7 +1,9 @@
 ﻿#include "Screen.h"
 #include "Rooms.h"
+#include "Player.h"
 #include <cstring>
 #include <windows.h>
+#include <cmath>
 
 Screen::Screen()
 {
@@ -81,6 +83,101 @@ void Screen::setCharAt(int x, int y, char ch)
     applyColor(ch);
     std::cout << ch;
     resetColor();
+}
+void Screen::setDark(bool isDark)
+{
+    dark = isDark;
+}
+bool Screen::isDark() const
+{
+    return dark;
+}
+
+void Screen::drawMapWithTorch(const Player& p1) const
+{
+    const int R = 6;
+
+    static bool initialized = false;
+    static int lastX = -1, lastY = -1;
+
+    int cx = p1.getX();
+    int cy = p1.getY();
+
+    // אם לא זז – לא מציירים שוב → מונע ריצוד
+    if (initialized && cx == lastX && cy == lastY)
+        return;
+
+    if (!initialized)
+    {
+        for (int y = 0; y < MAP_HEIGHT; y++)
+        {
+            gotoxy(0, y);
+            for (int x = 0; x < WIDTH; x++)
+                std::cout << ' ';
+        }
+        initialized = true;
+    }
+
+    auto clearHalo = [&](int cx, int cy)
+        {
+            for (int y = cy - R; y <= cy + R; y++)
+            {
+                if (y < 0 || y >= MAP_HEIGHT) continue;
+                for (int x = cx - R; x <= cx + R; x++)
+                {
+                    if (x < 0 || x >= WIDTH) continue;
+                    int dx = x - cx, dy = y - cy;
+                    if (dx * dx + dy * dy <= R * R)
+                    {
+                        gotoxy(x, y);
+                        std::cout << ' ';
+                    }
+                }
+            }
+        };
+
+    auto drawHalo = [&](int cx, int cy)
+        {
+            for (int y = cy - R; y <= cy + R; y++)
+            {
+                if (y < 0 || y >= MAP_HEIGHT) continue;
+                for (int x = cx - R; x <= cx + R; x++)
+                {
+                    if (x < 0 || x >= WIDTH) continue;
+                    int dx = x - cx, dy = y - cy;
+                    if (dx * dx + dy * dy <= R * R)
+                    {
+                        gotoxy(x, y);
+                        char c = screen[y][x];
+                        applyColor(c);
+                        std::cout << c;
+                    }
+                }
+            }
+        };
+
+    if (lastX != -1)
+        clearHalo(lastX, lastY);
+
+    drawHalo(cx, cy);
+
+    lastX = cx;
+    lastY = cy;
+
+    resetColor();
+}
+
+
+void Screen :: drawDark() const
+{
+    for (int y = 0; y < MAP_HEIGHT; y++)
+    {
+        gotoxy(0, y);
+        for (int x = 0; x < WIDTH; x++)
+        {
+            std::cout << ' ';
+        }
+    }
 }
 
 void Screen::setCharAt(const Point& p, char ch)
@@ -263,6 +360,12 @@ void Screen::applyColor(char c) const
 
     case 'K':    // key
         setColor(COLOR_GOLD);
+        break;
+	case '@':    // Bomb
+        setColor(COLOR_CYAN);
+        break;
+	case '!':    // Torch
+        setColor(COLOR_RED);
         break;
 
     default:

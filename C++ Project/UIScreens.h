@@ -16,6 +16,8 @@ public:
 	static void showExitMessage();
 
 	static void showInventoryFullMessage(const Screen& currentScreen);
+	static void showGameOverMessage();
+
 private:
 	static void printScreen(const char** screen );
 };
