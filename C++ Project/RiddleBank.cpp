@@ -143,7 +143,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             screen.setCharAt(x, y, '?');
 
             // draw map and player again
-            screen.drawMap();
+            if (screen.isDark())
+                screen.drawMapWithTorch(player);
+            else
+                screen.drawMap();
             player.draw();
 
             return;
@@ -267,20 +270,20 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
             {
                 std::cout << "Wrong! -1 life";
                 player.loseLife();
-                if (player.getLives() <= 0)
-                {
-                    player.addLives(); 
+     //           if (player.getLives() <= 0)
+     //           {
+     //               player.addLives(); 
 
-					// special message for no lives left
-                    std::string msg = "No lives left :( granting 1 bonus life :)";
-                    gotoxy(34, Screen::MAP_HEIGHT + 1);
-                    setColor(COLOR_LIGHT_RED);
-                    std::cout << msg;
-					Sleep(2000);
-                    gotoxy(34, Screen::MAP_HEIGHT + 1);
-                    resetColor();
-					std::cout << std::string(msg.length(), ' ');
-                }
+					//// special message for no lives left
+     //               std::string msg = "No lives left :( granting 1 bonus life :)";
+     //               gotoxy(34, Screen::MAP_HEIGHT + 1);
+     //               setColor(COLOR_LIGHT_RED);
+     //               std::cout << msg;
+					//Sleep(2000);
+     //               gotoxy(34, Screen::MAP_HEIGHT + 1);
+     //               resetColor();
+					//std::cout << std::string(msg.length(), ' ');
+     //           }
                 screen.setCharAt(x, y, '?'); // put the riddle symbol back
             }
 
@@ -289,7 +292,10 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
             //redraw map and player
             player.stepBack(); // move player back to avoid re-triggering
-            screen.drawMap();
+            if (screen.isDark())
+                screen.drawMapWithTorch(player);
+            else
+                screen.drawMap();
             player.draw();
 
             answered = true;

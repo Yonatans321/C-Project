@@ -93,45 +93,93 @@ bool Screen::isDark() const
     return dark;
 }
 
-void Screen::drawMapWithTorch(const Player& p1, const Player& p2) const
+void Screen::drawMapWithTorch(const Player& p1) const
 {
-	const int R = 1; // radius of light
+    const int R = 6;
 
-	for (int y = 0; y < MAP_HEIGHT; y++) // for each row
+    static bool initialized = false;
+    static int lastX = -1, lastY = -1;
+
+    int cx = p1.getX();
+    int cy = p1.getY();
+
+    // אם לא זז – לא מציירים שוב → מונע ריצוד
+    if (initialized && cx == lastX && cy == lastY)
+        return;
+
+    if (!initialized)
     {
-        gotoxy(0, y);
-		for (int x = 0; x < WIDTH; x++) // for each column
+        for (int y = 0; y < MAP_HEIGHT; y++)
         {
-			char c = screen[y][x]; // get the character at (x, y)
-            bool lit = false;
-
-			if (p1.hasItem('!')) // if player 1 has torch
-			{ // check if (x, y) is within radius R of player 1
-                if (std::abs(x - p1.getX()) <= R &&
-                    std::abs(y - p1.getY()) <= R)
-                    lit = true;
-            }
-
-			if (p2.hasItem('!')) // if player 2 has torch
-			{ // check if (x, y) is within radius R of player 2
-                if (std::abs(x - p2.getX()) <= R &&
-                    std::abs(y - p2.getY()) <= R)
-                    lit = true;
-            }
-
-			if (lit) // if the position is lit
-            {
-                applyColor(c);
-                std::cout << c;
-            }
-            else
-            {
+            gotoxy(0, y);
+            for (int x = 0; x < WIDTH; x++)
                 std::cout << ' ';
-            }
         }
+        initialized = true;
     }
+
+    auto clearHalo = [&](int cx, int cy)
+        {
+            for (int y = cy - R; y <= cy + R; y++)
+            {
+                if (y < 0 || y >= MAP_HEIGHT) continue;
+                for (int x = cx - R; x <= cx + R; x++)
+                {
+                    if (x < 0 || x >= WIDTH) continue;
+                    int dx = x - cx, dy = y - cy;
+                    if (dx * dx + dy * dy <= R * R)
+                    {
+                        gotoxy(x, y);
+                        std::cout << ' ';
+                    }
+                }
+            }
+        };
+
+    auto drawHalo = [&](int cx, int cy)
+        {
+            for (int y = cy - R; y <= cy + R; y++)
+            {
+                if (y < 0 || y >= MAP_HEIGHT) continue;
+                for (int x = cx - R; x <= cx + R; x++)
+                {
+                    if (x < 0 || x >= WIDTH) continue;
+                    int dx = x - cx, dy = y - cy;
+                    if (dx * dx + dy * dy <= R * R)
+                    {
+                        gotoxy(x, y);
+                        char c = screen[y][x];
+                        applyColor(c);
+                        std::cout << c;
+                    }
+                }
+            }
+        };
+
+    if (lastX != -1)
+        clearHalo(lastX, lastY);
+
+    drawHalo(cx, cy);
+
+    lastX = cx;
+    lastY = cy;
+
     resetColor();
 }
+
+
+void Screen :: drawDark() const
+{
+    for (int y = 0; y < MAP_HEIGHT; y++)
+    {
+        gotoxy(0, y);
+        for (int x = 0; x < WIDTH; x++)
+        {
+            std::cout << ' ';
+        }
+    }
+}
+
 void Screen::setCharAt(const Point& p, char ch)
 {
     setCharAt(p.getX(), p.getY(), ch);

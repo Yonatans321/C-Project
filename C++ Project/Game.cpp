@@ -82,13 +82,15 @@ void Game::initLevel(int specificDoor)
     Screen& currentScreen = gameScreens[currentLevel];
 
     cls();
-	if (currentLevel == 2) // level 3 is dark
+	if (currentLevel == 1) // level 2 is dark
 		currentScreen.setDark(true); // set dark
     else
 		currentScreen.setDark(false); // other levels are not dark
 
-	Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
-	riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
+    if (currentScreen.isDark())
+        currentScreen.drawMapWithTorch(player1);
+    else
+        currentScreen.drawMap();;	riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
 
     // Assign screen to players
     player1.setScreen(currentScreen);
@@ -141,8 +143,10 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     }
 
     clearInputBuffer();
-	Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
-    player1.draw();
+    if (currentScreen.isDark())
+        currentScreen.drawMapWithTorch(player1);
+    else
+        currentScreen.drawMap();;    player1.draw();
     player2.draw();
 }
 // Main game loop 
@@ -152,26 +156,27 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
+        Screen& currentScreen = gameScreens[currentLevel];
         if (pauseRequestedFromRiddle) // stop in the middle of riddle
         {
             pauseRequestedFromRiddle = false;
-            Screen& cs = gameScreens[currentLevel];
-            handlePause(cs, gameRunning);
+            handlePause(currentScreen, gameRunning);
             clearInputBuffer();
             if (!gameRunning)
             {
                 break;
             }
-            cls();
-			Torch::handleTorch(player1, player2, cs); // handle torch lighting
+            if (currentScreen.isDark())
+                currentScreen.drawMapWithTorch(player1);
+            else
+                currentScreen.drawMap();;
+
             player1.draw();
             player2.draw();
-
-            cs.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
+            currentScreen.drawStatusBar(
+                player1.getHeldItem(), player1.getLives(), player1.getScore(),
+				player2.getHeldItem(), player2.getLives(), player2.getScore());
         }
-
-        Screen& currentScreen = gameScreens[currentLevel];
-
         // Handle input 
         if (_kbhit())
         {
@@ -186,11 +191,17 @@ void Game::gameLoop()
                 if (!gameRunning)
                     break;
 
-                // Redraw after pause
-				Torch::handleTorch(player1, player2, currentScreen); // handle torch lighting
+                // redraw after pause
+                if (currentScreen.isDark())
+                    currentScreen.drawMapWithTorch(player1);
+                else
+                    currentScreen.drawMap();
+
                 player1.draw();
                 player2.draw();
-                currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
+                currentScreen.drawStatusBar(
+                    player1.getHeldItem(), player1.getLives(), player1.getScore(),
+                    player2.getHeldItem(), player2.getLives(), player2.getScore());
             }
             else
             {
@@ -228,9 +239,6 @@ void Game::gameLoop()
             player2.move();
         }
 
-        player1.draw();
-        player2.draw();
-
         // --- Bomb Update Logic ---
         // Tick the bomb independently of keyboard input
         if (activeBomb != nullptr)
@@ -243,13 +251,31 @@ void Game::gameLoop()
             }
         }
 
-        currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
+        if (currentScreen.isDark())
+            currentScreen.drawMapWithTorch(player1);
+        
 
-        if (checkLevel() == true)
+        player1.draw();
+        player2.draw();
+
+        currentScreen.drawStatusBar(
+            player1.getHeldItem(), player1.getLives(), player1.getScore(),
+            player2.getHeldItem(), player2.getLives(), player2.getScore());
+
+        if (player1.isDead() || player2.isDead())
         {
-            gameRunning = false;      // level completed
-            currStatus = GameModes::MENU; // return to menu
-            break;                    // exit game loop
+            UIScreens::showGameOverMessage();
+            resetGame();
+            currStatus = GameModes::MENU;
+            return;
+        }
+
+        // --- Check level ---
+        if (checkLevel())
+        {
+            gameRunning = false;
+            currStatus = GameModes::MENU;
+            break;
         }
 
         Sleep(GAME_DELAY);
@@ -267,9 +293,15 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     char cell = currentScreen.getCharAt(pos);
     char targetCell = currentScreen.getCharAt(targetPos);
 
-    if (targetCell == 'K' || targetCell == '@') {
+    if (targetCell == 'K' || targetCell == '@' || targetCell == '!') {
         if (player.getHeldItem() != ' ' && player.getHeldItem() != 0) {
             UIScreens::showInventoryFullMessage(gameScreens[currentLevel]);
+
+            if (currentScreen.isDark())
+                currentScreen.drawMapWithTorch(player);
+            else
+                currentScreen.drawMap();
+
             player.stepBack();
             player.draw();
             return true;

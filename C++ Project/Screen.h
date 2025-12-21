@@ -29,10 +29,10 @@ public:
 	void loadMap(int level);
 	void drawMap() const;
 
-	void drawMapWithTorch(const Player& p1, const Player& p2) const;
+	void drawMapWithTorch(const Player& p1) const;
 	bool isDark() const;
 	void setDark(bool isDark);
-
+	void drawDark() const;
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);

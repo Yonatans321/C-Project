@@ -163,7 +163,7 @@ void UIScreens::showWinScreen()
     };
 
     printScreen(WIN_SCREEN);
-    _getch();
+	waitForKey();
 }
 
 void UIScreens::showExitMessage()
@@ -177,6 +177,40 @@ void UIScreens::showExitMessage()
     Sleep(1200); // time to read the massage
 }
 
+void UIScreens::showGameOverMessage()
+{
+    static const char* GAME_OVER_SCREEN[Screen::HEIGHT] =
+    {
+        "                                                                                ",//1
+        "                                OOPS... YOU DIED!                                ",//2
+        "                                                                                ",//3
+        "                          =============================                          ",//4
+        "                          Even heroes need more practice!                        ",//5
+        "                                                                                ",//6
+        "                    I knew you wouldn't make it this time...                     ",//7
+        "                                                                                ",//8
+        "                 Try again! Maybe you'll fail a bit further ;)                   ",
+        "                                                                                ",
+        "                                                                                ",
+        "              @         @@@@@@    @@@@@@    @@@@@@    @@@@@@@                   ",
+        "              @         @    @    @         @         @     @                  ",
+        "              @         @    @    @@@@@     @@@@@     @@@@@@@                  ",
+        "              @         @    @         @    @         @    @                   ",
+        "              @@@@@@    @@@@@@    @@@@@@    @@@@@@    @     @                   ",
+        "                                                                                ",
+        "                                                                                ",
+        "                        Press ANY key to return to Main Menu                      ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+    };
+
+    printScreen(GAME_OVER_SCREEN);
+    waitForKey();
+}
 
 void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     Screen::drawAnimatedBox(10, 5, 50, 12);
@@ -186,9 +220,6 @@ void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     std::cout << "You can only carry one item at a time.";
     gotoxy(13, 11);
     std::cout << "Press any key to continue...";
-    _getch(); 
+	waitForKey();
     Screen::closeAnimatedBox(10, 5, 50, 12);
-
-    
-    currentScreen.drawMap();
 }
