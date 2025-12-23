@@ -6,7 +6,9 @@
 #include "UIScreens.h"
 #include "Utils.h"
 #include "Bomb.h"
-
+#include <vector>   // vector for storing screen file names
+#include <string>   // for string handling
+#include <filesystem> // for directory iteration
 
 class Game {
 private:
@@ -24,14 +26,18 @@ private:
     static constexpr char EXIT_KEY = '9';
     static constexpr char Colors_ON_OFF = '2';
 
-    // Levels
-    static constexpr int MAX_LEVELS = 4;
-	std::array <Screen, MAX_LEVELS> gameScreens; // array to hold game screens (helped by AI)
-	
-    int currentLevel = 0;
+    
+	std::vector<std::string> screenFileNames; // list of screen file names
+	Screen currentScreen;             // current game screen        
+	std::vector<Screen> allLevels;    // all game levels
+	int currentLevelIdx = 0;         // current level index         
+
+	//function to get all screen file names from the directory
+    void getAllScreenFileNames(std::vector<std::string>& vec_to_fill);
+
+    //int currentLevel = 0;
 	char activeDoor = ' '; // to track last door used
    
-
     // Game modes - options of the game
     GameModes currStatus = GameModes::MENU;
     Player player1;         
@@ -41,7 +47,7 @@ private:
     
     void showMenu();        
     void showInstructions(); 
-    void initLevel(int specificDoor = -1);  //run the game
+    void initLevel(const std::string& filename, int specificDoor = -1);  //run the game
 	void gameLoop();// main game loop       
 	bool handleTile(Player& player);// handle tile interaction for a player
 	void showWinScreen();
@@ -52,9 +58,6 @@ private:
 	bool checkLevel();// check if level is completed
 
     Bomb* activeBomb = nullptr;
-    bool isBombTickerActive = false;
-    int bombTimer = 0;
-    Point bombPos;
     
 public:
     Game(); 

@@ -4,6 +4,9 @@
 #include <cstring>
 #include <windows.h>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+
 
 Screen::Screen()
 {
@@ -17,38 +20,54 @@ Screen::Screen()
 }
 
 //   LOAD MAP
-void Screen::loadMap(int level)
+void Screen::loadMapFromFile(const std::string& filename)
 {
-    const char* const* src = nullptr;
-
-    switch (level)
-    {
-    case 0: src = ROOM0; break;
-    case 1: src = ROOM1; break;
-    case 2: src = ROOM2; break;
-    default: return;
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cout << "DEBUG: Failed to open file: " << filename << std::endl; // שורת דיבג
+        return; // טיפול בשגיאה אם הקובץ לא נמצא
     }
 
-    for (int y = 0; y < MAP_HEIGHT; y++)
-    {
-        strncpy_s(screen[y], src[y], WIDTH);
+    // איפוס המפה לפני טעינה
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            screen[y][x] = ' ';
+        }
         screen[y][WIDTH] = '\0';
     }
-    for (int y = 0; y < 23; y++)
+
+    std::string line;
+    int y = 0;
+    while (std::getline(file, line) && y < MAP_HEIGHT)
     {
-        for (int x = 0; x < 80; x++)
+        for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
         {
-            char c = screen[y][x];
-            
-            if (c >= '1' && c <= '9')
+            char c = line[x];
+            if (c == 'L')
             {
-                int id = c - '0'; 
-                doors[id] = Door(id);
+                // שמירת המיקום של ה-Legend לפי ההוראות
+                legendPos = Point(x, y);
+                screen[y][x] = ' '; // החלפה ברווח כדי שה-L לא יופיע על המסך
+            }
+            else
+            {
+                screen[y][x] = c;
+            }
+        }
+        y++;
+    }
+    file.close();
+
+    // אתחול דלתות לפי המפה שנטענה
+    for (int ty = 0; ty < MAP_HEIGHT; ty++) {
+        for (int tx = 0; tx < WIDTH; tx++) {
+            char c = screen[ty][tx];
+            if (c >= '1' && c <= '9') {
+                doors[c - '0'] = Door(c - '0');
             }
         }
     }
 }
-
 
 //   DRAW MAP
 void Screen::drawMap() const
@@ -103,7 +122,7 @@ void Screen::drawMapWithTorch(const Player& p1) const
     int cx = p1.getX();
     int cy = p1.getY();
 
-    // אם לא זז – לא מציירים שוב → מונע ריצוד
+    
     if (initialized && cx == lastX && cy == lastY)
         return;
 
