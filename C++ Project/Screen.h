@@ -33,6 +33,7 @@ public:
 	bool isDark() const;
 	void setDark(bool isDark);
 	void drawDark() const;
+	static void resetTorchState();
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
