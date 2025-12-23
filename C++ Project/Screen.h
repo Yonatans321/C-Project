@@ -2,6 +2,7 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <vector>
 #include "Point.h"
 #include "Door.h"
 #include "Utils.h"
@@ -21,18 +22,21 @@ private:
 	Door doors [10]; // array to hold doors
 	
 	bool dark = false; // is the screen dark
-	static const char* const MAP_LAYOUTS[NUM_MAPS][MAP_HEIGHT];
+	Point legendPos;
+	//static const char* const MAP_LAYOUTS[NUM_MAPS][MAP_HEIGHT];
 public:
 	Screen();
 
 	// Map drawing
-	void loadMap(int level);
+	void loadMapFromFile(const std::string& filename); // פונקציה חדשה לטעינה מהדיסק
+	//void loadMap(int level);
 	void drawMap() const;
 
 	void drawMapWithTorch(const Player& p1) const;
 	bool isDark() const;
 	void setDark(bool isDark);
 	void drawDark() const;
+
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
@@ -54,6 +58,7 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	
+	Point getLegendPos() const { return legendPos; } // Getter למיקום ה-Legend
+
 	void applyColor(char c) const;
 };
