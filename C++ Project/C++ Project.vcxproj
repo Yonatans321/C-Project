@@ -134,7 +134,6 @@
     <ClInclude Include="Point.h" />
     <ClInclude Include="Riddle.h" />
     <ClInclude Include="RiddleBank.h" />
-    <ClInclude Include="Rooms.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Switch.h" />
     <ClInclude Include="Torch.h" />
