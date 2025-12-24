@@ -8,6 +8,9 @@
 #include <fstream>
 
 
+static int torchLastX = -1;
+static int torchLastY = -1;
+//   CONSTRUCTOR
 Screen::Screen()
 {
     for (int y = 0; y < MAP_HEIGHT; y++)
@@ -141,93 +144,105 @@ bool Screen::isDark() const
     return dark;
 }
 
-void Screen::drawMapWithTorch(const Player& p1) const
+void Screen::drawMapWithTorch(const Player& p) const
 {
-    const int R = 6;
-
-    static bool initialized = false;
-    static int lastX = -1, lastY = -1;
-
-    int cx = p1.getX();
-    int cy = p1.getY();
-
-    
-    if (initialized && cx == lastX && cy == lastY)
-        return;
-
-    if (!initialized)
+    if (p.getHeldItem() != '!')
     {
-        for (int y = 0; y < MAP_HEIGHT; y++)
-        {
-            gotoxy(0, y);
-            for (int x = 0; x < WIDTH; x++)
-                std::cout << ' ';
-        }
-        initialized = true;
+        drawDark();
+        resetTorchState();
+        return;
     }
 
-    auto clearHalo = [&](int cx, int cy)
+    const int R = 6;
+
+    int cx = p.getX();
+    int cy = p.getY();
+
+    // אם השחקן זז - נקה את ההילה הישנה
+    if (torchLastX != -1 && (torchLastX != cx || torchLastY != cy))
+    {
+        for (int y = torchLastY - R; y <= torchLastY + R; y++)
         {
-            for (int y = cy - R; y <= cy + R; y++)
+            if (y < 0 || y >= MAP_HEIGHT) continue;
+
+            for (int x = torchLastX - R; x <= torchLastX + R; x++)
             {
-                if (y < 0 || y >= MAP_HEIGHT) continue;
-                for (int x = cx - R; x <= cx + R; x++)
+                if (x < 0 || x >= WIDTH) continue;
+
+                int dx = x - torchLastX, dy = y - torchLastY;
+                if (dx * dx + dy * dy <= R * R)
                 {
-                    if (x < 0 || x >= WIDTH) continue;
-                    int dx = x - cx, dy = y - cy;
-                    if (dx * dx + dy * dy <= R * R)
+                    gotoxy(x, y);
+                    char c = screen[y][x];
+
+                    if ((c >= '1' && c <= '9') || c == '!')
                     {
-                        gotoxy(x, y);
+                        applyColor(c);
+                        std::cout << c;
+                        resetColor();
+                    }
+                    else
+                    {
                         std::cout << ' ';
                     }
                 }
             }
-        };
+        }
+    }
 
-    auto drawHalo = [&](int cx, int cy)
+    // צייר את ההילה החדשה
+    for (int y = cy - R; y <= cy + R; y++)
+    {
+        if (y < 0 || y >= MAP_HEIGHT) continue;
+
+        for (int x = cx - R; x <= cx + R; x++)
         {
-            for (int y = cy - R; y <= cy + R; y++)
+            if (x < 0 || x >= WIDTH) continue;
+
+            int dx = x - cx, dy = y - cy;
+            if (dx * dx + dy * dy <= R * R)
             {
-                if (y < 0 || y >= MAP_HEIGHT) continue;
-                for (int x = cx - R; x <= cx + R; x++)
-                {
-                    if (x < 0 || x >= WIDTH) continue;
-                    int dx = x - cx, dy = y - cy;
-                    if (dx * dx + dy * dy <= R * R)
-                    {
-                        gotoxy(x, y);
-                        char c = screen[y][x];
-                        applyColor(c);
-                        std::cout << c;
-                    }
-                }
+                gotoxy(x, y);
+                char c = screen[y][x];
+                applyColor(c);
+                std::cout << c;
+                resetColor();
             }
-        };
+        }
+    }
 
-    if (lastX != -1)
-        clearHalo(lastX, lastY);
-
-    drawHalo(cx, cy);
-
-    lastX = cx;
-    lastY = cy;
-
-    resetColor();
+    torchLastX = cx;
+    torchLastY = cy;
 }
 
-
-void Screen :: drawDark() const
+void Screen::drawDark() const
 {
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
         gotoxy(0, y);
         for (int x = 0; x < WIDTH; x++)
         {
-            std::cout << ' ';
+			char c = screen[y][x]; // get character at position
+
+			if ((c >= '1' && c <= '9') || c == '!') // show doors and torches even in dark
+            {
+                applyColor(c);
+                std::cout << c;
+                resetColor();
+            }
+            else
+            {
+                std::cout << ' ';
+            }
         }
     }
 }
 
+void Screen::resetTorchState()
+{
+    torchLastX = -1;
+    torchLastY = -1;
+}
 void Screen::setCharAt(const Point& p, char ch)
 {
     setCharAt(p.getX(), p.getY(), ch);

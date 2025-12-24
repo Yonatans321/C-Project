@@ -37,7 +37,7 @@ public:
 	bool isDark() const;
 	void setDark(bool isDark);
 	void drawDark() const;
-
+	static void resetTorchState();
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
@@ -59,7 +59,7 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	Point getLegendPos() const { return legendPos; } // Getter мойчен д-Legend
+	Point getLegendPos() const { return legendPos; } // Getter Г¬Г®Г©Г·ГҐГ­ Г¤-Legend
 
 	void applyColor(char c) const;
 };

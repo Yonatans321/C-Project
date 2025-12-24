@@ -179,15 +179,30 @@ void Game::gameLoop()
                 break;
             }
             if (currentScreen.isDark())
-                currentScreen.drawMapWithTorch(player1);
+            {
+                // בדוק אם מישהו מחזיק לפיד
+                bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
+                if (hasTorch)
+                {
+                    if (Torch::playerHasTorch(player1))
+                        currentScreen.drawMapWithTorch(player1);
+                    else
+                        currentScreen.drawMapWithTorch(player2);
+                }
+                else
+                {
+                    currentScreen.drawDark();
+                    currentScreen.resetTorchState();
+                }
+            }
             else
-                currentScreen.drawMap();;
+                currentScreen.drawMap();
 
             player1.draw();
             player2.draw();
             currentScreen.drawStatusBar(
                 player1.getHeldItem(), player1.getLives(), player1.getScore(),
-				player2.getHeldItem(), player2.getLives(), player2.getScore());
+                player2.getHeldItem(), player2.getLives(), player2.getScore());
         }
         // Handle input 
         if (_kbhit())
@@ -205,7 +220,22 @@ void Game::gameLoop()
 
                 // redraw after pause
                 if (currentScreen.isDark())
-                    currentScreen.drawMapWithTorch(player1);
+                {
+                    // בדוק אם מישהו מחזיק לפיד
+                    bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
+                    if (hasTorch)
+                    {
+                        if (Torch::playerHasTorch(player1))
+                            currentScreen.drawMapWithTorch(player1);
+                        else
+                            currentScreen.drawMapWithTorch(player2);
+                    }
+                    else
+                    {
+                        currentScreen.drawDark();
+                        currentScreen.resetTorchState();
+                    }
+                }
                 else
                     currentScreen.drawMap();
 
@@ -223,7 +253,6 @@ void Game::gameLoop()
         }
 
         // --- Bomb Creation Logic ---
-        // Check if any player requested to drop a bomb via flag
         if (player1.hasDroppedBomb() && activeBomb == nullptr)
         {
             activeBomb = new Bomb(player1.getLastDropPos());
@@ -252,20 +281,35 @@ void Game::gameLoop()
         }
 
         // --- Bomb Update Logic ---
-        // Tick the bomb independently of keyboard input
         if (activeBomb != nullptr)
         {
-            // Execute bomb logic from Bomb.cpp (timer update and explosion)
             if (activeBomb->tick(currentScreen, player1, player2))
             {
-                delete activeBomb; // Explosion finished, clean memory
+                delete activeBomb;
                 activeBomb = nullptr;
             }
         }
 
+        // צייר רק בחדר חשוך אם יש לפיד בפועל
         if (currentScreen.isDark())
-            currentScreen.drawMapWithTorch(player1);
-        
+        {
+            // בדוק אם מישהו מחזיק לפיד
+            bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
+
+            if (hasTorch)
+            {
+                // צייר הילה רק אם יש מחזיק לפיד
+                if (Torch::playerHasTorch(player1))
+                    currentScreen.drawMapWithTorch(player1);
+                else
+                    currentScreen.drawMapWithTorch(player2);
+            }
+            else
+            {
+                currentScreen.drawDark();
+                currentScreen.resetTorchState();
+            }
+        }
 
         player1.draw();
         player2.draw();
@@ -293,7 +337,6 @@ void Game::gameLoop()
         Sleep(GAME_DELAY);
     }
 }
-
 
 bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
