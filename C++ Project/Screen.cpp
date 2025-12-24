@@ -52,7 +52,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
             if (c == 'L')
             {
                 if(!isLegendPositionValid(x, y, filename)) {
-                    file.close();
+                    
                     return false; // exit if legend position is invalid
 				}
 				// save legend position
@@ -122,7 +122,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
 //   DRAWING HELPERS
 void Screen::setCharAt(int x, int y, char ch)
 {
-    if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
+    if (x < 0 || x >= 80 || y < 0 || y >= 25)
         return;
 
     screen[y][x] = ch;
