@@ -18,7 +18,7 @@ public:
 	static constexpr int NUM_MAPS = 4;
 	
 private:
-	char screen[MAP_HEIGHT][WIDTH + 1];
+	char screen[HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
 	
 	bool dark = false; // is the screen dark
@@ -29,7 +29,7 @@ public:
 	Screen();
 
 	// Map drawing
-	bool loadMapFromFile(const std::string& filename); // פונקציה חדשה לטעינה מהדיסק
+	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
 	//void loadMap(int level);
 	void drawMap() const;
 
