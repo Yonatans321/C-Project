@@ -125,7 +125,18 @@ void Screen::drawMapWithTorch(const Player& p) const
                 if (dx * dx + dy * dy <= R * R)
                 {
                     gotoxy(x, y);
-                    std::cout << ' ';
+                    char c = screen[y][x];
+
+                    if ((c >= '1' && c <= '9') || c == '!')
+                    {
+                        applyColor(c);
+                        std::cout << c;
+                        resetColor();
+                    }
+                    else
+                    {
+                        std::cout << ' ';
+                    }
                 }
             }
         }
@@ -156,14 +167,25 @@ void Screen::drawMapWithTorch(const Player& p) const
     torchLastY = cy;
 }
 
-void Screen :: drawDark() const
+void Screen::drawDark() const
 {
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
         gotoxy(0, y);
         for (int x = 0; x < WIDTH; x++)
         {
-            std::cout << ' ';
+			char c = screen[y][x]; // get character at position
+
+			if ((c >= '1' && c <= '9') || c == '!') // show doors and torches even in dark
+            {
+                applyColor(c);
+                std::cout << c;
+                resetColor();
+            }
+            else
+            {
+                std::cout << ' ';
+            }
         }
     }
 }
