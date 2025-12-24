@@ -23,12 +23,13 @@ private:
 	
 	bool dark = false; // is the screen dark
 	Point legendPos;
-	//static const char* const MAP_LAYOUTS[NUM_MAPS][MAP_HEIGHT];
+	void clearScreenBuffer();
+	bool isLegendPositionValid(int x, int y, const std::string& filename);
 public:
 	Screen();
 
 	// Map drawing
-	void loadMapFromFile(const std::string& filename); // פונקציה חדשה לטעינה מהדיסק
+	bool loadMapFromFile(const std::string& filename); // פונקציה חדשה לטעינה מהדיסק
 	//void loadMap(int level);
 	void drawMap() const;
 

@@ -34,7 +34,7 @@ void Game::getAllScreenFileNames(std::vector<std::string>& vec_to_fill) {
 
 		// Check if the filename starts with "adv-world" and ends with ".screen"
         if (filenameStr.find("adv-world") == 0 && filename.extension() == ".screen") {
-            std::cout << " ^ added!!\n";
+           
             vec_to_fill.push_back(filenameStr);
         }
     }
@@ -89,11 +89,7 @@ void Game::showInstructions()
 // Initialize level 
 void Game::initLevel(const std::string& filename, int specificDoor)
 {
-    //Screen& currentScreen = gameScreens[currentLevel];
-
     cls();
-
-    //currentScreen.loadMapFromFile(filename);
 
     if (filename.find("dark") != std::string::npos)
         currentScreen.setDark(true);
@@ -422,10 +418,10 @@ void Game::run() // main game loop
         }
         else if (currStatus == GameModes::NEW_GAME) // start new game
         {
-            // 1. קבלת שמות כל הקבצים מהתיקייה
+			//get all screen file names from the directory
             getAllScreenFileNames(screenFileNames);
 
-            // בדיקה אם קיימים שלבים בכלל לפני שממשיכים
+			// check if any screen files were found
             if (screenFileNames.empty()) {
                 cls();
                 std::cout << "No screen files found (adv-world*.screen) in the directory!" << std::endl;
@@ -434,27 +430,37 @@ void Game::run() // main game loop
                 continue;
             }
 
-            // 2. טעינת כל המפות לזיכרון (וקטור allLevels)
+			// load all levels into memory
             allLevels.clear();
+			bool successload = true;
             for (const auto& fileName : screenFileNames) {
                 Screen tempScreen;
-                tempScreen.loadMapFromFile(fileName);
+                if (!tempScreen.loadMapFromFile(fileName)) {
+                    successload = false;
+                    break;
+              }
                 allLevels.push_back(tempScreen);
             }
+            if (!successload) {
+                std::cout << "\nPress any key to return to Menu..." << std::endl;
+                waitForKey();
+                currStatus = GameModes::MENU;
+                continue;
+            }
 
-            // 3. איפוס נתוני המשחק (חיים, ניקוד וכו')
+			//review loaded levels
             resetGame();
 
-            // 4. הגדרת השלב ההתחלתי (אינדקס 0)
+			// start from level 0
             currentLevelIdx = 0;
 
-            // 5. עדכון currentScreen מהזיכרון - זה מה שמונע מסך שחור!
+			// set current screen
             currentScreen = allLevels[currentLevelIdx];
 
-            // 6. אתחול השלב (ציור המפה והצבת שחקנים)
+			//start the first level
             initLevel(screenFileNames[currentLevelIdx]);
 
-            // 7. כניסה ללולאת המשחק
+			//enter the main game loop
             gameLoop();
 
             currStatus = GameModes::MENU;
