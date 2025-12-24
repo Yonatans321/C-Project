@@ -4,6 +4,9 @@
 #include <cstring>
 #include <windows.h>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+
 
 static int torchLastX = -1;
 static int torchLastY = -1;
@@ -18,40 +21,67 @@ Screen::Screen()
     for (int i = 0; i < 10; i++)
         doors[i] = Door();
 }
-
-//   LOAD MAP
-void Screen::loadMap(int level)
-{
-    const char* const* src = nullptr;
-
-    switch (level)
-    {
-    case 0: src = ROOM0; break;
-    case 1: src = ROOM1; break;
-    case 2: src = ROOM2; break;
-    default: return;
-    }
-
-    for (int y = 0; y < MAP_HEIGHT; y++)
-    {
-        strncpy_s(screen[y], src[y], WIDTH);
-        screen[y][WIDTH] = '\0';
-    }
-    for (int y = 0; y < 23; y++)
-    {
-        for (int x = 0; x < 80; x++)
-        {
-            char c = screen[y][x];
-            
-            if (c >= '1' && c <= '9')
-            {
-                int id = c - '0'; 
-                doors[id] = Door(id);
-            }
+// CLEAR SCREEN BUFFER
+void Screen::clearScreenBuffer() {
+    // reset screen 
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            screen[y][x] = ' ';
         }
+        screen[y][WIDTH] = '\0';
     }
 }
 
+//   LOAD MAP
+bool Screen::loadMapFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+		std::cout << "DEBUG: Failed to open file: " << filename << std::endl; //debug message
+		return false; //  exit if file cannot be opened
+    }
+
+    legendPos = Point(-1, -1); // reset legend position
+	clearScreenBuffer();// clear screen buffer
+
+	// read file line by line
+    std::string line;
+    int y = 0;
+    while (std::getline(file, line) && y < HEIGHT)
+    {
+        for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
+        {
+            char c = line[x];
+            if (c == 'L')
+            {
+                if(!isLegendPositionValid(x, y, filename)) {
+                    file.close();
+                    return false; // exit if legend position is invalid
+				}
+				// save legend position
+                legendPos = Point(x, y);
+				screen[y][x] = ' '; //change 'L' to space
+            }
+            else
+            {
+                screen[y][x] = c;
+            }
+        }
+        y++;
+    }
+    file.close();
+
+	//reset doors array
+    for (int ty = 0; ty < MAP_HEIGHT; ty++) {
+        for (int tx = 0; tx < WIDTH; tx++) {
+            char c = screen[ty][tx];
+            if (c >= '1' && c <= '9') {
+                doors[c - '0'] = Door(c - '0');
+            }
+        }
+    }
+	return true;
+}
 
 //   DRAW MAP
 void Screen::drawMap() const
@@ -71,7 +101,25 @@ void Screen::drawMap() const
     resetColor();
 }
 
+bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
+{
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT){
+        std::cout << "\nError: Legend (L) is out of 80x25 screen bounds!" << std::endl;
+    return false;
+}
+    if (y < MAP_HEIGHT) {
+		std::cout << "\nError: Legend (L) must be below the game arena!" << std::endl;
+        return false;
+    }
+    if(x>20) {
+        std::cout << "\nError: Legend (L) is too far right" << std::endl;
+		return false;
+	}
+	return true;
 
+
+
+}
 
 
 //   DRAWING HELPERS
@@ -204,22 +252,26 @@ void Screen::drawStatusBar(
     char inv1, int lives1, int score1,
     char inv2, int lives2, int score2)
 {
+	// get legend position
+    int startX = legendPos.getX();
+    int startY = legendPos.getY();
+
     // player 1 - first line
-    gotoxy(0, MAP_HEIGHT);
+    gotoxy(startX, startY);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
         << "P1 & - Lives: " << lives1
         << "  Inv:" << (inv1 == 0 ? '-' : inv1)
         << "  Score: " << score1
-        << "                                        ";
+        << "             ";
 
     // player 2 - second line
-    gotoxy(0, MAP_HEIGHT + 1);
+    gotoxy(startX, startY + 1);
     std::cout
         << "P2 $ - Lives: " << lives2
         << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
         << "  Score: " << score2
-        << "                                        ";
+        << "             ";
     resetColor();
 }
 void Screen::drawBox(int x, int y, int w, int h)
