@@ -35,32 +35,60 @@ void Screen::clearScreenBuffer() {
 //   LOAD MAP
 bool Screen::loadMapFromFile(const std::string& filename)
 {
+    meta.clear();
+
     std::ifstream file(filename);
     if (!file.is_open()) {
-		std::cout << "DEBUG: Failed to open file: " << filename << std::endl; //debug message
-		return false; //  exit if file cannot be opened
+        std::cout << "DEBUG: Failed to open file: " << filename << std::endl;
+        return false;
     }
 
-    legendPos = Point(-1, -1); // reset legend position
-	clearScreenBuffer();// clear screen buffer
+    legendPos = Point(-1, -1);
+    clearScreenBuffer();
 
-	// read file line by line
     std::string line;
     int y = 0;
+
     while (std::getline(file, line) && y < HEIGHT)
     {
+        // ---------- METADATA ----------
+        if (line.size() > 0 && line[0] == '#') {
+
+            if (line.find("DARK") != std::string::npos) {
+                if (line.find("true") != std::string::npos)
+                    meta.setDark(true);
+                else
+                    meta.setDark(false);
+            }
+            else if (line.find("DOOR") != std::string::npos) {
+                // פורמט: # DOOR 1 open
+                int id = line[line.find("DOOR") + 5] - '0';
+                if (line.find("open") != std::string::npos)
+                    meta.setDoorOpen(id, true);
+                else
+                    meta.setDoorOpen(id, false);
+            }
+            else if (line.find("KEY") != std::string::npos) {
+                // פורמט: # KEY opens 1
+                int id = line[line.size() - 1] - '0'; // הספרה האחרונה
+                meta.setKeyOpens(id);
+            }
+
+            continue; // לא לצייר שורת מטא-דאטה למפה
+        }
+
+        // ---------- MAP ----------
         for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
         {
             char c = line[x];
             if (c == 'L')
             {
-                if(!isLegendPositionValid(x, y, filename)) {
+                if (!isLegendPositionValid(x, y, filename)) {
                     file.close();
-                    return false; // exit if legend position is invalid
-				}
-				// save legend position
+                    return false;
+                }
                 legendPos = Point(x, y);
-				screen[y][x] = ' '; //change 'L' to space
+                screen[y][x] = ' ';
             }
             else
             {
@@ -69,20 +97,28 @@ bool Screen::loadMapFromFile(const std::string& filename)
         }
         y++;
     }
+
     file.close();
 
-	//reset doors array
+    // ---------- INIT DOORS ----------
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
             char c = screen[ty][tx];
             if (c >= '1' && c <= '9') {
-                doors[c - '0'] = Door(c - '0');
+                int id = c - '0';
+                Door d(id);
+                if (meta.isDoorOpen(id))
+                    d.setOpen(true);
+                doors[id] = d;
             }
         }
     }
-	return true;
-}
 
+    // ---------- APPLY DARK ----------
+    setDark(meta.isDark());
+
+    return true;
+}
 //   DRAW MAP
 void Screen::drawMap() const
 {
