@@ -16,25 +16,25 @@ Game::Game() // initializer list
     player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
         { 'I','L','M','J','K','O' })
 {
-	hideCursor();// hide cursor at the start of the game
+    hideCursor();// hide cursor at the start of the game
     currStatus = GameModes::MENU;
 
     getAllScreenFileNames(screenFileNames);
-    
+
 }
 //taken from exrecise 7
 void Game::getAllScreenFileNames(std::vector<std::string>& vec_to_fill) {
     namespace fs = std::filesystem;
-	vec_to_fill.clear(); //clear the vector before filling it
+    vec_to_fill.clear(); //clear the vector before filling it
 
-	// Iterate through files in the current directory
+    // Iterate through files in the current directory
     for (const auto& entry : fs::directory_iterator(fs::current_path())) {
         auto filename = entry.path().filename();
         auto filenameStr = filename.string();
 
-		// Check if the filename starts with "adv-world" and ends with ".screen"
+        // Check if the filename starts with "adv-world" and ends with ".screen"
         if (filenameStr.find("adv-world") == 0 && filename.extension() == ".screen") {
-           
+
             vec_to_fill.push_back(filenameStr);
         }
     }
@@ -44,7 +44,23 @@ void Game::getAllScreenFileNames(std::vector<std::string>& vec_to_fill) {
 void Game::showMenu()
 {
     clearInputBuffer();
-    UIScreens::showMenu();
+
+    // Check if riddles loaded successfully before showing menu
+    if (!riddleBank.isLoaded()) {
+        cls();
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "ERROR: Riddles.txt file is missing!" << std::endl;
+        std::cout << "The game cannot start without riddles." << std::endl;
+        std::cout << "========================================\n" << std::endl;
+        std::cout << "Press any key to return to menu..." << std::endl;
+        waitForKey();
+        currStatus = GameModes::MENU; // Stay in menu
+        UIScreens::showMenu();
+    }
+    else {
+        UIScreens::showMenu();
+    }
+
     bool menu = true;
     while (menu)
     {
@@ -54,8 +70,21 @@ void Game::showMenu()
             switch (input)
             {
             case START_KEY:
-                currStatus = GameModes::NEW_GAME;
-                menu = false;
+                // Check if riddles are loaded before starting game
+                if (!riddleBank.isLoaded()) {
+                    cls();
+                    std::cout << "\n========================================" << std::endl;
+                    std::cout << "ERROR: Cannot start game!" << std::endl;
+                    std::cout << "Riddles.txt file is missing." << std::endl;
+                    std::cout << "========================================\n" << std::endl;
+                    std::cout << "Press any key to return to menu..." << std::endl;
+                    waitForKey();
+                    UIScreens::showMenu();
+                }
+                else {
+                    currStatus = GameModes::NEW_GAME;
+                    menu = false;
+                }
                 break;
 
             case INSTRUCTIONS_KEY:
@@ -65,7 +94,7 @@ void Game::showMenu()
 
             case Colors_ON_OFF: // Colors ON/OFF
                 ColorsEnabled = !ColorsEnabled;
-                UIScreens::showMenu(); 
+                UIScreens::showMenu();
                 break;
             case EXIT_KEY:
                 currStatus = GameModes::EXIT;
@@ -75,26 +104,27 @@ void Game::showMenu()
         }
     }
 
-	clearInputBuffer();// clear any extra input
+    clearInputBuffer();// clear any extra input
 }
 
 // Show instructions screen
 void Game::showInstructions()
 {
     UIScreens::showInstructions();
-	waitForKey(); // wait for any key press
-   
+    waitForKey(); // wait for any key press
+
     currStatus = GameModes::MENU;
 }
-// Initialize level 
+// Initialize level
 void Game::initLevel(const std::string& filename, int specificDoor)
 {
     cls();
 
-    if (filename.find("dark") != std::string::npos)
+    // Make level 2 (adv-world_02) always dark by default
+    if (filename.find("adv-world_02") != std::string::npos || filename.find("dark") != std::string::npos)
         currentScreen.setDark(true);
     else
-        currentScreen.setDark(false); 
+        currentScreen.setDark(false);
 
     if (currentScreen.isDark())
         currentScreen.drawMapWithTorch(player1);
@@ -107,12 +137,12 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
-	// Reset players' positions
+    // Reset players' positions
     player1.activate();
     player2.activate();
 
     if (specificDoor != -1)
-   // if (activeDoor >= '1' && activeDoor <= '9')
+        // if (activeDoor >= '1' && activeDoor <= '9')
     {
         placePlayersAtEntrance(specificDoor);
     }
@@ -168,7 +198,7 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
-       // Screen& currentScreen = gameScreens[currentLevel];
+        // Screen& currentScreen = gameScreens[currentLevel];
         if (pauseRequestedFromRiddle) // stop in the middle of riddle
         {
             pauseRequestedFromRiddle = false;
@@ -255,12 +285,12 @@ void Game::gameLoop()
         // --- Bomb Creation Logic ---
         if (player1.hasDroppedBomb() && activeBomb == nullptr)
         {
-            activeBomb = new Bomb(player1.getLastDropPos());
+            activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
             player1.clearBombRequest();
         }
         else if (player2.hasDroppedBomb() && activeBomb == nullptr)
         {
-            activeBomb = new Bomb(player2.getLastDropPos());
+            activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
             player2.clearBombRequest();
         }
 
@@ -340,7 +370,7 @@ void Game::gameLoop()
 
 bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
-	// get reference to the other player
+    // get reference to the other player
    // Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
     Point targetPos = pos;
@@ -364,11 +394,11 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     }
     switch (cell)
     {
-	case '?':// riddle
+    case '?':// riddle
         riddleBank.handleRiddle(player, currentScreen, currentLevelIdx);
         break;
 
-	case 'K':// key
+    case 'K':// key
         if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
             player.GrabItem('K', currentLevelIdx + 1);
             currentScreen.setCharAt(pos, ' ');
@@ -386,62 +416,62 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         else
             return true;
         break;
-        case '@':// bomb
-            if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
-                player.GrabItem('@');
-                currentScreen.setCharAt(pos, ' ');
-            }
-            else
-                return true;
-            break; 
-    // switch
+    case '@':// bomb
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
+            player.GrabItem('@');
+            currentScreen.setCharAt(pos, ' ');
+        }
+        else
+            return true;
+        break;
+        // switch
     case '\\':
     case '/':
         Switch::handleSwitch(player, currentScreen);
         return false;
     }
 
-	switch (targetCell)// check target cell
+    switch (targetCell)// check target cell
     {
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-		bool doorOpened = Door::handleDoor(player, currentScreen, currentLevelIdx, activeDoor);// try to handle door
+        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevelIdx, activeDoor);// try to handle door
         if (doorOpened)
         {
-			player.setPosition(targetPos);// move player through door
+            player.setPosition(targetPos);// move player through door
             return true;
         }
         break;
 
     }
-	case '*':// obstacle
+    case '*':// obstacle
     {
-		Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
+        Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
 
-		char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
+        char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
 
         if (afterPush == '*')
-			return true;    // cannot move, obstacle not moved
+            return true;    // cannot move, obstacle not moved
 
-		player.setPosition(targetPos);// move player into obstacle's previous position
+        player.setPosition(targetPos);// move player into obstacle's previous position
         return true;
     }
 
-	case 's':// switch wall
+    case 's':// switch wall
         return true;
         break;
 
     }
 
-	return false; // the player can move
-    
+    return false; // the player can move
+
 }
 
 void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
-	waitForKey(); // wait for any key press
+    waitForKey(); // wait for any key press
 }
 
 
@@ -461,10 +491,10 @@ void Game::run() // main game loop
         }
         else if (currStatus == GameModes::NEW_GAME) // start new game
         {
-			//get all screen file names from the directory
+            //get all screen file names from the directory
             getAllScreenFileNames(screenFileNames);
 
-			// check if any screen files were found
+            // check if any screen files were found
             if (screenFileNames.empty()) {
                 cls();
                 std::cout << "No screen files found (adv-world*.screen) in the directory!" << std::endl;
@@ -473,15 +503,15 @@ void Game::run() // main game loop
                 continue;
             }
 
-			// load all levels into memory
+            // load all levels into memory
             allLevels.clear();
-			bool successload = true;
+            bool successload = true;
             for (const auto& fileName : screenFileNames) {
                 Screen tempScreen;
                 if (!tempScreen.loadMapFromFile(fileName)) {
                     successload = false;
                     break;
-              }
+                }
                 allLevels.push_back(tempScreen);
             }
             if (!successload) {
@@ -491,19 +521,19 @@ void Game::run() // main game loop
                 continue;
             }
 
-			//review loaded levels
+            //review loaded levels
             resetGame();
 
-			// start from level 0
+            // start from level 0
             currentLevelIdx = 0;
 
-			// set current screen
+            // set current screen
             currentScreen = allLevels[currentLevelIdx];
 
-			//start the first level
+            //start the first level
             initLevel(screenFileNames[currentLevelIdx]);
 
-			//enter the main game loop
+            //enter the main game loop
             gameLoop();
 
             currStatus = GameModes::MENU;
@@ -527,7 +557,7 @@ bool Game::checkLevel()
                 cls();
                 std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
                 std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
-				Sleep(2000); //delay for loading next level 2 seconds
+                Sleep(2000); //delay for loading next level 2 seconds
             }
             else {
                 showWinScreen();
@@ -540,7 +570,7 @@ bool Game::checkLevel()
                 nextLevelIdx--;
                 cls();
                 std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
-				Sleep(1500); // delay for loading previous level 1.5 seconds
+                Sleep(1500); // delay for loading previous level 1.5 seconds
             }
         }
 
@@ -557,31 +587,31 @@ bool Game::checkLevel()
 
 void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
 {
-   // Screen& currentScreen = gameScreens[currentLevel];
+    // Screen& currentScreen = gameScreens[currentLevel];
 
-	int lowestDoor = 10; // higher than any door id
+    int lowestDoor = 10; // higher than any door id
     Point targetDoorPos;
     bool found = false;
 
-	// Search for doors in the current screen (helped by AI)
+    // Search for doors in the current screen (helped by AI)
     for (int y = 0; y < Screen::MAP_HEIGHT; y++)
     {
         for (int x = 0; x < Screen::WIDTH; x++)
         {
-			char c = currentScreen.getCharAt(x, y);// get character at position
+            char c = currentScreen.getCharAt(x, y);// get character at position
             if (c >= '1' && c <= '9')
             {
                 int id = c - '0';
                 if (specificDoor != -1)
                 {
-					if (id == specificDoor)// found the specific door
+                    if (id == specificDoor)// found the specific door
                     {
-						targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
-						found = true;  // mark as found
-						goto EndSearch;// exit both loops (helped by AI)
+                        targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
+                        found = true;  // mark as found
+                        goto EndSearch;// exit both loops (helped by AI)
                     }
                 }
-				else if (id < lowestDoor) // find the lowest door id    
+                else if (id < lowestDoor) // find the lowest door id    
                 {
                     lowestDoor = id;
                     targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
@@ -590,12 +620,12 @@ void Game::placePlayersAtEntrance(int specificDoor) // place players next to the
             }
         }
     }
-    
-EndSearch:// exit point for goto (helped by AI)
-	if (!found) return;
 
-	placeNextToDoor(targetDoorPos); // place players next to the found door
-      
+EndSearch:// exit point for goto (helped by AI)
+    if (!found) return;
+
+    placeNextToDoor(targetDoorPos); // place players next to the found door
+
 }
 
 void Game::placeNextToDoor(const Point& targetDoorPos)
@@ -617,19 +647,19 @@ void Game::placeNextToDoor(const Point& targetDoorPos)
 
 void Game::resetGame()
 {
-	// reset game state
+    // reset game state
     currentLevelIdx = 0;
     activeDoor = ' ';
     Door::switchesAreOn = false;
 
     player1.resetStats();
     player2.resetStats();
-	
 
-	// reset riddles
+
+    // reset riddles
     riddleBank.resetAllRiddles();
 
-	// reset doors
+    // reset doors
     for (int i = 0; i < 10; i++)
         Door::openDoors[i] = false;
 

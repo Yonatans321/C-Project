@@ -1,7 +1,9 @@
 #include "Bomb.h"
 #include "Screen.h"
 #include "Player.h"
+#include "Utils.h"
 #include <cmath> // For std::abs
+#include <iostream>
 
 // Update signature to match Bomb.h (3 arguments)
 void Bomb::explode(Screen& screen, Player& p1, Player& p2)
@@ -48,8 +50,11 @@ bool Bomb::tick(Screen& screen, Player& p1, Player& p2)
     // Decrease internal timer
     timer--;
 
-    // Redraw the bomb icon so it doesn't disappear when players move over it
-    position.draw('@');
+    // Redraw the bomb icon in red
+    gotoxy(position.getX(), position.getY());
+    setColor(COLOR_RED);  // Red color for bomb
+    std::cout << '@';
+    resetColor();
 
     if (timer <= 0)
     {
