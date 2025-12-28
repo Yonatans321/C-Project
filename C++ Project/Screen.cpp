@@ -47,30 +47,33 @@ bool Screen::loadMapFromFile(const std::string& filename)
 	// read file line by line
     std::string line;
     int y = 0;
-    while (std::getline(file, line) && y < HEIGHT)
+    while (std::getline(file, line)&&y <HEIGHT)
     {
-        for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
+        for (int x = 0; x < (int)line.length(); x++)
         {
             char c = line[x];
             if (c == 'L')
             {
                 if(!isLegendPositionValid(x, y, filename)) {
-                    file.close();
+                    
                     return false; // exit if legend position is invalid
 				}
 				// save legend position
                 legendPos = Point(x, y);
 				screen[y][x] = ' '; //change 'L' to space
             }
-            else
-            {
-                screen[y][x] = c;
-            }
+                else
+                {
+                    screen[y][x] = c;
+                }
         }
         y++;
     }
     file.close();
-
+    if (legendPos.getX() == -1) {
+        std::cout << "\n\n 'L' (Legend) is out of boundries or not exist in: " << filename << std::endl;
+        return false;
+    }
 	//reset doors array
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
@@ -103,17 +106,17 @@ void Screen::drawMap() const
 
 bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
 {
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT){
-        std::cout << "\nError: Legend (L) is out of 80x25 screen bounds!" << std::endl;
+    if (x < 0 || x >= WIDTH-1 || y < 0 || y >= HEIGHT-1){
+        std::cout << "\n\nError: Legend (L) is out of 80x25 screen bounds in:" << filename << std::endl;
     return false;
 }
     if (y < MAP_HEIGHT) {
-		std::cout << "\nError: Legend (L) must be below the game arena!" << std::endl;
+		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-    if(x>20) {
-        std::cout << "\nError: Legend (L) is too far right" << std::endl;
-		return false;
+    else if (x+41 >= WIDTH) {
+        std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
+        return false;
 	}
 	return true;
 
@@ -125,7 +128,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
 //   DRAWING HELPERS
 void Screen::setCharAt(int x, int y, char ch)
 {
-    if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
         return;
 
     screen[y][x] = ch;

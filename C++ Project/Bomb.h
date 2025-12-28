@@ -7,9 +7,10 @@ class Player;
 class Bomb {
     Point position;
     int timer;
+    char playerChar;
 public:
 
-    Bomb(Point p) : position(p), timer(50) {}
+    Bomb(Point p, char pChar) : position(p), timer(50), playerChar(pChar) {}
     bool tick(Screen& screen, Player& p1, Player& p2);
     void explode(Screen& screen, Player& p1, Player& p2);
     Point getPosition() const { return position; }
