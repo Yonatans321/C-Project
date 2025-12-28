@@ -6,6 +6,7 @@
 #include "Point.h"
 #include "Door.h"
 #include "Utils.h"
+#include "RoomMeta.h"
 
 class Player; // forward declaration
 
@@ -25,6 +26,8 @@ private:
 	Point legendPos;
 	void clearScreenBuffer();
 	bool isLegendPositionValid(int x, int y, const std::string& filename);
+	RoomMeta meta;
+
 public:
 	Screen();
 
@@ -62,4 +65,7 @@ public:
 	Point getLegendPos() const { return legendPos; } // Getter ìîé÷åí ä-Legend
 
 	void applyColor(char c) const;
+
+	RoomMeta& getMeta() { return meta; }
+	const RoomMeta& getMeta() const { return meta; }
 };

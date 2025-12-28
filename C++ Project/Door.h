@@ -28,7 +28,7 @@ public:
 	bool canPass() const { return open; }
 	static bool isDoorChar(char c) { return (c >= '1' && c <= '9'); }
 	static bool handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor);
-
+	void setOpen() { open = true; }
    //SET AWITCHES ON
 	static void allSwitchesAreOn() { switchesAreOn = true; }
 
