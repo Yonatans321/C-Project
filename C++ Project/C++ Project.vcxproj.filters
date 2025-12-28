@@ -51,9 +51,6 @@
     <ClInclude Include="Obstacle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rooms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UIScreens.h">
       <Filter>Header Files</Filter>
     </ClInclude>

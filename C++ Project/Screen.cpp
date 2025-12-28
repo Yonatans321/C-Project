@@ -90,17 +90,20 @@ bool Screen::loadMapFromFile(const std::string& filename)
                 legendPos = Point(x, y);
                 screen[y][x] = ' ';
             }
-            else
-            {
-                screen[y][x] = c;
-            }
+                else
+                {
+                    screen[y][x] = c;
+                }
         }
         y++;
     }
 
     file.close();
-
-    // ---------- INIT DOORS ----------
+    if (legendPos.getX() == -1) {
+        std::cout << "\n\n 'L' (Legend) is out of boundries or not exist in: " << filename << std::endl;
+        return false;
+    }
+	//reset doors array
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
             char c = screen[ty][tx];
@@ -139,17 +142,17 @@ void Screen::drawMap() const
 
 bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
 {
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT){
-        std::cout << "\nError: Legend (L) is out of 80x25 screen bounds!" << std::endl;
+    if (x < 0 || x >= WIDTH-1 || y < 0 || y >= HEIGHT-1){
+        std::cout << "\n\nError: Legend (L) is out of 80x25 screen bounds in:" << filename << std::endl;
     return false;
 }
     if (y < MAP_HEIGHT) {
-		std::cout << "\nError: Legend (L) must be below the game arena!" << std::endl;
+		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-    if(x>20) {
-        std::cout << "\nError: Legend (L) is too far right" << std::endl;
-		return false;
+    else if (x+41 >= WIDTH) {
+        std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
+        return false;
 	}
 	return true;
 
@@ -161,7 +164,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
 //   DRAWING HELPERS
 void Screen::setCharAt(int x, int y, char ch)
 {
-    if (x < 0 || x >= WIDTH || y < 0 || y >= MAP_HEIGHT)
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
         return;
 
     screen[y][x] = ch;
