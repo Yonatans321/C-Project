@@ -111,7 +111,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
                 int id = c - '0';
                 Door d(id);
                 if (meta.isDoorOpen(id))
-                    d.setOpen(true);
+                    d.setOpen();
                 doors[id] = d;
             }
         }

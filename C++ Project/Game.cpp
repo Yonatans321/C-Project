@@ -285,12 +285,12 @@ void Game::gameLoop()
         // --- Bomb Creation Logic ---
         if (player1.hasDroppedBomb() && activeBomb == nullptr)
         {
-            activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
+            activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar(), currentLevelIdx);
             player1.clearBombRequest();
         }
         else if (player2.hasDroppedBomb() && activeBomb == nullptr)
         {
-            activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
+            activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar(),currentLevelIdx);
             player2.clearBombRequest();
         }
 
@@ -309,17 +309,7 @@ void Game::gameLoop()
         {
             player2.move();
         }
-
-        // --- Bomb Update Logic ---
-        if (activeBomb != nullptr)
-        {
-            if (activeBomb->tick(currentScreen, player1, player2))
-            {
-                delete activeBomb;
-                activeBomb = nullptr;
-            }
-        }
-
+       
         // צייר רק בחדר חשוך אם יש לפיד בפועל
         if (currentScreen.isDark())
         {
@@ -338,6 +328,15 @@ void Game::gameLoop()
             {
                 currentScreen.drawDark();
                 currentScreen.resetTorchState();
+            }
+        }
+        //  Bomb Update Logic
+        if (activeBomb != nullptr)
+        {
+            if (activeBomb->tick(currentScreen, player1, player2,currentLevelIdx))
+            {
+                delete activeBomb;
+                activeBomb = nullptr;
             }
         }
 
@@ -662,6 +661,13 @@ void Game::resetGame()
     // reset doors
     for (int i = 0; i < 10; i++)
         Door::openDoors[i] = false;
+
+	//reset bombs
+    if (activeBomb != nullptr)
+    {
+        delete activeBomb;
+        activeBomb = nullptr;
+	}
 
 }
 
