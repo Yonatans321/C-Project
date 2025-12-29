@@ -119,33 +119,17 @@ void Game::showInstructions()
 void Game::initLevel(const std::string& filename, int specificDoor)
 {
     cls();
+    drawCurrentScreen();
 
-    // Make level 2 (adv-world_02) always dark by default
-    if (filename.find("adv-world_02") != std::string::npos || filename.find("dark") != std::string::npos)
-        currentScreen.setDark(true);
-    else
-        currentScreen.setDark(false);
-
-    if (currentScreen.isDark())
-        currentScreen.drawMapWithTorch(player1);
-    else
-        currentScreen.drawMap();
-
-    riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
-
-    // Assign screen to players
+    riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
-    // Reset players' positions
     player1.activate();
     player2.activate();
 
     if (specificDoor != -1)
-        // if (activeDoor >= '1' && activeDoor <= '9')
-    {
         placePlayersAtEntrance(specificDoor);
-    }
     else
     {
         player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
@@ -156,10 +140,9 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     player2.draw();
 
     if (!Switch::exists(currentScreen))
-    {
         Door::allSwitchesAreOn();
-    }
 }
+
 // Handle pause function
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
@@ -191,55 +174,140 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
         currentScreen.drawMap();;    player1.draw();
     player2.draw();
 }
+// Helper function to handle screen drawing based on torch / dark state
+void Game::drawCurrentScreen()
+{
+    if (currentScreen.isDark())
+    {
+        bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
+
+        if (hasTorch)
+        {
+            if (Torch::playerHasTorch(player1))
+                currentScreen.drawMapWithTorch(player1);
+            else
+                currentScreen.drawMapWithTorch(player2);
+        }
+        else
+        {
+            currentScreen.drawDark();
+            currentScreen.resetTorchState();
+        }
+    }
+    else
+    {
+        currentScreen.resetTorchState();
+        currentScreen.drawMap();
+    }
+}
+
+// Helper function to redraw everything after pause or game state change
+void Game::redrawGame()
+{
+    drawCurrentScreen();
+    player1.draw();
+    player2.draw();
+    currentScreen.drawStatusBar(
+        player1.getHeldItem(), player1.getLives(), player1.getScore(),
+        player2.getHeldItem(), player2.getLives(), player2.getScore());
+}
+
+// Minimal redraw - just update what changed
+void Game::updateDisplay()
+{
+    // Only redraw players and status bar (much faster)
+    player1.draw();
+    player2.draw();
+    currentScreen.drawStatusBar(
+        player1.getHeldItem(), player1.getLives(), player1.getScore(),
+        player2.getHeldItem(), player2.getLives(), player2.getScore());
+}
+
+// Handle bomb creation
+void Game::updateBomb()
+{
+    if (player1.hasDroppedBomb() && activeBomb == nullptr)
+    {
+        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
+        player1.clearBombRequest();
+    }
+    else if (player2.hasDroppedBomb() && activeBomb == nullptr)
+    {
+        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
+        player2.clearBombRequest();
+    }
+
+    if (activeBomb != nullptr)
+    {
+        if (activeBomb->tick(currentScreen, player1, player2))
+        {
+            delete activeBomb;
+            activeBomb = nullptr;
+        }
+    }
+}
+
+// Handle player movement and collisions
+void Game::updatePlayers()
+{
+    player1.erase();
+    player2.erase();
+
+    bool stop1 = handleTile(player1);
+    bool stop2 = handleTile(player2);
+
+    if (!stop1)
+        player1.move();
+    if (!stop2)
+        player2.move();
+}
+
+// Check game end conditions
+bool Game::checkGameOver()
+{
+    if (player1.isDead() || player2.isDead())
+    {
+        UIScreens::showGameOverMessage();
+        resetGame();
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    if (checkLevel())
+    {
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    return false;
+}
+
 // Main game loop 
 void Game::gameLoop()
 {
     bool gameRunning = true;
-
+    redrawGame(); // Draw full screen at start
     while (gameRunning)
     {
-        // Screen& currentScreen = gameScreens[currentLevel];
-        if (pauseRequestedFromRiddle) // stop in the middle of riddle
+        // Handle pause request from riddle
+        if (pauseRequestedFromRiddle)
         {
             pauseRequestedFromRiddle = false;
             handlePause(currentScreen, gameRunning);
             clearInputBuffer();
-            if (!gameRunning)
-            {
-                break;
-            }
-            if (currentScreen.isDark())
-            {
-                // בדוק אם מישהו מחזיק לפיד
-                bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
-                if (hasTorch)
-                {
-                    if (Torch::playerHasTorch(player1))
-                        currentScreen.drawMapWithTorch(player1);
-                    else
-                        currentScreen.drawMapWithTorch(player2);
-                }
-                else
-                {
-                    currentScreen.drawDark();
-                    currentScreen.resetTorchState();
-                }
-            }
-            else
-                currentScreen.drawMap();
 
-            player1.draw();
-            player2.draw();
-            currentScreen.drawStatusBar(
-                player1.getHeldItem(), player1.getLives(), player1.getScore(),
-                player2.getHeldItem(), player2.getLives(), player2.getScore());
+            if (!gameRunning)
+                break;
+
+            redrawGame();
+            continue;
         }
+
         // Handle input 
         if (_kbhit())
         {
             char ch = _getch();
 
-            // PAUSE → Escape key
             if (ch == ESC)
             {
                 handlePause(currentScreen, gameRunning);
@@ -248,32 +316,8 @@ void Game::gameLoop()
                 if (!gameRunning)
                     break;
 
-                // redraw after pause
-                if (currentScreen.isDark())
-                {
-                    // בדוק אם מישהו מחזיק לפיד
-                    bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
-                    if (hasTorch)
-                    {
-                        if (Torch::playerHasTorch(player1))
-                            currentScreen.drawMapWithTorch(player1);
-                        else
-                            currentScreen.drawMapWithTorch(player2);
-                    }
-                    else
-                    {
-                        currentScreen.drawDark();
-                        currentScreen.resetTorchState();
-                    }
-                }
-                else
-                    currentScreen.drawMap();
-
-                player1.draw();
-                player2.draw();
-                currentScreen.drawStatusBar(
-                    player1.getHeldItem(), player1.getLives(), player1.getScore(),
-                    player2.getHeldItem(), player2.getLives(), player2.getScore());
+                redrawGame();
+                continue;
             }
             else
             {
@@ -282,86 +326,17 @@ void Game::gameLoop()
             }
         }
 
-        // --- Bomb Creation Logic ---
-        if (player1.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
-            player1.clearBombRequest();
-        }
-        else if (player2.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
-            player2.clearBombRequest();
-        }
+        // Update game state
+        updateBomb();
+        updatePlayers();
 
-        // Update players
-        player1.erase();
-        player2.erase();
+        // Minimal redraw - only update players and status bar
+        updateDisplay();
 
-        bool stop1 = handleTile(player1);
-        bool stop2 = handleTile(player2);
-
-        if (!stop1)
-        {
-            player1.move();
-        }
-        if (!stop2)
-        {
-            player2.move();
-        }
-
-        // --- Bomb Update Logic ---
-        if (activeBomb != nullptr)
-        {
-            if (activeBomb->tick(currentScreen, player1, player2))
-            {
-                delete activeBomb;
-                activeBomb = nullptr;
-            }
-        }
-
-        // צייר רק בחדר חשוך אם יש לפיד בפועל
-        if (currentScreen.isDark())
-        {
-            // בדוק אם מישהו מחזיק לפיד
-            bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
-
-            if (hasTorch)
-            {
-                // צייר הילה רק אם יש מחזיק לפיד
-                if (Torch::playerHasTorch(player1))
-                    currentScreen.drawMapWithTorch(player1);
-                else
-                    currentScreen.drawMapWithTorch(player2);
-            }
-            else
-            {
-                currentScreen.drawDark();
-                currentScreen.resetTorchState();
-            }
-        }
-
-        player1.draw();
-        player2.draw();
-
-        currentScreen.drawStatusBar(
-            player1.getHeldItem(), player1.getLives(), player1.getScore(),
-            player2.getHeldItem(), player2.getLives(), player2.getScore());
-
-        if (player1.isDead() || player2.isDead())
-        {
-            UIScreens::showGameOverMessage();
-            resetGame();
-            currStatus = GameModes::MENU;
-            return;
-        }
-
-        // --- Check level ---
-        if (checkLevel())
+        // Check end conditions
+        if (checkGameOver())
         {
             gameRunning = false;
-            currStatus = GameModes::MENU;
-            break;
         }
 
         Sleep(GAME_DELAY);

@@ -33,6 +33,7 @@ void Screen::clearScreenBuffer() {
 }
 
 //   LOAD MAP
+// LOAD MAP
 bool Screen::loadMapFromFile(const std::string& filename)
 {
     meta.clear();
@@ -49,38 +50,24 @@ bool Screen::loadMapFromFile(const std::string& filename)
     std::string line;
     int y = 0;
 
-    while (std::getline(file, line) && y < HEIGHT)
+    // ---------- READ MAP + METADATA (single pass) ----------
+    while (std::getline(file, line))
     {
-        // ---------- METADATA ----------
-        if (line.size() > 0 && line[0] == '#') {
-
-            if (line.find("DARK") != std::string::npos) {
-                if (line.find("true") != std::string::npos)
-                    meta.setDark(true);
-                else
-                    meta.setDark(false);
-            }
-            else if (line.find("DOOR") != std::string::npos) {
-                // פורמט: # DOOR 1 open
-                int id = line[line.find("DOOR") + 5] - '0';
-                if (line.find("open") != std::string::npos)
-                    meta.setDoorOpen(id, true);
-                else
-                    meta.setDoorOpen(id, false);
-            }
-            else if (line.find("KEY") != std::string::npos) {
-                // פורמט: # KEY opens 1
-                int id = line[line.size() - 1] - '0'; // הספרה האחרונה
-                meta.setKeyOpens(id);
-            }
-
-            continue; // לא לצייר שורת מטא-דאטה למפה
+        // ----- METADATA -----
+        if (!line.empty() && line[0] == '#')
+        {
+            meta.loadFromLine(line);   // פונקציה קטנה ב-RoomMeta
+            continue;
         }
 
-        // ---------- MAP ----------
+        // ----- MAP -----
+        if (y >= HEIGHT)
+            break;
+
         for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
         {
             char c = line[x];
+
             if (c == 'L')
             {
                 if (!isLegendPositionValid(x, y, filename)) {
@@ -90,20 +77,26 @@ bool Screen::loadMapFromFile(const std::string& filename)
                 legendPos = Point(x, y);
                 screen[y][x] = ' ';
             }
-                else
-                {
-                    screen[y][x] = c;
-                }
+            else
+            {
+                screen[y][x] = c;
+            }
         }
         y++;
     }
 
     file.close();
+
     if (legendPos.getX() == -1) {
-        std::cout << "\n\n 'L' (Legend) is out of boundries or not exist in: " << filename << std::endl;
+        std::cout << "\n\n 'L' (Legend) is out of boundaries or not exist in: "
+            << filename << std::endl;
         return false;
     }
-	//reset doors array
+
+    // ---------- BUILD DOORS FROM MAP ----------
+    for (int i = 0; i < 10; i++)
+        doors[i] = Door();   // איפוס ברור
+
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
             char c = screen[ty][tx];
@@ -111,7 +104,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
                 int id = c - '0';
                 Door d(id);
                 if (meta.isDoorOpen(id))
-                    d.setOpen(true);
+                    d.setOpen();
                 doors[id] = d;
             }
         }
@@ -122,6 +115,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
 
     return true;
 }
+
 //   DRAW MAP
 void Screen::drawMap() const
 {
