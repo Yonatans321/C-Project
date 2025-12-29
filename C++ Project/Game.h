@@ -26,7 +26,14 @@ private:
     static constexpr char EXIT_KEY = '9';
     static constexpr char Colors_ON_OFF = '2';
 
-    
+	void drawCurrentScreen(); // draw the current screen
+	void redrawGame();         // redraw game elements
+	void updateBomb();        // update bomb state
+	void updatePlayers();      // draw both players
+	bool checkGameOver();      // check if game over
+	void updateDisplay();	 // update players and status bar
+
+
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen        
 	std::vector<Screen> allLevels;    // all game levels
