@@ -6,6 +6,7 @@
 #include "UIScreens.h"
 #include "Utils.h"
 #include "Bomb.h"
+#include "RoomMeta.h"
 #include <vector>   // vector for storing screen file names
 #include <string>   // for string handling
 #include <filesystem> // for directory iteration
@@ -35,7 +36,8 @@ private:
 
 
 	std::vector<std::string> screenFileNames; // list of screen file names
-	Screen currentScreen;             // current game screen        
+	Screen currentScreen;             // current game screen      
+	RoomMeta currentRoomMeta;       // current room metadata
 	std::vector<Screen> allLevels;    // all game levels
 	int currentLevelIdx = 0;         // current level index         
 

@@ -21,4 +21,18 @@ W    w                              w      s              s                    W
 Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s  !           s                    W
 W            *  *                          s      2       s                    W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-         L            
+L   
+
+# ROOM 2
+# DARK TRUE
+
+# KEY opens=2
+
+# DOOR id=1 state=open leads=1 
+# DOOR id=2 state=closed leads=3 
+
+# RIDDLE 4 22  1
+# RIDDLE 13 4  2
+# RIDDLE 46 8  3
+
+# SWITCH (\) affects=ssss

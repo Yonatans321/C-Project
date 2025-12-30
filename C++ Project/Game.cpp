@@ -118,8 +118,9 @@ void Game::showInstructions()
 // Initialize level
 void Game::initLevel(const std::string& filename, int specificDoor)
 {
-    cls();
+    /*cls();*/
     drawCurrentScreen();
+    currentRoomMeta = currentScreen.getRoomMeta();
 
     riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
@@ -205,8 +206,10 @@ void Game::drawCurrentScreen()
 void Game::redrawGame()
 {
     drawCurrentScreen();
-    player1.draw();
-    player2.draw();
+	if (player1.isActive())
+        player1.draw();
+	if (player2.isActive())
+        player2.draw();
     currentScreen.drawStatusBar(
         player1.getHeldItem(), player1.getLives(), player1.getScore(),
         player2.getHeldItem(), player2.getLives(), player2.getScore());
@@ -338,7 +341,10 @@ void Game::gameLoop()
         {
             gameRunning = false;
         }
-
+        if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
+            {
+            redrawGame();
+		}
         Sleep(GAME_DELAY);
     }
 }
@@ -374,8 +380,10 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         break;
 
     case 'K':// key
-        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
-            player.GrabItem('K', currentLevelIdx + 1);
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+        {
+			Key keyFromRoom = currentRoomMeta.getRoomKey();  // get the key info from room meta
+            player.GrabItem('K', keyFromRoom.getDoorID());   // 
             currentScreen.setCharAt(pos, ' ');
         }
         else
@@ -411,10 +419,14 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, currentLevelIdx, activeDoor);// try to handle door
+        bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
         if (doorOpened)
         {
             player.setPosition(targetPos);// move player through door
+            if (currentScreen.isDark())
+                currentScreen.drawMapWithTorch(player);
+            else
+				currentScreen.drawMap();
             return true;
         }
         break;
@@ -521,45 +533,49 @@ bool Game::checkLevel()
     if (!player1.isActive() && !player2.isActive())
     {
         allLevels[currentLevelIdx] = currentScreen;
-        int doorId = activeDoor - '0';
-        int nextLevelIdx = currentLevelIdx;
 
-        // בדיקה אם להתקדם או לחזור אחורה
-        if (doorId > currentLevelIdx)
+        int doorId = activeDoor - '0';
+
+        Door* door = currentScreen.getDoorById(doorId);
+        if (!door) return false;
+
+        int nextLevelIdx = door->getDestinationLevel();
+
+        // אם יש חדר חוקי
+        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
         {
-            if (currentLevelIdx + 1 < (int)screenFileNames.size()) {
-                nextLevelIdx++;
+            // בדיקה אם להתקדם או לחזור אחורה
+            if (nextLevelIdx > currentLevelIdx)
+            {
                 cls();
+
                 std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
                 std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
                 Sleep(2000); //delay for loading next level 2 seconds
             }
-            else {
-                showWinScreen();
-                return true;
-            }
-        }
-        else if (doorId <= currentLevelIdx)
-        {
-            if (currentLevelIdx > 0) {
-                nextLevelIdx--;
+            else if (nextLevelIdx < currentLevelIdx)
+            {
                 cls();
                 std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
                 Sleep(1500); // delay for loading previous level 1.5 seconds
             }
+
+            // עדכון האינדקס וטעינת השלב
+            currentLevelIdx = nextLevelIdx;
+            currentScreen = allLevels[currentLevelIdx];
+            initLevel(screenFileNames[currentLevelIdx], doorId);
+            activeDoor = ' ';
+            return false;
         }
-
-        // עדכון האינדקס וטעינת השלב
-        currentLevelIdx = nextLevelIdx;
-        currentScreen = allLevels[currentLevelIdx];
-        initLevel(screenFileNames[currentLevelIdx], doorId);
-        activeDoor = ' ';
-
-        return false;
+        else
+        {
+            // סיים את המשחק
+            showWinScreen();
+            return true;
+        }
     }
     return false;
 }
-
 void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
 {
     // Screen& currentScreen = gameScreens[currentLevel];

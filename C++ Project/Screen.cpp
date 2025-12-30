@@ -32,11 +32,11 @@ void Screen::clearScreenBuffer() {
     }
 }
 
-//   LOAD MAP
-// LOAD MAP
+// LOAD MAP FROM FILE
 bool Screen::loadMapFromFile(const std::string& filename)
 {
-    meta.clear();
+    roomMeta.clear();
+    Door::switchesAreOn = false;
 
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -56,7 +56,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
         // ----- METADATA -----
         if (!line.empty() && line[0] == '#')
         {
-            meta.loadFromLine(line);   // פונקציה קטנה ב-RoomMeta
+            roomMeta.loadFromLine(line);   // פונקציה קטנה ב-RoomMeta
             continue;
         }
 
@@ -96,22 +96,31 @@ bool Screen::loadMapFromFile(const std::string& filename)
     // ---------- BUILD DOORS FROM MAP ----------
     for (int i = 0; i < 10; i++)
         doors[i] = Door();   // איפוס ברור
-
+        
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
             char c = screen[ty][tx];
             if (c >= '1' && c <= '9') {
                 int id = c - '0';
-                Door d(id);
-                if (meta.isDoorOpen(id))
-                    d.setOpen();
-                doors[id] = d;
+                doors[id] = Door(id);
+
+                if (roomMeta.isDoorOpen(id) || Door::openDoors[id]) {
+                    doors[id].setOpen();
+                    Door::openDoors[id] = true;  
+                }
+
+
+                int dest = roomMeta.getDoorLeadsTo(id);
+
+                if (dest >= 0) {
+                    doors[id].setDestinationLevel(dest);
+                }
             }
         }
     }
 
     // ---------- APPLY DARK ----------
-    setDark(meta.isDark());
+    setDark(roomMeta.isDark());
 
     return true;
 }
@@ -415,6 +424,13 @@ Door* Screen::getDoor(const Point& p)
     if (id >= 1 && id <= 9)
         return &doors[id];
 
+    return nullptr;
+}
+
+Door* Screen::getDoorById(int id)
+{
+    if (id >= 1 && id <= 9)
+        return &doors[id];
     return nullptr;
 }
 // MAP DATA
