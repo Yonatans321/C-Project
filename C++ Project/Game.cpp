@@ -223,28 +223,40 @@ void Game::updateDisplay()
         player2.getHeldItem(), player2.getLives(), player2.getScore());
 }
 
+
+
+
+
 // Handle bomb creation
 void Game::updateBomb()
 {
+    if (activeBomb != nullptr)
+    {
+        int bombRoomID = activeBomb->getRoomID();
+        if (bombRoomID == currentLevelIdx)
+        {
+            if (activeBomb->tick(currentScreen, player1, player2, currentLevelIdx))
+            {
+                delete activeBomb;
+                activeBomb = nullptr;
+            }
+        }
+        else 
+        {       
+            delete activeBomb;
+            activeBomb = nullptr;   
+        }
+    }
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
+        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar(),currentLevelIdx);
         player1.clearBombRequest();
     }
     else if (player2.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
+        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar(),currentLevelIdx);
         player2.clearBombRequest();
-    }
-
-    if (activeBomb != nullptr)
-    {
-        if (activeBomb->tick(currentScreen, player1, player2))
-        {
-            delete activeBomb;
-            activeBomb = nullptr;
-        }
-    }
+    }    
 }
 
 // Handle player movement and collisions
@@ -326,68 +338,11 @@ void Game::gameLoop()
             }
         }
 
-<<<<<<<<< Temporary merge branch 1
-        // --- Bomb Creation Logic ---
-        if (player1.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar(), currentLevelIdx);
-            player1.clearBombRequest();
-        }
-        else if (player2.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar(),currentLevelIdx);
-            player2.clearBombRequest();
-        }
-
-        // Update players
-        player1.erase();
-        player2.erase();
-
-        bool stop1 = handleTile(player1);
-        bool stop2 = handleTile(player2);
-
-        if (!stop1)
-        {
-            player1.move();
-        }
-        if (!stop2)
-        {
-            player2.move();
-        }
-       
-        // צייר רק בחדר חשוך אם יש לפיד בפועל
-        if (currentScreen.isDark())
-        {
-            // בדוק אם מישהו מחזיק לפיד
-            bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
-
-            if (hasTorch)
-            {
-                // צייר הילה רק אם יש מחזיק לפיד
-                if (Torch::playerHasTorch(player1))
-                    currentScreen.drawMapWithTorch(player1);
-                else
-                    currentScreen.drawMapWithTorch(player2);
-            }
-            else
-            {
-                currentScreen.drawDark();
-                currentScreen.resetTorchState();
-            }
-        }
-        //  Bomb Update Logic
-        if (activeBomb != nullptr)
-        {
-            if (activeBomb->tick(currentScreen, player1, player2,currentLevelIdx))
-            {
-                delete activeBomb;
-                activeBomb = nullptr;
-            }
-        }
-=========
         // Update game state
         updateBomb();
         updatePlayers();
+        
+        
 
         // Minimal redraw - only update players and status bar
         updateDisplay();
@@ -583,7 +538,7 @@ bool Game::checkLevel()
         int doorId = activeDoor - '0';
         int nextLevelIdx = currentLevelIdx;
 
-        // בדיקה אם להתקדם או לחזור אחורה
+		//check if moving to next or previous level
         if (doorId > currentLevelIdx)
         {
             if (currentLevelIdx + 1 < (int)screenFileNames.size()) {
@@ -608,7 +563,7 @@ bool Game::checkLevel()
             }
         }
 
-        // עדכון האינדקס וטעינת השלב
+		// update current level index and screen
         currentLevelIdx = nextLevelIdx;
         currentScreen = allLevels[currentLevelIdx];
         initLevel(screenFileNames[currentLevelIdx], doorId);
@@ -621,7 +576,7 @@ bool Game::checkLevel()
 
 void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
 {
-    // Screen& currentScreen = gameScreens[currentLevel];
+    
 
     int lowestDoor = 10; // higher than any door id
     Point targetDoorPos;

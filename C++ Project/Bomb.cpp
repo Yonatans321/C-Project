@@ -39,15 +39,17 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
             }
         }
     }
-
-    // 3. Check for player damage in range 3 (Chebyshev distance)
-    // If player is within 3 cells (including diagonals), they lose a life
-    if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
-        p1.loseLife();
-    }
-    if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
-        p2.loseLife();
-    }
+    if (isInCurrentRoom) 
+    {
+        // 3. Check for player damage in range 3 (Chebyshev distance)
+        // If player is within 3 cells (including diagonals), they lose a life
+        if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
+            p1.loseLife();
+        }
+        if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
+            p2.loseLife();
+        }
+     }
 }
 
 
@@ -68,12 +70,7 @@ bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
 	}
 
 
-   //     // Redraw the bomb icon in red
-   //     gotoxy(position.getX(), position.getY());
-   //     setColor(COLOR_RED);  // Red color for bomb
-   //     std::cout << '@';
-   //     resetColor();
-   //// }
+   
     if (timer <= 0)
     {
         explode(screen, p1, p2, isInCurrentRoom); // Trigger explosion with player references
