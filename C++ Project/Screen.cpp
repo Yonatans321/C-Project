@@ -36,7 +36,6 @@ void Screen::clearScreenBuffer() {
 bool Screen::loadMapFromFile(const std::string& filename)
 {
     roomMeta.clear();
-    Door::switchesAreOn = false;
 
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -102,14 +101,16 @@ bool Screen::loadMapFromFile(const std::string& filename)
             char c = screen[ty][tx];
             if (c >= '1' && c <= '9') {
                 int id = c - '0';
+
+                bool shouldBeOpen =
+                    roomMeta.isDoorOpen(id) || Door::openDoors[id];
+
                 doors[id] = Door(id);
 
-                if (roomMeta.isDoorOpen(id) || Door::openDoors[id]) {
+                if (shouldBeOpen) {
                     doors[id].setOpen();
-                    Door::openDoors[id] = true;  
+                    Door::openDoors[id] = true;
                 }
-
-
                 int dest = roomMeta.getDoorLeadsTo(id);
 
                 if (dest >= 0) {

@@ -55,7 +55,7 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 			Door* door = screen.getDoor(checkPos);// get door object
 			if (door == nullptr) continue;
 			// If door is already open, move player through
-			if (door->isOpen()) {
+			if (Door::openDoors[doorIndex]) {
 				p.setInactive();
 				p.erase();
 				foundDoor = cell;
@@ -113,7 +113,15 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 			{
 				doorCanPass = true;
 			}
+			if (doorCanPass)
+			{
+				p.setInactive();
+				p.erase();
+				foundDoor = cell;
+				return true;
+			}
 		}
+
 	}
 	return false;
 }

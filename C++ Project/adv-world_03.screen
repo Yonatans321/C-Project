@@ -1,0 +1,34 @@
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW,
+W    2     W                  \ W                 \W                 W         \W
+W          W        WW          W              WWWWW             W      *      W
+WWWWWWW?WWWWWWWWWWWW  W?WWWWWWWWWWWWWWWWW?WWWWW   WWWWWWWWWWWW  WWWWWWWW WWWWWWW
+W                  W                  W W               W  W                   W
+WWWWWWW*WWWWWWWWWW*W       WWW        W WWWWWWWWW*WWWWWWWWW WWW*WWWWWWWWWWWWWWWW
+W                  W**WWWWW   WWWWWWWWW                 W                  W   W
+W                  W                  W WWWWWWWWW WWWWWWWWW   W   WWW**WWWW   WW
+WW****WWWWWWWWWWWWWW  WWWWW  WWWWWWWWWW*WWWWWW  WWWWWWWWWW * WWWWWW**WWWWW  WWWW
+WW*WWWWWWWWWWWWWWWWWWWWWWWW**WWWWWWWWWW*WWWWWW**WWWWWWWWWWW*WWWWWWW**WWWWW  WWWW
+W             * *         W                                                    W
+W            WWWWWWWW                                                          W
+W            WK   W  W                                                         W
+W           WW       W                             WWWWWW     WWWWWW           W
+W            WWW     W                                                         W
+W            WW* WWWWW                                  W     W                W
+W            WW**WWWWW                                  W     W                W
+W                  WWW                             W               W           W
+W                  WWW                             WW             WW           W
+W        WWWWWWWWWWWWWWWWWWWWWW                     WWWWWWWWWWWWWWW            W
+W        W       WWWWW        W                                                W
+W        s       W 3 ?       sss                                               W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+L
+
+# ROOM 3
+# DARK FALSE
+# KEY opens=3
+# DOOR id=2 state=open leads=2 
+# DOOR id=3 state=closed leads=4 
+# RIDDLE 4 22  1
+# RIDDLE 13 4  2
+# RIDDLE 46 8  3
+# SWITCH (\) affects=ssss

@@ -118,9 +118,10 @@ void Game::showInstructions()
 // Initialize level
 void Game::initLevel(const std::string& filename, int specificDoor)
 {
-    /*cls();*/
-    drawCurrentScreen();
+    cls();
     currentRoomMeta = currentScreen.getRoomMeta();
+    currentScreen.resetTorchState();
+    drawCurrentScreen();
 
     riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
@@ -128,6 +129,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
 
     player1.activate();
     player2.activate();
+    currentScreen.resetTorchState();
 
     if (specificDoor != -1)
         placePlayersAtEntrance(specificDoor);
@@ -422,11 +424,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
         if (doorOpened)
         {
-            player.setPosition(targetPos);// move player through door
-            if (currentScreen.isDark())
-                currentScreen.drawMapWithTorch(player);
-            else
-				currentScreen.drawMap();
+            //player.setPosition(targetPos);// move player through door
             return true;
         }
         break;
@@ -549,15 +547,15 @@ bool Game::checkLevel()
             {
                 cls();
 
-                std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
-                std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
-                Sleep(2000); //delay for loading next level 2 seconds
+                //std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
+                //std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
+                //Sleep(2000); //delay for loading next level 2 seconds
             }
             else if (nextLevelIdx < currentLevelIdx)
             {
-                cls();
-                std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
-                Sleep(1500); // delay for loading previous level 1.5 seconds
+                //cls();
+                //std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
+                //Sleep(1500); // delay for loading previous level 1.5 seconds
             }
 
             // עדכון האינדקס וטעינת השלב
