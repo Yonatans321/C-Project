@@ -121,15 +121,15 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     cls();
     currentRoomMeta = currentScreen.getRoomMeta();
     currentScreen.resetTorchState();
-    drawCurrentScreen();
 
     riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
-    player1.activate();
-    player2.activate();
-    currentScreen.resetTorchState();
+    if (!player1.isActive())
+        player1.activate();
+    if (!player2.isActive())
+        player2.activate();
 
     if (specificDoor != -1)
         placePlayersAtEntrance(specificDoor);
@@ -138,7 +138,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
         player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
         player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'));
     }
-
+    drawCurrentScreen();
     player1.draw();
     player2.draw();
 
@@ -180,7 +180,9 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 // Helper function to handle screen drawing based on torch / dark state
 void Game::drawCurrentScreen()
 {
-    if (currentScreen.isDark())
+    bool isDark = currentScreen.getRoomMeta().isDark();
+
+    if (isDark)
     {
         bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
 
@@ -188,7 +190,7 @@ void Game::drawCurrentScreen()
         {
             if (Torch::playerHasTorch(player1))
                 currentScreen.drawMapWithTorch(player1);
-            else
+            else if (Torch::playerHasTorch(player2))
                 currentScreen.drawMapWithTorch(player2);
         }
         else
@@ -218,16 +220,18 @@ void Game::redrawGame()
 }
 
 // Minimal redraw - just update what changed
+// Minimal redraw - just update what changed
 void Game::updateDisplay()
 {
     // Only redraw players and status bar (much faster)
-    player1.draw();
-    player2.draw();
+    if (player1.isActive())
+        player1.draw();
+    if (player2.isActive())
+        player2.draw();
     currentScreen.drawStatusBar(
         player1.getHeldItem(), player1.getLives(), player1.getScore(),
         player2.getHeldItem(), player2.getLives(), player2.getScore());
 }
-
 // Handle bomb creation
 void Game::updateBomb()
 {
@@ -288,10 +292,15 @@ bool Game::checkGameOver()
 }
 
 // Main game loop 
+// Main game loop 
 void Game::gameLoop()
 {
     bool gameRunning = true;
+    Point p1PosLastFrame = player1.getPosition();
+    Point p2PosLastFrame = player2.getPosition();
+
     redrawGame(); // Draw full screen at start
+
     while (gameRunning)
     {
         // Handle pause request from riddle
@@ -300,11 +309,10 @@ void Game::gameLoop()
             pauseRequestedFromRiddle = false;
             handlePause(currentScreen, gameRunning);
             clearInputBuffer();
-
-            if (!gameRunning)
-                break;
-
+            if (!gameRunning) break;
             redrawGame();
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
             continue;
         }
 
@@ -317,11 +325,10 @@ void Game::gameLoop()
             {
                 handlePause(currentScreen, gameRunning);
                 clearInputBuffer();
-
-                if (!gameRunning)
-                    break;
-
+                if (!gameRunning) break;
                 redrawGame();
+                p1PosLastFrame = player1.getPosition();
+                p2PosLastFrame = player2.getPosition();
                 continue;
             }
             else
@@ -335,7 +342,34 @@ void Game::gameLoop()
         updateBomb();
         updatePlayers();
 
-        // Minimal redraw - only update players and status bar
+        // בדוק אם השחקנים הפעילים זזו
+        bool p1Moved = player1.isActive() &&
+            ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
+                (p1PosLastFrame.getY() != player1.getPosition().getY()));
+        bool p2Moved = player2.isActive() &&
+            ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||
+                (p2PosLastFrame.getY() != player2.getPosition().getY()));
+
+        // צייר הילה רק בחדר חשוך וכשהשחקן זז
+        bool isDark = currentScreen.getRoomMeta().isDark();
+        if (isDark && (p1Moved || p2Moved))
+        {
+            // בדוק בנפרד - רק אם השחקן **מחזיק** את הלפיד
+            if (Torch::playerHasTorch(player1))
+            {
+                currentScreen.drawMapWithTorch(player1);
+            }
+            else if (Torch::playerHasTorch(player2))
+            {
+                currentScreen.drawMapWithTorch(player2);
+            }
+            else
+            {
+                currentScreen.drawDark();
+            }
+        }
+
+        // Update players and status bar
         updateDisplay();
 
         // Check end conditions
@@ -343,14 +377,25 @@ void Game::gameLoop()
         {
             gameRunning = false;
         }
+
+        // כשעוברים דלת
         if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
-            {
+        {
             redrawGame();
-		}
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
+            activeDoor = ' ';
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+        }
+
+
+        // זכור את המצב לפעם הבאה
+        p1PosLastFrame = player1.getPosition();
+        p2PosLastFrame = player2.getPosition();
+
         Sleep(GAME_DELAY);
     }
 }
-
 bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
     // get reference to the other player
@@ -542,26 +587,38 @@ bool Game::checkLevel()
         // אם יש חדר חוקי
         if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
         {
+            char p1Item = player1.getHeldItem();
+            int p1ItemId = player1.getItemId();
+            char p2Item = player2.getHeldItem();
+            int p2ItemId = player2.getItemId();
+
             // בדיקה אם להתקדם או לחזור אחורה
             if (nextLevelIdx > currentLevelIdx)
             {
                 cls();
 
-                //std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
-                //std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
-                //Sleep(2000); //delay for loading next level 2 seconds
+                std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
+                std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
+                Sleep(2000); //delay for loading next level 2 seconds
+				cls();
             }
             else if (nextLevelIdx < currentLevelIdx)
             {
-                //cls();
-                //std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
-                //Sleep(1500); // delay for loading previous level 1.5 seconds
+                cls();
+                std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
+                Sleep(1500); // delay for loading previous level 1.5 seconds
+                cls();
             }
 
             // עדכון האינדקס וטעינת השלב
             currentLevelIdx = nextLevelIdx;
             currentScreen = allLevels[currentLevelIdx];
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
             initLevel(screenFileNames[currentLevelIdx], doorId);
+            if (p1Item != ' ' && p1Item != 0)
+                player1.GrabItem(p1Item, p1ItemId);
+            if (p2Item != ' ' && p2Item != 0)
+                player2.GrabItem(p2Item, p2ItemId);
             activeDoor = ' ';
             return false;
         }
