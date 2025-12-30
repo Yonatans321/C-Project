@@ -75,8 +75,8 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					Sleep(1200);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();// move player back
-					screen.drawMap();
-					p.draw();
+					/*screen.drawMap();
+					p.draw();*/
 					return false;
 				}
 				char heldKey = p.getHeldItem();
@@ -92,8 +92,8 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					std::cout << "Door " << doorIndex << " unlocked!";
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
-					screen.drawMap();
-					p.draw();
+					/*screen.drawMap();
+					p.draw();*/
 					doorCanPass = true;
 				}
 				else
@@ -104,8 +104,8 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();
-					screen.drawMap();
-					p.draw();
+					/*screen.drawMap();
+					p.draw();*/
 					return false;
 				}
 			}

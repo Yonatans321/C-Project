@@ -259,8 +259,11 @@ void Game::updateBomb()
 // Handle player movement and collisions
 void Game::updatePlayers()
 {
-    player1.erase();
-    player2.erase();
+    if (player1.isActive())
+        player1.erase();
+
+    if (player2.isActive())
+        player2.erase();
 
     bool stop1 = handleTile(player1);
     bool stop2 = handleTile(player2);
@@ -381,6 +384,14 @@ void Game::gameLoop()
         // כשעוברים דלת
         if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
         {
+            if (player1.isActive()) {
+                player1.rememberPosition();
+                player1.erase();
+            }
+            if (player2.isActive()) {
+                player2.rememberPosition();
+                player2.erase();
+            }
             redrawGame();
             p1PosLastFrame = player1.getPosition();
             p2PosLastFrame = player2.getPosition();
@@ -467,6 +478,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     case '6': case '7': case '8': case '9':
     {
         bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
+        redrawGame();
         if (doorOpened)
         {
             //player.setPosition(targetPos);// move player through door
