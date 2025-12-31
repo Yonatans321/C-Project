@@ -478,7 +478,6 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     case '6': case '7': case '8': case '9':
     {
         bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
-        redrawGame();
         if (doorOpened)
         {
             //player.setPosition(targetPos);// move player through door
