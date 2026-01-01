@@ -111,7 +111,7 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 // AI generated function to attach positions to unsolved riddles based on '?' locations on the screen
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
-    const RoomMeta& meta = screen.getMeta();
+    const RoomMeta& meta = screen.getRoomMeta();
 
     // First, assign riddles based on metadata
     for (int i = 0; i < meta.getRiddleCount(); i++)

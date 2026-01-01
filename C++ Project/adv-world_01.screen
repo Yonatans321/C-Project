@@ -27,7 +27,6 @@ L
 # DARK false
 # KEY opens=1
 # DOOR id=1 state=CLOSED leads=2 
-# RIDDLE 4 22  1
-# RIDDLE 13 4  2
-# RIDDLE 46 8  3
-# SWITCH (\) affects=ssss	
+# RIDDLE 8 6 22 
+# RIDDLE 2 14 4 
+# RIDDLE 3 46 8 

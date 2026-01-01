@@ -13,8 +13,8 @@ private:
     // ---- Room state ----
     bool dark;                 // Is the room initially dark
     bool doorOpen[10];         // doorOpen[1] -> door with id 1
-    int keyOpensDoor;          // Which door the key opens (-1 if none)
-
+    int doorLeadsTo[10];   // where each door leads
+    Key roomKey;              // Key object for the room
     struct RiddlePosition {
         int riddleID;
         int x;
@@ -35,12 +35,14 @@ public:
     void setDark(bool v);
     void setDoorOpen(int id, bool open);
     void setKeyOpens(int id);
-
+	
     // getters
     bool isDark() const;
     bool isDoorOpen(int id) const;
     int getKeyOpens() const;
-	
+    int getDoorLeadsTo(int id) const;
+	Key getRoomKey() const;
+
 	// Riddle position management
     void addRiddlePosition(int riddleID, int x, int y);
     int getRiddleCount() const;
