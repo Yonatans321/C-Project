@@ -33,7 +33,7 @@ void Screen::clearScreenBuffer() {
 }
 
 //   LOAD MAP
-// LOAD MAP
+
 bool Screen::loadMapFromFile(const std::string& filename)
 {
     meta.clear();

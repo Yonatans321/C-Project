@@ -21,12 +21,12 @@ public:
 private:
 	char screen[HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
-	
+	RoomMeta meta;
 	bool dark = false; // is the screen dark
 	Point legendPos;
 	void clearScreenBuffer();
 	bool isLegendPositionValid(int x, int y, const std::string& filename);
-	RoomMeta meta;
+	
 
 public:
 	Screen();

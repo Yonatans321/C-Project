@@ -20,7 +20,7 @@ void RoomMeta::clear()
 {
     dark = false;
     keyOpensDoor = -1;
-
+    riddleCount = 0;
     for (int i = 0; i < 10; i++)
         doorOpen[i] = false;
 }
@@ -74,7 +74,17 @@ void RoomMeta::loadFromLine(const std::string& line)
         if (id >= 0 && id < 10)
             doorOpen[id] = open;
     }
-
+	// ----- RIDDLE -----
+    else if (key == "RIDDLE")
+    {
+        // Expected format: # RIDDLE x y id
+        // Example: # RIDDLE 4 22 1
+        int x, y, riddleID;
+        if (iss >> x >> y >> riddleID)
+        {
+            addRiddlePosition(riddleID, x, y);
+        }
+    }
     // Future metadata (SWITCH, etc.) will be added here
 }
 
@@ -113,4 +123,44 @@ bool RoomMeta::isDoorOpen(int id) const
 int RoomMeta::getKeyOpens() const
 {
     return keyOpensDoor;
+}
+
+
+
+// ---------- Riddle position management ----------
+void RoomMeta::addRiddlePosition(int riddleID, int x, int y)
+{
+    if (riddleCount < 20)
+    {
+        riddlePositions[riddleCount].riddleID = riddleID;
+        riddlePositions[riddleCount].x = x;
+        riddlePositions[riddleCount].y = y;
+        riddleCount++;
+    }
+}
+
+int RoomMeta::getRiddleCount() const
+{
+    return riddleCount;
+}
+
+int RoomMeta::getRiddleID(int index) const
+{
+    if (index >= 0 && index < riddleCount)
+        return riddlePositions[index].riddleID;
+    return -1;
+}
+
+int RoomMeta::getRiddleX(int index) const
+{
+    if (index >= 0 && index < riddleCount)
+        return riddlePositions[index].x;
+    return -1;
+}
+
+int RoomMeta::getRiddleY(int index) const
+{
+    if (index >= 0 && index < riddleCount)
+        return riddlePositions[index].y;
+    return -1;
 }

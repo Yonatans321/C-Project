@@ -135,7 +135,6 @@
     <ClInclude Include="Riddle.h" />
     <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="RoomMeta.h" />
-    <ClInclude Include="Rooms.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Switch.h" />
     <ClInclude Include="Torch.h" />
@@ -159,6 +158,9 @@
     <ClCompile Include="Torch.cpp" />
     <ClCompile Include="UIScreens.cpp" />
     <ClCompile Include="Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Riddles.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

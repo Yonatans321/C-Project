@@ -1,9 +1,9 @@
 1
 What's the output?\nint x = 3;\ncout << x + ++x;
 7
-Remember:++x increments BEFORE use
-2
-What does this print?\nfor(int i=0;i<3;i++) cout << i;
+Remember:++x increments BEFORE use	
+2			
+What does this print?\nfor(int i=0;i<3;i++) cout << i;	
 012
 Remember:Loop just like C
 3
