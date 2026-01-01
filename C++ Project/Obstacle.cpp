@@ -13,6 +13,7 @@
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
     Point obs;
+    bool pushed = false;
 
     if (isFacingObstacle(p1, screen, obs))
     {
@@ -22,31 +23,27 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
         if (count == 1)
         {
             pushChain(chain, p1.getDirection(), screen);
-            return;
+            pushed = true;
         }
-        if (count == 2 && playersAlignedAndPushing(p1, p2))
+        else if (count == 2 && playersAlignedAndPushing(p1, p2))
         {
             pushChain(chain, p1.getDirection(), screen);
-            return;
+            pushed = true;
         }
-        return;
     }
 
-    if (isFacingObstacle(p2, screen, obs))
+    if (!pushed && isFacingObstacle(p2, screen, obs))
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
-        int count = (int)chain.size();
+        size_t count = chain.size();
 
         if (count == 1)
         {
             pushChain(chain, p2.getDirection(), screen);
-            return;
         }
-
-        if (count == 2 && playersAlignedAndPushing(p2, p1))
+        else if (count == 2 && playersAlignedAndPushing(p2, p1))
         {
             pushChain(chain, p2.getDirection(), screen);
-            return;
         }
     }
 }

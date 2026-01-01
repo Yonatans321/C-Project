@@ -184,12 +184,12 @@ void Player::dropHeldItem()
 	Direction direction = position.getDirection();
 
 	// if the player is not moving
-	if (direction.getX()==0 && direction.getY()==0)
+	if (direction.getX() == 0 && direction.getY() == 0)
 	{
 		// default to right
 		dropX = position.getX() + 1;
 		dropY = position.getY();
-		
+
 
 		// if right blocked - try left
 		if (screen->getCharAt(dropX, dropY) != ' ')
@@ -220,7 +220,10 @@ void Player::dropHeldItem()
 	}
 	// check if drop position is empty
 	if (screen->getCharAt(dropX, dropY) == ' ') {
-		if (getHeldItem() == '@')
+
+		char droppedItem = heldItem;
+
+		if (droppedItem == '@')
 		{
 			bombDroppedRequest = true;
 			lastDropPos = Point(dropX, dropY);
@@ -228,12 +231,17 @@ void Player::dropHeldItem()
 		else
 		{
 			// put the item on the screen
-			screen->setCharAt(dropX, dropY, heldItem);
+			screen->setCharAt(dropX, dropY, droppedItem);
 		}
-		
-		DropItem();// drop from the player
-	}	
+
+		DropItem(); // drop from the player
+
+		if (droppedItem == '!' && screen->isDark())
+		{
+			screen->resetTorchState();
+			screen->drawDark();
+		}
+	}
 }
-
-
+	
 

@@ -163,7 +163,6 @@ void UIScreens::showWinScreen()
     };
 
     printScreen(WIN_SCREEN);
-	waitForKey();
 }
 
 void UIScreens::showExitMessage()

@@ -1,9 +1,8 @@
 #pragma once
 #include "Player.h"
-
 // forward declaration
 class Screen; 
-
+class RoomMeta;
 class Door
 {
 private:
@@ -27,7 +26,7 @@ public:
 	bool tryOpen(int keyId);
 	bool canPass() const { return open; }
 	static bool isDoorChar(char c) { return (c >= '1' && c <= '9'); }
-	static bool handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor);
+	static bool handleDoor(Player& p, Screen& screen, char& foundDoor);
 	void setOpen() { open = true; }
    //SET AWITCHES ON
 	static void allSwitchesAreOn() { switchesAreOn = true; }

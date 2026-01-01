@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include "Key.h"
+#include "Door.h"
 
 
 
@@ -25,8 +27,7 @@ public:
     RoomMeta();
 
     void clear();
-
-    // קריאה מקובץ פתוח (אחרי המפה)
+	//  load room metadata from a line
     void loadFromLine(const std::string& line);
 
 

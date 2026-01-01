@@ -26,7 +26,7 @@ private:
 	Point legendPos;
 	void clearScreenBuffer();
 	bool isLegendPositionValid(int x, int y, const std::string& filename);
-	
+	RoomMeta roomMeta;
 
 public:
 	Screen();
@@ -57,15 +57,25 @@ public:
 	bool isWall(const Point& p) const;
 	bool isObstacle(const Point& p) const;
 	Door* getDoor(const Point& p);
-
+	Door* getDoorById(int doorId);
 	//Map data
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	Point getLegendPos() const { return legendPos; } // Getter ìîé÷åí ä-Legend
+	Point getLegendPos() const { return legendPos; } // 
 
 	void applyColor(char c) const;
 
-	RoomMeta& getMeta() { return meta; }
-	const RoomMeta& getMeta() const { return meta; }
+	RoomMeta getRoomMeta() const
+	{
+		return roomMeta;
+	}
+
+	void setRoomMeta(const RoomMeta& meta)
+	{
+		roomMeta = meta;
+	}
+	bool validateMetadata(const std::string& filename);
+	bool validateKey(const std::string& filename);
+	bool validateDoors(const std::string& filename);
 };

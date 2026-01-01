@@ -32,18 +32,15 @@ void Screen::clearScreenBuffer() {
     }
 }
 
-//   LOAD MAP
-
+// LOAD MAP FROM FILE helper function to load map and metadata from file- helped by AI
 bool Screen::loadMapFromFile(const std::string& filename)
 {
-    meta.clear();
-
+    roomMeta.clear();
     std::ifstream file(filename);
-    if (!file.is_open()) {
+	if (!file.is_open()) { // file open error
         std::cout << "DEBUG: Failed to open file: " << filename << std::endl;
         return false;
     }
-
     legendPos = Point(-1, -1);
     clearScreenBuffer();
 
@@ -56,7 +53,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
         // ----- METADATA -----
         if (!line.empty() && line[0] == '#')
         {
-            meta.loadFromLine(line);   // פונקציה קטנה ב-RoomMeta
+            roomMeta.loadFromLine(line);
             continue;
         }
 
@@ -67,7 +64,6 @@ bool Screen::loadMapFromFile(const std::string& filename)
         for (int x = 0; x < WIDTH && x < (int)line.length(); x++)
         {
             char c = line[x];
-
             if (c == 'L')
             {
                 if (!isLegendPositionValid(x, y, filename)) {
@@ -87,7 +83,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
 
     file.close();
 
-    if (legendPos.getX() == -1) {
+	if (legendPos.getX() == -1) { // 'L' not found
         std::cout << "\n\n 'L' (Legend) is out of boundaries or not exist in: "
             << filename << std::endl;
         return false;
@@ -95,27 +91,137 @@ bool Screen::loadMapFromFile(const std::string& filename)
 
     // ---------- BUILD DOORS FROM MAP ----------
     for (int i = 0; i < 10; i++)
-        doors[i] = Door();   // איפוס ברור
+        doors[i] = Door();
 
     for (int ty = 0; ty < MAP_HEIGHT; ty++) {
         for (int tx = 0; tx < WIDTH; tx++) {
             char c = screen[ty][tx];
             if (c >= '1' && c <= '9') {
                 int id = c - '0';
-                Door d(id);
-                if (meta.isDoorOpen(id))
-                    d.setOpen();
-                doors[id] = d;
+                bool shouldBeOpen = roomMeta.isDoorOpen(id) || Door::openDoors[id];
+                doors[id] = Door(id);
+                if (shouldBeOpen) {
+                    doors[id].setOpen();
+                    Door::openDoors[id] = true;
+                }
+                int dest = roomMeta.getDoorLeadsTo(id);
+                if (dest >= 0) {
+                    doors[id].setDestinationLevel(dest);
+                }
             }
         }
     }
 
     // ---------- APPLY DARK ----------
-    setDark(meta.isDark());
+    setDark(roomMeta.isDark());
+
+    // ---------- VALIDATE METADATA ----------
+    if (!validateMetadata(filename))
+        return false;
 
     return true;
 }
 
+// Helper function to validate key metadata
+bool Screen::validateKey(const std::string& filename)
+{
+    int keyOpensId = roomMeta.getKeyOpens();
+    if (keyOpensId == -1)
+		return true; // no key defined, nothing to validate
+
+	// check that the door the key opens exists in the map
+    bool doorExists = false;
+    for (int i = 1; i <= 9; i++)
+    {
+        if (doors[i].getId() == keyOpensId)
+        {
+            doorExists = true;
+            break;
+        }
+    }
+
+    if (!doorExists)
+    {
+        std::cout << "\n\nERROR in " << filename << std::endl;
+        std::cout << "KEY OPENS=" << keyOpensId
+            << " - but door " << keyOpensId << " doesn't exist in map!" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+// Helper function to validate door metadata
+bool Screen::validateDoors(const std::string& filename)
+{
+    for (int i = 1; i <= 9; i++)
+    {
+        int leadsTo = roomMeta.getDoorLeadsTo(i);
+
+		// if LEADS is not defined, skip
+        if (leadsTo == -1)
+            continue;
+
+		// check that the door exists in the map
+        bool doorExistsInMap = false;
+        for (int y = 0; y < MAP_HEIGHT; y++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                if (screen[y][x] == ('0' + i))
+                {
+                    doorExistsInMap = true;
+                    break;
+                }
+            }
+            if (doorExistsInMap) break;
+        }
+
+        if (!doorExistsInMap)
+        {
+            std::cout << "\n\nERROR in " << filename << std::endl;
+            std::cout << "DOOR ID=" << i
+                << " defined in metadata but doesn't exist in map!" << std::endl;
+            return false;
+        }
+
+		// check that LEADS points to a valid room number
+        if (leadsTo < 0 || leadsTo >= 4)
+        {
+            std::cout << "\n\nERROR in " << filename << std::endl;
+            std::cout << "DOOR ID=" << i << " LEADS=" << (leadsTo + 1)
+                << " - invalid room number! Only rooms 1-4 exist." << std::endl;
+            return false;
+        }
+    }
+    for (int i = 1; i <= 9; i++)
+    {
+        if (roomMeta.getDoorLeadsTo(i) != -1)
+        {
+			if (doors[i].getId() == -1)  // state not defined
+            {
+                std::cout << "\n\nERROR in " << filename << std::endl;
+                std::cout << "DOOR ID=" << i << " has invalid state!" << std::endl;
+                std::cout << "Valid states are: \"open\" or \"closed\"" << std::endl;
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+// Main validation function
+bool Screen::validateMetadata(const std::string& filename)
+{
+    if (!validateKey(filename))
+        return false;
+
+    if (!validateDoors(filename))
+        return false;
+
+    return true;
+}
 //   DRAW MAP
 void Screen::drawMap() const
 {
@@ -134,17 +240,17 @@ void Screen::drawMap() const
     resetColor();
 }
 
-bool Screen::isLegendPositionValid(int x, int y, const std::string& filename)
+bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) // helper function to validate legend position
 {
-    if (x < 0 || x >= WIDTH-1 || y < 0 || y >= HEIGHT-1){
+	if (x < 0 || x >= WIDTH - 1 || y < 0 || y >= HEIGHT - 1) { // out of bounds
         std::cout << "\n\nError: Legend (L) is out of 80x25 screen bounds in:" << filename << std::endl;
     return false;
 }
-    if (y < MAP_HEIGHT) {
+	if (y < MAP_HEIGHT) { // legend must be below game arena
 		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-    else if (x+41 >= WIDTH) {
+	else if (x + 41 >= WIDTH) { // legend too far right
         std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
         return false;
 	}
@@ -177,9 +283,9 @@ bool Screen::isDark() const
     return dark;
 }
 
-void Screen::drawMapWithTorch(const Player& p) const
+void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight effect
 {
-    if (p.getHeldItem() != '!')
+	if (p.getHeldItem() != '!') // no torch
     {
         drawDark();
         resetTorchState();
@@ -191,7 +297,7 @@ void Screen::drawMapWithTorch(const Player& p) const
     int cx = p.getX();
     int cy = p.getY();
 
-    // אם השחקן זז - נקה את ההילה הישנה
+	// if the player moved, clear the previous halo
     if (torchLastX != -1 && (torchLastX != cx || torchLastY != cy))
     {
         for (int y = torchLastY - R; y <= torchLastY + R; y++)
@@ -223,7 +329,7 @@ void Screen::drawMapWithTorch(const Player& p) const
         }
     }
 
-    // צייר את ההילה החדשה
+	// draw current halo
     for (int y = cy - R; y <= cy + R; y++)
     {
         if (y < 0 || y >= MAP_HEIGHT) continue;
@@ -248,7 +354,7 @@ void Screen::drawMapWithTorch(const Player& p) const
     torchLastY = cy;
 }
 
-void Screen::drawDark() const
+void Screen::drawDark() const // draw completely dark screen
 {
     for (int y = 0; y < MAP_HEIGHT; y++)
     {
@@ -415,6 +521,13 @@ Door* Screen::getDoor(const Point& p)
     if (id >= 1 && id <= 9)
         return &doors[id];
 
+    return nullptr;
+}
+
+Door* Screen::getDoorById(int id)
+{
+    if (id >= 1 && id <= 9)
+        return &doors[id];
     return nullptr;
 }
 // MAP DATA

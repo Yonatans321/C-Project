@@ -1,5 +1,5 @@
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-W      1           w                                                           W
+W      1   @@@     w                                                           W
 W                  w?wwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwww wwwW
 W          w   @   w        w     * w                      www                 W
 W        ww wwww   w        w\ ww  ww   wwwwwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwW
@@ -18,7 +18,17 @@ W    w    wwwwww*K wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww*s       **                W
 W    w    w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww   wwwwwwwwwwwwwwwwwwwwwww   W
 W    w    wwwwwwwwwwwwwwwwwwwwww   **      s      www     s                    W
 W    w                              w      s              s                    W
-Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s  !           s                    W
+Wwww?wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww     s              s                    W
 W            *  *                          s      2       s                    W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-         L
+L   
+
+# ROOM 2
+# DARK TRUE
+# KEY opens=2
+# DOOR id=1 state=open leads=1 
+# DOOR id=2 state=closed leads=3 
+# RIDDLE 4 22  1
+# RIDDLE 13 4  2
+# RIDDLE 46 8  3
+# SWITCH (\) affects=ssss
