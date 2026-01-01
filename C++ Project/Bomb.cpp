@@ -6,11 +6,14 @@
 #include <iostream>
 
 // Update signature to match Bomb.h (3 arguments)
-void Bomb::explode(Screen& screen, Player& p1, Player& p2)
+void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
 {
     // 1. Remove the bomb from logical map and physical screen
     screen.setCharAt(position, ' ');
-    position.draw(' ');
+    if (isInCurrentRoom) {
+        position.draw(' ');
+    }
+    
 
     int centerX = position.getX();
     int centerY = position.getY();
@@ -29,36 +32,48 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2)
             if (targetChar == 'w' || targetChar == '*')
             {
                 screen.setCharAt(targetX, targetY, ' ');
-                Point(targetX, targetY).draw(' ');
+                if (isInCurrentRoom) {
+                    Point(targetX, targetY).draw(' ');
+                }
+                
             }
         }
     }
-
-    // 3. Check for player damage in range 3 (Chebyshev distance)
-    // If player is within 3 cells (including diagonals), they lose a life
-    if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
-        p1.loseLife();
-    }
-    if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
-        p2.loseLife();
-    }
+    if (isInCurrentRoom) 
+    {
+        // 3. Check for player damage in range 3 (Chebyshev distance)
+        // If player is within 3 cells (including diagonals), they lose a life
+        if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
+            p1.loseLife();
+        }
+        if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
+            p2.loseLife();
+        }
+     }
 }
 
-// Update signature to match Bomb.h (3 arguments)
-bool Bomb::tick(Screen& screen, Player& p1, Player& p2)
+
+bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
 {
+    
     // Decrease internal timer
     timer--;
 
-    // Redraw the bomb icon in red
-    gotoxy(position.getX(), position.getY());
-    setColor(COLOR_RED);  // Red color for bomb
-    std::cout << '@';
-    resetColor();
+	bool isInCurrentRoom = (this->roomID == currentRoomID);
+    if(isInCurrentRoom)
+    {
+        // Draw the bomb only if it's in the current room
+        gotoxy(position.getX(), position.getY());
+        setColor(COLOR_RED);  // Red color for bomb
+        std::cout << '@';
+        resetColor();
+	}
 
+
+   
     if (timer <= 0)
     {
-        explode(screen, p1, p2); // Trigger explosion with player references
+        explode(screen, p1, p2, isInCurrentRoom); // Trigger explosion with player references
         return true;     // Bomb has finished its life cycle
     }
     return false;        // Bomb is still active
