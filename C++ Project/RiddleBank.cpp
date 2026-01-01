@@ -111,10 +111,27 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 // AI generated function to attach positions to unsolved riddles based on '?' locations on the screen
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
+    const RoomMeta& meta = screen.getMeta();
+
+    // First, assign riddles based on metadata
+    for (int i = 0; i < meta.getRiddleCount(); i++)
+    {
+        int riddleID = meta.getRiddleID(i);
+        int x = meta.getRiddleX(i);
+        int y = meta.getRiddleY(i);
+
+        // Find the riddle with this ID
+        Riddle* r = getRiddleById(riddleID);
+        if (r && !r->isSolved())
+        {
+            r->setPosition(Point(x, y));
+        }
+    }
+
+    // Then handle any remaining '?' marks without metadata (backward compatibility)
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
-    // for each '?' on the screen
     for (int y = 0; y < H; ++y)
     {
         for (int x = 0; x < W; ++x)
@@ -122,11 +139,11 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
             if (screen.getCharAt(x, y) != '?')
                 continue;
 
-            //check if a riddle is already assigned here
+            // Check if a riddle is already assigned here
             if (getRiddleAt(x, y) != nullptr)
                 continue;
 
-            // find an unsolved riddle without a position
+            // Find an unsolved riddle without a position
             for (size_t i = 0; i < riddleCount; ++i)
             {
                 if (riddles[i].isSolved())
@@ -135,7 +152,6 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
                 Point p = riddles[i].getPosition();
                 if (p.getX() != 0 || p.getY() != 0)
                     continue;
-
 
                 riddles[i].setPosition(Point(x, y));
                 break;

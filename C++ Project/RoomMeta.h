@@ -3,13 +3,24 @@
 #include <vector>
 #include <fstream>
 
-// room metadata structure
-struct RiddleMetadata {
-    int x, y, id;
-};
+
 
 
 class RoomMeta {
+private:
+    // ---- Room state ----
+    bool dark;                 // Is the room initially dark
+    bool doorOpen[10];         // doorOpen[1] -> door with id 1
+    int keyOpensDoor;          // Which door the key opens (-1 if none)
+
+    struct RiddlePosition {
+        int riddleID;
+        int x;
+        int y;
+    };
+    RiddlePosition riddlePositions[6]; // Max 6 riddles per room
+    int riddleCount;
+
 public:
     RoomMeta();
 
@@ -29,11 +40,11 @@ public:
     bool isDoorOpen(int id) const;
     int getKeyOpens() const;
 	
-    const std::vector<RiddleMetadata>& getRiddlesMetadata() const { return riddlesMetadata; }
-private:
-    // ---- Room state ----
-    bool dark;                 // Is the room initially dark
-    bool doorOpen[10];         // doorOpen[1] -> door with id 1
-    int keyOpensDoor;          // Which door the key opens (-1 if none)
-    std::vector<RiddleMetadata> riddlesMetadata;
+	// Riddle position management
+    void addRiddlePosition(int riddleID, int x, int y);
+    int getRiddleCount() const;
+    int getRiddleID(int index) const;
+    int getRiddleX(int index) const;
+    int getRiddleY(int index) const;
+   
 };
