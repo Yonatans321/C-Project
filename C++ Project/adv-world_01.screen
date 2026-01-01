@@ -21,10 +21,10 @@ W   w      wwwwwwww  w                                     wwwwwww             W
 W   w                w                                     wwwwwwwww wwwwwwwww w
 W   ? \          w    w                                   wwwwwwwww wwwwwwwww  W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-L                                                                                                                                           
+L                                                                                                                                          
 																		
 # ROOM 1
-# DARK FALSE
+# DARK false
 # KEY opens=1
 # DOOR id=1 state=CLOSED leads=2 
 # RIDDLE 4 22  1

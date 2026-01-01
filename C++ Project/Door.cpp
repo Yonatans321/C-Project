@@ -75,6 +75,8 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					Sleep(1200);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();// move player back
+					screen.drawMap(); // redraw map to clear any artifacts
+					p.draw(); // redraw player
 					return false;
 				}
 				char heldKey = p.getHeldItem();
@@ -99,6 +101,8 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();
+					screen.drawMap(); // redraw map to clear any artifacts
+					p.draw(); // redraw player
 					return false;
 				}
 			}
