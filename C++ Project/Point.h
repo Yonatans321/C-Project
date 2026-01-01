@@ -42,10 +42,9 @@ public:
 	void changeDirection(const Direction& new_dir) {
 		dir = new_dir;
 	}
-	const Direction& getDirection() const { return dir; };
-	const Direction& getOppositeDirection() const {
-		static Direction opposite(-dir.getX(), -dir.getY());
-		return opposite;
+	Direction getDirection() const { return dir; };
+	Direction getOppositeDirection() const {
+		return Direction(-dir.getX(), -dir.getY());
 	}
 	//data functions
 	int getX() const {
