@@ -20,7 +20,7 @@ void RoomMeta::clear()
 {
     dark = false;
     keyOpensDoor = -1;
-
+    
     for (int i = 0; i < 10; i++)
         doorOpen[i] = false;
 }

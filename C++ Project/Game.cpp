@@ -120,7 +120,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
 {
     cls();
     drawCurrentScreen();
-
+    currentScreen.loadMapFromFile(filename);
     riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
@@ -223,10 +223,6 @@ void Game::updateDisplay()
         player2.getHeldItem(), player2.getLives(), player2.getScore());
 }
 
-
-
-
-
 // Handle bomb creation
 void Game::updateBomb()
 {
@@ -244,7 +240,8 @@ void Game::updateBomb()
         else 
         {       
             delete activeBomb;
-            activeBomb = nullptr;   
+            activeBomb = nullptr;
+   
         }
     }
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
