@@ -5,9 +5,9 @@ class Player;
 
 
 class Bomb {
-    Point position;
-    int timer;
-    char playerChar;
+	Point position; // bomb position
+	int timer; // the countdown timer
+    char playerChar; 
 public:
 
     Bomb(Point p, char pChar) : position(p), timer(50), playerChar(pChar) {}

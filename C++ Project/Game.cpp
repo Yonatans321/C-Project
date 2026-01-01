@@ -126,13 +126,13 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
-    if (!player1.isActive())
+	if (!player1.isActive()) // activate players
         player1.activate();
-    if (!player2.isActive())
+	if (!player2.isActive()) // activate players
         player2.activate();
 
-    if (specificDoor != -1)
-        placePlayersAtEntrance(specificDoor);
+	if (specificDoor != -1) // if coming from a door, place players there
+        placePlayersAtEntrance(specificDoor); 
     else
     {
         player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
@@ -142,7 +142,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     player1.draw();
     player2.draw();
 
-    if (!Switch::exists(currentScreen))
+	if (!Switch::exists(currentScreen)) // if no switches, set allSwitchesAreOn to true
         Door::allSwitchesAreOn();
 }
 
@@ -171,7 +171,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     }
 
     clearInputBuffer();
-    if (currentScreen.isDark())
+	if (currentScreen.isDark()) // redraw based on dark/torch state
         currentScreen.drawMapWithTorch(player1);
     else
         currentScreen.drawMap();;    player1.draw();
@@ -184,9 +184,9 @@ void Game::drawCurrentScreen()
 
     if (isDark)
     {
-        bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2);
+		bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2); // check if any player has torch
 
-        if (hasTorch)
+		if (hasTorch) // draw with torch
         {
             if (Torch::playerHasTorch(player1))
                 currentScreen.drawMapWithTorch(player1);
@@ -219,7 +219,6 @@ void Game::redrawGame()
         player2.getHeldItem(), player2.getLives(), player2.getScore());
 }
 
-// Minimal redraw - just update what changed
 // Minimal redraw - just update what changed
 void Game::updateDisplay()
 {
@@ -295,7 +294,6 @@ bool Game::checkGameOver()
 }
 
 // Main game loop 
-// Main game loop 
 void Game::gameLoop()
 {
     bool gameRunning = true;
@@ -345,7 +343,7 @@ void Game::gameLoop()
         updateBomb();
         updatePlayers();
 
-        // בדוק אם השחקנים הפעילים זזו
+		// check if players moved
         bool p1Moved = player1.isActive() &&
             ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
                 (p1PosLastFrame.getY() != player1.getPosition().getY()));
@@ -353,11 +351,11 @@ void Game::gameLoop()
             ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||
                 (p2PosLastFrame.getY() != player2.getPosition().getY()));
 
-        // צייר הילה רק בחדר חשוך וכשהשחקן זז
+		// draw based on dark / torch state if players moved
         bool isDark = currentScreen.getRoomMeta().isDark();
         if (isDark && (p1Moved || p2Moved))
         {
-            // בדוק בנפרד - רק אם השחקן **מחזיק** את הלפיד
+			// check who has torch
             if (Torch::playerHasTorch(player1))
             {
                 currentScreen.drawMapWithTorch(player1);
@@ -381,7 +379,7 @@ void Game::gameLoop()
             gameRunning = false;
         }
 
-        // כשעוברים דלת
+		// when a player goes through a door
         if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
         {
             if (player1.isActive()) {
@@ -400,7 +398,7 @@ void Game::gameLoop()
         }
 
 
-        // זכור את המצב לפעם הבאה
+		// remember last positions
         p1PosLastFrame = player1.getPosition();
         p2PosLastFrame = player2.getPosition();
 
@@ -410,7 +408,6 @@ void Game::gameLoop()
 bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
     // get reference to the other player
-   // Screen& currentScreen = gameScreens[currentLevel];
     Point pos = player.getPosition();
     Point targetPos = pos;
     targetPos.move();
@@ -480,7 +477,6 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
         if (doorOpened)
         {
-            //player.setPosition(targetPos);// move player through door
             return true;
         }
         break;
@@ -582,20 +578,20 @@ void Game::run() // main game loop
     }
     UIScreens::showExitMessage();
 }
-bool Game::checkLevel()
+bool Game::checkLevel() // check if level is completed
 {
     if (!player1.isActive() && !player2.isActive())
     {
-        allLevels[currentLevelIdx] = currentScreen;
+		allLevels[currentLevelIdx] = currentScreen; // save current screen state
 
         int doorId = activeDoor - '0';
 
-        Door* door = currentScreen.getDoorById(doorId);
+		Door* door = currentScreen.getDoorById(doorId); // get door object
         if (!door) return false;
 
         int nextLevelIdx = door->getDestinationLevel();
 
-        // אם יש חדר חוקי
+		// if next level index is valid, load next level
         if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
         {
             char p1Item = player1.getHeldItem();
@@ -603,7 +599,7 @@ bool Game::checkLevel()
             char p2Item = player2.getHeldItem();
             int p2ItemId = player2.getItemId();
 
-            // בדיקה אם להתקדם או לחזור אחורה
+			// check if moving to next or previous level
             if (nextLevelIdx > currentLevelIdx)
             {
                 cls();
@@ -621,7 +617,7 @@ bool Game::checkLevel()
                 cls();
             }
 
-            // עדכון האינדקס וטעינת השלב
+			// update current level index and screen
             currentLevelIdx = nextLevelIdx;
             currentScreen = allLevels[currentLevelIdx];
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
@@ -635,54 +631,78 @@ bool Game::checkLevel()
         }
         else
         {
-            // סיים את המשחק
+			// you won the game
             showWinScreen();
             return true;
         }
     }
     return false;
 }
-void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
+void Game::placePlayersAtEntrance(int specificDoor)
 {
-    // Screen& currentScreen = gameScreens[currentLevel];
-
-    int lowestDoor = 10; // higher than any door id
-    Point targetDoorPos;
-    bool found = false;
-
-    // Search for doors in the current screen (helped by AI)
-    for (int y = 0; y < Screen::MAP_HEIGHT; y++)
+    int targetDoorId = -1;
+	// step 1 look for door that leads to previous level
+    if (specificDoor != -1 && currentLevelIdx > 0)
     {
-        for (int x = 0; x < Screen::WIDTH; x++)
+        for (int i = 1; i <= 9; i++)
         {
-            char c = currentScreen.getCharAt(x, y);// get character at position
-            if (c >= '1' && c <= '9')
+            int leadsTo = currentScreen.getRoomMeta().getDoorLeadsTo(i);
+            if (leadsTo == currentLevelIdx - 1)
             {
-                int id = c - '0';
-                if (specificDoor != -1)
+                targetDoorId = i;
+                break;
+            }
+        }
+    }
+
+	// step 2 : if not found, look for any door (lowest numbered)
+    if (targetDoorId == -1)
+    {
+        int lowestDoor = 10;
+        Point targetDoorPos;
+        bool found = false;
+
+        for (int y = 0; y < Screen::MAP_HEIGHT && !found; y++)
+        {
+            for (int x = 0; x < Screen::WIDTH && !found; x++)
+            {
+                char c = currentScreen.getCharAt(x, y);
+                if (c >= '1' && c <= '9')
                 {
-                    if (id == specificDoor)// found the specific door
+                    int id = c - '0';
+
+					// if there is a specific door to use, prioritize it
+                    if (specificDoor != -1 && id == specificDoor)
                     {
-                        targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
-                        found = true;  // mark as found
-                        goto EndSearch;// exit both loops (helped by AI)
+                        targetDoorId = id;
+                        found = true;
                     }
-                }
-                else if (id < lowestDoor) // find the lowest door id    
-                {
-                    lowestDoor = id;
-                    targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
-                    found = true;
+					// else find the lowest numbered door
+                    else if (id < lowestDoor)
+                    {
+                        lowestDoor = id;
+                        targetDoorId = id;
+                    }
                 }
             }
         }
     }
 
-EndSearch:// exit point for goto (helped by AI)
-    if (!found) return;
-
-    placeNextToDoor(targetDoorPos); // place players next to the found door
-
+	// step 3: place players next to the target door
+    if (targetDoorId != -1)
+    {
+        for (int y = 0; y < Screen::MAP_HEIGHT; y++)
+        {
+            for (int x = 0; x < Screen::WIDTH; x++)
+            {
+                if (currentScreen.getCharAt(x, y) == ('0' + targetDoorId))
+                {
+                    placeNextToDoor(Point(x, y, Direction::directions[Direction::STAY], ' '));
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void Game::placeNextToDoor(const Point& targetDoorPos)

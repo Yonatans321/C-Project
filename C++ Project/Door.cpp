@@ -75,8 +75,6 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					Sleep(1200);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();// move player back
-					/*screen.drawMap();
-					p.draw();*/
 					return false;
 				}
 				char heldKey = p.getHeldItem();
@@ -86,37 +84,32 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 					door->setOpen();
 					Door::openDoors[doorIndex] = true;
 					p.keyUsed();// mark key as used
-					// הצג הודעה עם הנפשה
 					Screen::drawAnimatedBox(10, 5, 50, 12);
 					gotoxy(17, 7);
 					std::cout << "Door " << doorIndex << " unlocked!";
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
-					/*screen.drawMap();
-					p.draw();*/
 					doorCanPass = true;
 				}
-				else
-				{
+				else // player is not holding a key that matches the door 
+				{  
 					Screen::drawAnimatedBox(10, 5, 50, 12);
 					gotoxy(17, 7);
 					std::cout << "you need the correct key!";
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();
-					/*screen.drawMap();
-					p.draw();*/
 					return false;
 				}
 			}
 			else
 			{
-				doorCanPass = true;
+				doorCanPass = true; // door is open
 			}
-			if (doorCanPass)
+			if (doorCanPass) // move player through door
 			{
-				p.setInactive();
-				p.erase();
+				p.setInactive(); // deactivate player
+				p.erase(); // erase player from current position
 				foundDoor = cell;
 				return true;
 			}

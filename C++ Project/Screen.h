@@ -62,7 +62,7 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	Point getLegendPos() const { return legendPos; } // Getter ìîé÷åí ä-Legend
+	Point getLegendPos() const { return legendPos; } // 
 
 	void applyColor(char c) const;
 
@@ -75,4 +75,7 @@ public:
 	{
 		roomMeta = meta;
 	}
+	bool validateMetadata(const std::string& filename);
+	bool validateKey(const std::string& filename);
+	bool validateDoors(const std::string& filename);
 };

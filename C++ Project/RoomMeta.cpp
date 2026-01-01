@@ -28,7 +28,7 @@ void RoomMeta::clear()
     }
 }
 
-void RoomMeta::loadFromLine(const std::string& line)
+void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line helped by AI
 {
     // Skip empty lines and non-metadata lines
     if (line.empty() || line[0] != '#')
@@ -99,7 +99,6 @@ void RoomMeta::loadFromLine(const std::string& line)
     }
 }
 
-    // Future metadata (SWITCH, etc.) will be added here
 
 // ---------- Setters ----------
 

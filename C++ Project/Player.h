@@ -69,11 +69,11 @@ public:
 	
 	
 	//Directions functions
-	Direction getDirection() const
+	const Direction& getDirection() const
 	{
 		return position.getDirection();
 	}
-	Direction getOppositeDirection() const
+	const Direction& getOppositeDirection() const
 	{
 		return position.getOppositeDirection();
 	}
