@@ -234,25 +234,33 @@ void Game::updateDisplay()
 // Handle bomb creation
 void Game::updateBomb()
 {
+    if (activeBomb != nullptr)
+    {
+        int bombRoomID = activeBomb->getRoomID();
+        if (bombRoomID == currentLevelIdx)
+        {
+            if (activeBomb->tick(currentScreen, player1, player2, currentLevelIdx))
+            {
+                delete activeBomb;
+                activeBomb = nullptr;
+            }
+        }
+        else 
+        {       
+            delete activeBomb;
+            activeBomb = nullptr;   
+        }
+    }
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar());
+        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar(),currentLevelIdx);
         player1.clearBombRequest();
     }
     else if (player2.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar());
+        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar(),currentLevelIdx);
         player2.clearBombRequest();
-    }
-
-    if (activeBomb != nullptr)
-    {
-        if (activeBomb->tick(currentScreen, player1, player2))
-        {
-            delete activeBomb;
-            activeBomb = nullptr;
-        }
-    }
+    }    
 }
 
 // Handle player movement and collisions
@@ -342,6 +350,8 @@ void Game::gameLoop()
         // Update game state
         updateBomb();
         updatePlayers();
+        
+        
 
 		// check if players moved
         bool p1Moved = player1.isActive() &&
@@ -585,19 +595,18 @@ bool Game::checkLevel() // check if level is completed
 		allLevels[currentLevelIdx] = currentScreen; // save current screen state
 
         int doorId = activeDoor - '0';
+  Door* door = currentScreen.getDoorById(doorId); // get door object
+  if (!door) return false;
 
-		Door* door = currentScreen.getDoorById(doorId); // get door object
-        if (!door) return false;
+  int nextLevelIdx = door->getDestinationLevel();
 
-        int nextLevelIdx = door->getDestinationLevel();
-
-		// if next level index is valid, load next level
-        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
-        {
-            char p1Item = player1.getHeldItem();
-            int p1ItemId = player1.getItemId();
-            char p2Item = player2.getHeldItem();
-            int p2ItemId = player2.getItemId();
+  // if next level index is valid, load next level
+  if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
+  {
+      char p1Item = player1.getHeldItem();
+      int p1ItemId = player1.getItemId();
+      char p2Item = player2.getHeldItem();
+      int p2ItemId = player2.getItemId();
 
 			// check if moving to next or previous level
             if (nextLevelIdx > currentLevelIdx)
@@ -739,6 +748,13 @@ void Game::resetGame()
     // reset doors
     for (int i = 0; i < 10; i++)
         Door::openDoors[i] = false;
+
+	//reset bombs
+    if (activeBomb != nullptr)
+    {
+        delete activeBomb;
+        activeBomb = nullptr;
+	}
 
 }
 
