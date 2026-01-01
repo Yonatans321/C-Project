@@ -1,6 +1,7 @@
 #include "RoomMeta.h"
 #include <sstream>
 #include <iostream>
+
 // ---------- Helper functions ----------
 
 // Converts string value to boolean (used only while reading metadata)
@@ -26,6 +27,7 @@ void RoomMeta::clear()
 		doorOpen[i] = false; // all doors closed by default
 		doorLeadsTo[i] = -1; // initialize to -1 (no destination)
     }
+    riddleCount = 0;
 }
 
 void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line helped by AI
