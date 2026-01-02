@@ -30,12 +30,12 @@ private:
 
 public:
 	Screen();
-
+	
 	// Map drawing
 	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
 	//void loadMap(int level);
 	void drawMap() const;
-
+	Point getLegendPos() const { return legendPos; }
 	void drawMapWithTorch(const Player& p1) const;
 	bool isDark() const;
 	void setDark(bool isDark);
@@ -44,7 +44,8 @@ public:
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
-	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2);static void drawBox(int x, int y, int width, int height);
+	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2 ,int timeRemaining);
+	static void drawBox(int x, int y, int width, int height);
 	static void clearBox(int x, int y, int width, int height);
 	static void drawAnimatedBox(int x, int y, int w, int h);
 	static void closeAnimatedBox(int x, int y, int w, int h);
@@ -62,7 +63,6 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	const char* getMapRow(int row) const; // get a specific row of the map
-	Point getLegendPos() const { return legendPos; } // 
 
 	void applyColor(char c) const;
 

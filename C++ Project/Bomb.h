@@ -18,5 +18,6 @@ public:
     void explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom);
     Point getPosition() const { return position; }
 	int getRoomID() const { return roomID; }
+	int getTimer() const { return timer; }
 };
 

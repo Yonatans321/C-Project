@@ -216,22 +216,50 @@ void Game::redrawGame()
         player1.draw();
 	if (player2.isActive())
         player2.draw();
+
+    int bombTimerDisplay = -1;
+    if (activeBomb != nullptr)
+    {
+        bombTimerDisplay = activeBomb->getTimer();
+    }
+
     currentScreen.drawStatusBar(
         player1.getHeldItem(), player1.getLives(), player1.getScore(),
-        player2.getHeldItem(), player2.getLives(), player2.getScore());
+        player2.getHeldItem(), player2.getLives(), player2.getScore(),
+        bombTimerDisplay);
 }
 
 // Minimal redraw - just update what changed
 void Game::updateDisplay()
 {
-    // Only redraw players and status bar (much faster)
+    // ✅ קבל את זמן הפצצה
+    int bombTimerDisplay = -1;  // -1 = אין פצצה
+    if (activeBomb != nullptr)
+    {
+        bombTimerDisplay = activeBomb->getTimer();
+    }
+
+    // ✅ צייר status bar עם bomb timer
+    currentScreen.drawStatusBar(
+        player1.getHeldItem(), player1.getLives(), player1.getScore(),
+        player2.getHeldItem(), player2.getLives(), player2.getScore(),
+        bombTimerDisplay);
+
+    // צייר את השחקנים
     if (player1.isActive())
         player1.draw();
     if (player2.isActive())
         player2.draw();
-    currentScreen.drawStatusBar(
-        player1.getHeldItem(), player1.getLives(), player1.getScore(),
-        player2.getHeldItem(), player2.getLives(), player2.getScore());
+
+    // צייר פצצה אם יש
+    if (activeBomb != nullptr)
+    {
+        Point bombPos = activeBomb->getPosition();
+        gotoxy(bombPos.getX(), bombPos.getY());
+        setColor(COLOR_RED);
+        std::cout << '@';
+        resetColor();
+    }
 }
 
 // Handle bomb creation
@@ -387,6 +415,7 @@ void Game::gameLoop()
         drawActiveBomb();
         // Update players and status bar
         updateDisplay();
+
 
         // Check end conditions
         if (checkGameOver())
