@@ -60,14 +60,14 @@ bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
     timer--;
 
 	bool isInCurrentRoom = (this->roomID == currentRoomID);
-    if(isInCurrentRoom)
-    {
-        // Draw the bomb only if it's in the current room
-        gotoxy(position.getX(), position.getY());
-        setColor(COLOR_RED);  // Red color for bomb
-        std::cout << '@';
-        resetColor();
-	}
+ //   if(isInCurrentRoom)
+ //   {
+ //       // Draw the bomb only if it's in the current room
+ //       gotoxy(position.getX(), position.getY());
+ //       setColor(COLOR_RED);  // Red color for bomb
+ //       std::cout << '@';
+ //       resetColor();
+	//}
 
 
    

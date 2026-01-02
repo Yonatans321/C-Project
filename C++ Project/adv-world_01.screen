@@ -26,7 +26,7 @@ L
 # ROOM 1
 # DARK FALSE
 # KEY opens=1
-# DOOR id=1 state=CLOSED leads=2 
-# RIDDLE 8 6 22 
-# RIDDLE 2 14 4 
-# RIDDLE 3 46 8 
+# DOOR id=1 state=CLOSED leads=2
+# RIDDLE 12 3 3
+# RIDDLE 45 7 1 
+# RIDDLE 4 21 2 
