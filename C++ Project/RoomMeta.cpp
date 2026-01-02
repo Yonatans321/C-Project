@@ -26,6 +26,7 @@ void RoomMeta::clear()
     {
 		doorOpen[i] = false; // all doors closed by default
 		doorLeadsTo[i] = -1; // initialize to -1 (no destination)
+		doorInvalidState[i] = false; // all states valid by default
     }
     riddleCount = 0;
 }
@@ -72,7 +73,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         int id = -1; 
         bool open = false;
         int leads = -1;
-
+        std::string stateStr = "";
         while (iss >> token) // Read each token
         {
             if (token.find("id=") == 0)
@@ -82,7 +83,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
             }
 			// door state
             else if (token.find("state=") == 0)
-				open = (token.find("open") != std::string::npos); // Check if state is "open"
+                stateStr = token.substr(6); // Check if state is "open"
 
 			// where the door leads
             else if (token.find("leads=") == 0)
@@ -92,13 +93,25 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
             }
         }
 
-		// Set door properties if ID is valid
+        // Set door properties if ID is valid
         if (id >= 0 && id < 10)
         {
-			doorOpen[id] = open;        // door state
-			doorLeadsTo[id] = leads;    // destination room ID
+            //  ùîåø àú STATE âí àí ìà ú÷éï - validation éòùä àú äáãé÷ä
+            if (stateStr == "open" || stateStr == "OPEN")
+                doorOpen[id] = true;
+            else if (stateStr == "closed" || stateStr == "CLOSED")
+                doorOpen[id] = false;
+            else if (!stateStr.empty())
+            {
+                //  ùîåø ñéîï ùSTATE ìà ú÷éï
+                doorOpen[id] = false;  // default to closed
+                doorInvalidState[id] = true;  // ñîï ë"ìà ú÷éï"
+            }
+
+            doorLeadsTo[id] = leads;
         }
     }
+
 	// ----- RIDDLE -----
     else if (key == "RIDDLE")
     {
@@ -162,7 +175,12 @@ int RoomMeta::getDoorLeadsTo(int id) const
     return -1;
 }
 
-
+bool RoomMeta::isDoorStateInvalid(int id) const
+{
+        if (id >= 0 && id < 10)
+            return doorInvalidState[id];
+        return false;
+}
 // ---------- Riddle position management ----------
 void RoomMeta::addRiddlePosition(int riddleID, int x, int y)
 {

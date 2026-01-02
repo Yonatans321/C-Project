@@ -34,7 +34,6 @@ private:
 	bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
 
-
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      
 	RoomMeta currentRoomMeta;       // current room metadata

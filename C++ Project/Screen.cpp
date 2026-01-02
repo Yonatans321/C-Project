@@ -156,6 +156,14 @@ bool Screen::validateDoors(const std::string& filename)
 {
     for (int i = 1; i <= 9; i++)
     {
+        if (roomMeta.isDoorStateInvalid(i))
+        {
+            std::cout << "\n\nERROR in " << filename << std::endl;
+            std::cout << "DOOR ID=" << i << " has invalid state!" << std::endl;
+            std::cout << "Valid states are: \"open\" or \"closed\"" << std::endl;
+            return false;
+        }
+
         int leadsTo = roomMeta.getDoorLeadsTo(i);
 
 		// if LEADS is not defined, skip
@@ -194,20 +202,6 @@ bool Screen::validateDoors(const std::string& filename)
             return false;
         }
     }
-    for (int i = 1; i <= 9; i++)
-    {
-        if (roomMeta.getDoorLeadsTo(i) != -1)
-        {
-			if (doors[i].getId() == -1)  // state not defined
-            {
-                std::cout << "\n\nERROR in " << filename << std::endl;
-                std::cout << "DOOR ID=" << i << " has invalid state!" << std::endl;
-                std::cout << "Valid states are: \"open\" or \"closed\"" << std::endl;
-                return false;
-            }
-        }
-    }
-
     return true;
 }
 
@@ -283,9 +277,10 @@ bool Screen::isDark() const
     return dark;
 }
 
+
 void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight effect
 {
-	if (p.getHeldItem() != '!') // no torch
+    if (p.getHeldItem() != '!') // no torch
     {
         drawDark();
         resetTorchState();
@@ -293,13 +288,21 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
     }
 
     const int R = 6;
-
     int cx = p.getX();
     int cy = p.getY();
 
-	// if the player moved, clear the previous halo
-    if (torchLastX != -1 && (torchLastX != cx || torchLastY != cy))
+    // אם השחקן לא זז - אל תעשה שום דבר
+    if (torchLastX == cx && torchLastY == cy)
+        return;
+
+    //  פעם ראשונה - צייר את כל המסך חשוך
+    if (torchLastX == -1)
     {
+        drawDark();
+    }
+    else
+    {
+        //  מחק את ההילה הישנה - רק החלקים שהיו מואים
         for (int y = torchLastY - R; y <= torchLastY + R; y++)
         {
             if (y < 0 || y >= MAP_HEIGHT) continue;
@@ -329,7 +332,7 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
         }
     }
 
-	// draw current halo
+    //  צייר את הילה חדשה
     for (int y = cy - R; y <= cy + R; y++)
     {
         if (y < 0 || y >= MAP_HEIGHT) continue;
@@ -349,6 +352,7 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
             }
         }
     }
+    fflush(stdout);
 
     torchLastX = cx;
     torchLastY = cy;
@@ -382,14 +386,13 @@ void Screen::resetTorchState()
     torchLastX = -1;
     torchLastY = -1;
 }
+
 void Screen::setCharAt(const Point& p, char ch)
 {
     setCharAt(p.getX(), p.getY(), ch);
 }
 // DRAW STATUS BAR
-void Screen::drawStatusBar(
-    char inv1, int lives1, int score1,
-    char inv2, int lives2, int score2)
+void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2, int timeRemaining)
 {
 	// get legend position
     int startX = legendPos.getX();
@@ -404,6 +407,29 @@ void Screen::drawStatusBar(
         << "  Score: " << score1
         << "             ";
 
+    if (timeRemaining >= 0)  // אם יש פצצה פעילה
+    {
+        std::cout << "  | BOMB: ";
+
+        if (timeRemaining >= 35)
+            setColor(COLOR_LIGHT_GREEN);  // ירוק (5-4)
+        else if (timeRemaining < 35 && timeRemaining > 10)
+            setColor(COLOR_YELLOW);       // צהוב (3)
+        else if (timeRemaining <= 10)
+            setColor(COLOR_LIGHT_RED);    // אדום (2-1)
+        else
+            setColor(COLOR_LIGHT_RED);    // אדום (BOOM)
+
+        if (timeRemaining > 0)
+            std::cout << timeRemaining;
+        else
+            std::cout << "BOOM!";
+
+        setColor(COLOR_LIGHT_CYAN);  // חזור לצבע מקורי
+    }
+
+    // ✅ מחק את הקודם
+    std::cout << "               ";
     // player 2 - second line
     gotoxy(startX, startY + 1);
     std::cout
