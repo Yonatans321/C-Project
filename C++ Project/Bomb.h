@@ -9,6 +9,8 @@ class Bomb {
     int timer;
     char playerChar;
 	int roomID;
+
+
 public:
 
     Bomb(Point p, char pChar,int ID) : position(p), timer(50), playerChar(pChar),roomID(ID) {}

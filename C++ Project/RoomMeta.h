@@ -5,27 +5,30 @@
 #include "Key.h"
 #include "Door.h"
 
-
-
-
 class RoomMeta {
 private:
-    // ---- Room state ----
+    //  Room state
     bool dark;                 // Is the room initially dark
     bool doorOpen[10];         // doorOpen[1] -> door with id 1
-    int doorLeadsTo[10];   // where each door leads
+    int doorLeadsTo[10];       // where each door leads
     Key roomKey;              // Key object for the room
+	// Riddle positions 
     struct RiddlePosition {
         int riddleID;
         int x;
         int y;
     };
+	// Light switch position
+    struct LightSwitch {
+        int x, y;
+        bool exists;
+    } lightSwitch;
+
     RiddlePosition riddlePositions[6]; // Max 6 riddles per room
     int riddleCount;
 
 public:
     RoomMeta();
-
     void clear();
 	//  load room metadata from a line
     void loadFromLine(const std::string& line);
@@ -50,4 +53,9 @@ public:
     int getRiddleX(int index) const;
     int getRiddleY(int index) const;
    
+	// Light switch management
+    void setLightSwitch(int x, int y);
+    bool hasLightSwitchAt(int x, int y) const;
+    void activateLightSwitch();
+	
 };
