@@ -30,6 +30,7 @@ private:
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
 	void updateBomb();        // update bomb state
+	void drawActiveBomb();   // draw the active bomb
 	void updatePlayers();      // draw both players
 	bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
