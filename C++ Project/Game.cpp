@@ -123,7 +123,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     currentScreen.resetTorchState();
 
     drawCurrentScreen();
-    currentScreen.loadMapFromFile(filename);
+    
     riddleBank.attachPositionToRoom(currentScreen);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
@@ -257,12 +257,12 @@ void Game::updateBomb()
     }
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player1.getLastDropPos(), player1.getChar(),currentLevelIdx);
+        activeBomb = new Bomb(player1.getPosition(), player1.getChar(),currentLevelIdx);
         player1.clearBombRequest();
     }
     else if (player2.hasDroppedBomb() && activeBomb == nullptr)
     {
-        activeBomb = new Bomb(player2.getLastDropPos(), player2.getChar(),currentLevelIdx);
+        activeBomb = new Bomb(player2.getPosition(), player2.getChar(), currentLevelIdx);
         player2.clearBombRequest();
     }    
 }
@@ -383,7 +383,8 @@ void Game::gameLoop()
                 currentScreen.drawDark();
             }
         }
-
+		// draw bomb   
+        drawActiveBomb();
         // Update players and status bar
         updateDisplay();
 
@@ -444,6 +445,16 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     }
     switch (cell)
     {
+    case 'A': // light switch
+        if (currentRoomMeta.hasLightSwitchAt(pos.getX(), pos.getY()))
+        {
+            if (currentRoomMeta.isDark())
+            {
+                currentRoomMeta.activateLightSwitch();
+            }
+        }
+        break;
+
     case '?':// riddle
         riddleBank.handleRiddle(player, currentScreen, currentLevelIdx);
         break;
@@ -451,8 +462,8 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     case 'K':// key
         if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
         {
-			Key keyFromRoom = currentRoomMeta.getRoomKey();  // get the key info from room meta
-            player.GrabItem('K', keyFromRoom.getDoorID());   // 
+            Key keyFromRoom = currentRoomMeta.getRoomKey();  // get the key info from room meta
+            player.GrabItem('K', keyFromRoom.getDoorID());   
             currentScreen.setCharAt(pos, ' ');
         }
         else
@@ -511,8 +522,6 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 
     case 's':// switch wall
         return true;
-        break;
-
     }
 
     return false; // the player can move
@@ -762,3 +771,22 @@ void Game::resetGame()
 
 }
 
+void Game::drawActiveBomb()
+{
+    if (activeBomb != nullptr && activeBomb->getRoomID() == currentLevelIdx)
+    {
+        Point pos = activeBomb->getPosition();
+
+		// draw bomb at its position
+        gotoxy(pos.getX(), pos.getY());
+        if (ColorsEnabled) {
+			setColor(COLOR_RED); // set bomb color
+        }
+
+        std::cout << '@';
+
+        if (ColorsEnabled) {
+            resetColor();
+        }
+    }
+}

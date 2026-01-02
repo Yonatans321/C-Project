@@ -21,6 +21,7 @@ void RoomMeta::clear()
 {
     dark = false;
     roomKey = Key(-1);
+    
 
     for (int i = 0; i < 10; i++)
     {
@@ -28,6 +29,9 @@ void RoomMeta::clear()
 		doorLeadsTo[i] = -1; // initialize to -1 (no destination)
     }
     riddleCount = 0;
+    lightSwitch.exists = false;
+    lightSwitch.x = -1;
+    lightSwitch.y = -1;
 }
 
 void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line helped by AI
@@ -67,9 +71,9 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
 
     // ----- DOOR -----
     else if (key == "DOOR")
-	{ // Expected format: # DOOR id=1 state=open leads=2
-        std::string token; 
-        int id = -1; 
+    { // Expected format: # DOOR id=1 state=open leads=2
+        std::string token;
+        int id = -1;
         bool open = false;
         int leads = -1;
 
@@ -77,29 +81,29 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         {
             if (token.find("id=") == 0)
             {// door ID
-				std::string numStr = token.substr(3);  // take after "id="
+                std::string numStr = token.substr(3);  // take after "id="
                 id = std::stoi(numStr); // Extract ID from the end of the token
             }
-			// door state
+            // door state
             else if (token.find("state=") == 0)
-				open = (token.find("open") != std::string::npos); // Check if state is "open"
+                open = (token.find("open") != std::string::npos); // Check if state is "open"
 
-			// where the door leads
+            // where the door leads
             else if (token.find("leads=") == 0)
             {
                 std::string numStr = token.substr(6);  // take after "leads="
-                leads = std::stoi(numStr)-1;
+                leads = std::stoi(numStr) - 1;
             }
         }
 
-		// Set door properties if ID is valid
+        // Set door properties if ID is valid
         if (id >= 0 && id < 10)
         {
-			doorOpen[id] = open;        // door state
-			doorLeadsTo[id] = leads;    // destination room ID
+            doorOpen[id] = open;        // door state
+            doorLeadsTo[id] = leads;    // destination room ID
         }
     }
-	// ----- RIDDLE -----
+    // ----- RIDDLE -----
     else if (key == "RIDDLE")
     {
         // Expected format: # RIDDLE x y id
@@ -110,8 +114,28 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
             addRiddlePosition(riddleID, x, y);
         }
     }
-    // Future metadata (SWITCH, etc.) will be added here
+    else if (key == "LIGHT_SWITCH") {
+        int x, y;
+        if (iss >> x >> y) {
+			setLightSwitch(x, y);
+        }
+    }
 }
+
+void RoomMeta::setLightSwitch(int x, int y)
+{
+    lightSwitch.x = x;
+    lightSwitch.y = y;
+    lightSwitch.exists = true;
+}
+    bool RoomMeta::hasLightSwitchAt(int x, int y) const {
+        return lightSwitch.exists && lightSwitch.x == x && lightSwitch.y == y;
+    }
+
+    void RoomMeta::activateLightSwitch() {
+        dark = !dark; // Turn the lights on
+    }
+    
 
 
 // ---------- Setters ----------
