@@ -25,6 +25,14 @@ private:
         bool exists;
     } lightSwitch;
 
+    // Key position
+    struct KeyPosition {
+        int x;
+        int y;
+        int doorID;  // Which door this key opens
+        bool exists;
+    } keyPosition;
+
     RiddlePosition riddlePositions[6]; // Max 6 riddles per room
     int riddleCount;
 
@@ -60,4 +68,14 @@ public:
     bool hasLightSwitchAt(int x, int y) const;
     void activateLightSwitch();
 	
+    // Key position methods
+    void setKeyPosition(int x, int y, int doorID);
+    bool hasKeyPosition() const;
+    int getKeyX() const;
+    int getKeyY() const;
+    int getKeyDoorID() const;
+
+    // Light switch metadata placement
+    void placeLightSwitchFromMetadata(class Screen& screen) const;
+    bool validateLightSwitchPosition(const class Screen& screen, const std::string& filename) const;
 };
