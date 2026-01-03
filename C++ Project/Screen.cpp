@@ -252,7 +252,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) //
 		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-	else if (x + 58 >= WIDTH) { // legend too far right
+	else if (x + 44 >= WIDTH) { // legend too far right
         std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
         return false;
 	}
@@ -407,66 +407,71 @@ void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int live
     int startY = legendPos.getY();
     gotoxy(startX, startY);
     std::cout << "                                                                                ";
+    gotoxy(startX, startY+1);
+    std::cout << "                                                                                ";
     // player 1 - first line
     gotoxy(startX, startY);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
-        << "P1 & - Lives: " << lives1
-        << "  Inv:" << (inv1 == 0 ? '-' : inv1)
-        << "  Score: " << score1;
-        
-
-	if (timeRemaining >= 0)  // if timeRemaining is valid
-    {
-        int timerbombStartX = startX + 35;// position for timer bomb
-		gotoxy(timerbombStartX, startY);
-        std::cout << "| BOMB: ";
-
-        if (timeRemaining >= 35)
-            setColor(COLOR_LIGHT_GREEN);  
-        else if (timeRemaining < 35 && timeRemaining > 10)
-            setColor(COLOR_YELLOW);
-        else if (timeRemaining <= 10)
-            setColor(COLOR_LIGHT_RED);    
-        else
-            setColor(COLOR_LIGHT_RED);    
-
-        if (timeRemaining > 0)
-            std::cout << timeRemaining;
-        else
-            std::cout << "BOOM!";
-
-        setColor(COLOR_LIGHT_CYAN);  
-        std::cout << "";
-    }
-    // Game timer
-    if (gameTimer >= 0) 
-    {
-        int timerX = startX + 47;// position for timer
-		gotoxy(timerX, startY);
-        std::cout << "| TIME: ";
-        if (gameTimer > 60)
-            setColor(COLOR_LIGHT_GREEN);
-        else if (gameTimer > 30)
-            setColor(COLOR_YELLOW);
-        else
-            setColor(COLOR_LIGHT_RED);
-
-        int minutes = gameTimer / 60;
-        int seconds = gameTimer % 60;
-        std::cout << minutes << ":" << (seconds < 10 ? "0" : "") << seconds;
-        setColor(COLOR_LIGHT_CYAN);
-    }
-    
-    
+        << "& - HP:" << lives1
+        << " Inv:" << (inv1 == 0 ? '-' : inv1)
+        << " SCR:" << score1;
+           
     // player 2 - second line
     gotoxy(startX, startY + 1);
     std::cout
-        << "P2 $ - Lives: " << lives2
-        << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
-        << "  Score: " << score2
+        << "$ - HP:" << lives2
+        << " Inv:" << (inv2 == 0 ? '-' : inv2)
+        << " SCR:" << score2
         << "             ";
     resetColor();
+
+	// TIMER DISPLAY
+const int TIMER_X = 70;
+const int TIMER_Y = 23;
+const int BOMB_TIMER_Y = 24;
+// Clear timer area first
+gotoxy(TIMER_X, TIMER_Y);
+std::cout << "           ";
+gotoxy(TIMER_X, BOMB_TIMER_Y);
+std::cout << "          ";
+if (gameTimer >= 0) {// only show if timer is active
+    gotoxy(TIMER_X, TIMER_Y);
+    std::cout << "|TIME:";
+
+    if (gameTimer > 60)
+        setColor(COLOR_LIGHT_GREEN);
+    else if (gameTimer > 30)
+        setColor(COLOR_YELLOW);
+    else
+        setColor(COLOR_LIGHT_RED);
+
+    int minutes = gameTimer / 60;
+    int seconds = gameTimer % 60;
+    std::cout << minutes << ":" << (seconds < 10 ? "0" : "") << seconds;
+
+    setColor(COLOR_LIGHT_CYAN);
+}
+if (timeRemaining >= 0) {// only show if bomb is active
+    gotoxy(TIMER_X, BOMB_TIMER_Y);
+    std::cout << "|BOMB:";
+
+    if (timeRemaining >= 35)
+        setColor(COLOR_LIGHT_GREEN);
+    else if (timeRemaining > 10)
+        setColor(COLOR_YELLOW);
+    else
+        setColor(COLOR_LIGHT_RED);
+
+    if (timeRemaining > 0)
+        std::cout << timeRemaining << "s ";
+    else
+        std::cout << "BOOM!";
+
+    setColor(COLOR_LIGHT_CYAN);
+}
+
+resetColor();
 }
 void Screen::drawBox(int x, int y, int w, int h)
 {

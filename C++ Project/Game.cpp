@@ -17,7 +17,7 @@ Game::Game() // initializer list
     player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
         { 'I','L','M','J','K','O' }),
 	player1LastPos(-1, -1),player2LastPos(-1,-1),
-    gameTimer(0), maxGameTime(180), timerActive(false)
+    gameTimer(0), maxGameTime(420), timerActive(false)
 {
     hideCursor();// hide cursor at the start of the game
     currStatus = GameModes::MENU;
@@ -708,24 +708,6 @@ bool Game::checkLevel() // check if level is completed
       int p1ItemId = player1.getItemId();
       char p2Item = player2.getHeldItem();
       int p2ItemId = player2.getItemId();
-
-			// check if moving to next or previous level
-            if (nextLevelIdx > currentLevelIdx)
-            {
-                cls();
-
-                std::cout << "\n\n\n\t\tMoving to NEXT Level..." << std::endl;
-                std::cout << "\t\tLoading: " << screenFileNames[nextLevelIdx] << std::endl;
-                Sleep(2000); //delay for loading next level 2 seconds
-				cls();
-            }
-            else if (nextLevelIdx < currentLevelIdx)
-            {
-                cls();
-                std::cout << "\n\n\n\t\tGoing BACK to previous Level..." << std::endl;
-                Sleep(1500); // delay for loading previous level 1.5 seconds
-                cls();
-            }
 
 			// update current level index and screen
             currentLevelIdx = nextLevelIdx;
