@@ -1,5 +1,6 @@
 #pragma once
-
+#include <string>
+class Screen; // forward declaration
 class Key
 {
 private:
@@ -15,6 +16,15 @@ public:
     bool matches(int d) const {return doorID == d;} // checks if the key matches the door id
 
     bool isValid() const {return doorID != -1;}  // check if the key is valid
-};
 
+
+    // Static methods for key management in screens
+    static bool isValidPosition(const Screen& screen, int x, int y);
+    static bool existsInMap(const Screen& screen);
+    static void placeFromMetadata(Screen& screen);
+    static bool validateMetadataPosition(const Screen& screen, const std::string& filename);
+private:
+    // Helper function to remove all keys from map
+    static void removeAllKeysFromMap(Screen& screen);
+};
 
