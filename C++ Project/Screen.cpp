@@ -252,7 +252,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) //
 		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-	else if (x + 41 >= WIDTH) { // legend too far right
+	else if (x + 58 >= WIDTH) { // legend too far right
         std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
         return false;
 	}
@@ -420,7 +420,7 @@ void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int live
     {
         int timerbombStartX = startX + 35;// position for timer bomb
 		gotoxy(timerbombStartX, startY);
-        std::cout << "  | BOMB: ";
+        std::cout << "| BOMB: ";
 
         if (timeRemaining >= 35)
             setColor(COLOR_LIGHT_GREEN);  
@@ -437,14 +437,14 @@ void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int live
             std::cout << "BOOM!";
 
         setColor(COLOR_LIGHT_CYAN);  
-        std::cout << " ";
+        std::cout << "";
     }
     // Game timer
     if (gameTimer >= 0) 
     {
-        int timerX = startX + 55;// position for timer
+        int timerX = startX + 47;// position for timer
 		gotoxy(timerX, startY);
-        std::cout << "  | TIME: ";
+        std::cout << "| TIME: ";
         if (gameTimer > 60)
             setColor(COLOR_LIGHT_GREEN);
         else if (gameTimer > 30)
