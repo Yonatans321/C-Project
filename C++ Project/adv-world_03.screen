@@ -25,7 +25,7 @@ L
 
 # ROOM 3
 # DARK FALSE
-# KEY opens=3
+# KEY 14 12 opens=3
 # DOOR id=2 state=open leads=2
 # DOOR id=3 state=closed leads=4
 # RIDDLE 7 3 7
