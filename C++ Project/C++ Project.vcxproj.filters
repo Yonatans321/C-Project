@@ -33,7 +33,7 @@
     <ClInclude Include="Direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="key.h">
+    <ClInclude Include="Key.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Switch.h">
@@ -111,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RoomMeta.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Key.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

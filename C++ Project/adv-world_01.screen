@@ -21,12 +21,11 @@ W   w      wwwwwwww  w                                     wwwwwww      **     W
 W   w                w                                    wwwwwwwww  wwwwwwwww w
 W   ? \          w    w                                   wwwwwwwww  wwwwwwwww W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-             L                                                                                                                                  
-																		
+         L                                         	
 # ROOM 1
 # DARK FALSE
 # KEY 61 17 opens=1
 # DOOR id=1 state=CLOSED leads=2
 # RIDDLE 12 3 3
 # RIDDLE 45 7 1 
-# RIDDLE 4 21 2
+# RIDDLE 4 21 2 

@@ -66,7 +66,13 @@ private:
     void handlePause(Screen& currentScreen, bool& gameRunning);
 	bool checkLevel();// check if level is completed
 
+	Point player1LastPos; // last position of player 1
+	Point player2LastPos;// last position of player 2
     Bomb* activeBomb = nullptr;
+
+	int gameTimer;           // Current time remaining
+	int maxGameTime;         // Starting time 
+	bool timerActive;        // Is timer running
     
 public:
     Game(); 

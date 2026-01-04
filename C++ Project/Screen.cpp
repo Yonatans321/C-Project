@@ -1,6 +1,7 @@
 ﻿#include "Screen.h"
 #include "Rooms.h"
 #include "Player.h"
+#include "Key.h"
 #include <cstring>
 #include <windows.h>
 #include <cmath>
@@ -47,17 +48,17 @@ bool Screen::loadMapFromFile(const std::string& filename)
     std::string line;
     int y = 0;
 
-    // ---------- READ MAP + METADATA (single pass) ----------
+    // READ MAP + METADATA (single pass) 
     while (std::getline(file, line))
     {
-        // ----- METADATA -----
+        // METADATA 
         if (!line.empty() && line[0] == '#')
         {
             roomMeta.loadFromLine(line);
             continue;
         }
 
-        // ----- MAP -----
+        //  MAP 
         if (y >= HEIGHT)
             break;
 
@@ -89,7 +90,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
         return false;
     }
 
-    // ---------- BUILD DOORS FROM MAP ----------
+    // BUILD DOORS FROM MAP 
     for (int i = 0; i < 10; i++)
         doors[i] = Door();
 
@@ -112,10 +113,10 @@ bool Screen::loadMapFromFile(const std::string& filename)
         }
     }
 
-    // ---------- APPLY DARK ----------
+    //  APPLY DARK
     setDark(roomMeta.isDark());
 
-    // ---------- VALIDATE METADATA ----------
+    //  VALIDATE METADATA
     if (!validateMetadata(filename))
         return false;
 
@@ -213,6 +214,13 @@ bool Screen::validateMetadata(const std::string& filename)
 
     if (!validateDoors(filename))
         return false;
+	// validate key position
+    if (!Key::validateMetadataPosition(*this, filename))
+        return false;
+    // Validate light switch position
+    if (!roomMeta.validateLightSwitchPosition(*this, filename))
+        return false;
+
 
     return true;
 }
@@ -244,7 +252,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) //
 		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-	else if (x + 41 >= WIDTH) { // legend too far right
+	else if (x + 44 >= WIDTH) { // legend too far right
         std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
         return false;
 	}
@@ -291,18 +299,18 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
     int cx = p.getX();
     int cy = p.getY();
 
-    // אם השחקן לא זז - אל תעשה שום דבר
+	//if the torch position didn't change, do nothing
     if (torchLastX == cx && torchLastY == cy)
         return;
 
-    //  פעם ראשונה - צייר את כל המסך חשוך
+	// first, erase old torchlight
     if (torchLastX == -1)
     {
         drawDark();
     }
     else
     {
-        //  מחק את ההילה הישנה - רק החלקים שהיו מואים
+		//   delete old torchlight
         for (int y = torchLastY - R; y <= torchLastY + R; y++)
         {
             if (y < 0 || y >= MAP_HEIGHT) continue;
@@ -332,7 +340,7 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
         }
     }
 
-    //  צייר את הילה חדשה
+	//  draw new torchlight
     for (int y = cy - R; y <= cy + R; y++)
     {
         if (y < 0 || y >= MAP_HEIGHT) continue;
@@ -392,52 +400,78 @@ void Screen::setCharAt(const Point& p, char ch)
     setCharAt(p.getX(), p.getY(), ch);
 }
 // DRAW STATUS BAR
-void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2, int timeRemaining)
+void Screen::drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2, int timeRemaining, int gameTimer)
 {
 	// get legend position
     int startX = legendPos.getX();
     int startY = legendPos.getY();
-
+    gotoxy(startX, startY);
+    std::cout << "                                                                                ";
+    gotoxy(startX, startY+1);
+    std::cout << "                                                                                ";
     // player 1 - first line
     gotoxy(startX, startY);
     setColor(COLOR_LIGHT_CYAN);
     std::cout
-        << "P1 & - Lives: " << lives1
-        << "  Inv:" << (inv1 == 0 ? '-' : inv1)
-        << "  Score: " << score1
-        << "             ";
-
-    if (timeRemaining >= 0)  // אם יש פצצה פעילה
-    {
-        std::cout << "  | BOMB: ";
-
-        if (timeRemaining >= 35)
-            setColor(COLOR_LIGHT_GREEN);  // ירוק (5-4)
-        else if (timeRemaining < 35 && timeRemaining > 10)
-            setColor(COLOR_YELLOW);       // צהוב (3)
-        else if (timeRemaining <= 10)
-            setColor(COLOR_LIGHT_RED);    // אדום (2-1)
-        else
-            setColor(COLOR_LIGHT_RED);    // אדום (BOOM)
-
-        if (timeRemaining > 0)
-            std::cout << timeRemaining;
-        else
-            std::cout << "BOOM!";
-
-        setColor(COLOR_LIGHT_CYAN);  // חזור לצבע מקורי
-    }
-
-    // ✅ מחק את הקודם
-    std::cout << "               ";
+        << "& - HP:" << lives1
+        << " Inv:" << (inv1 == 0 ? '-' : inv1)
+        << " SCR:" << score1;
+           
     // player 2 - second line
     gotoxy(startX, startY + 1);
     std::cout
-        << "P2 $ - Lives: " << lives2
-        << "  Inv:"  << (inv2 == 0 ? '-' : inv2)
-        << "  Score: " << score2
+        << "$ - HP:" << lives2
+        << " Inv:" << (inv2 == 0 ? '-' : inv2)
+        << " SCR:" << score2
         << "             ";
     resetColor();
+
+	// TIMER DISPLAY
+const int TIMER_X = 70;
+const int TIMER_Y = 23;
+const int BOMB_TIMER_Y = 24;
+// Clear timer area first
+gotoxy(TIMER_X, TIMER_Y);
+std::cout << "           ";
+gotoxy(TIMER_X, BOMB_TIMER_Y);
+std::cout << "          ";
+if (gameTimer >= 0) {// only show if timer is active
+    gotoxy(TIMER_X, TIMER_Y);
+    std::cout << "|TIME:";
+
+    if (gameTimer > 60)
+        setColor(COLOR_LIGHT_GREEN);
+    else if (gameTimer > 30)
+        setColor(COLOR_YELLOW);
+    else
+        setColor(COLOR_LIGHT_RED);
+
+    int minutes = gameTimer / 60;
+    int seconds = gameTimer % 60;
+    std::cout << minutes << ":" << (seconds < 10 ? "0" : "") << seconds;
+
+    setColor(COLOR_LIGHT_CYAN);
+}
+if (timeRemaining >= 0) {// only show if bomb is active
+    gotoxy(TIMER_X, BOMB_TIMER_Y);
+    std::cout << "|BOMB:";
+
+    if (timeRemaining >= 35)
+        setColor(COLOR_LIGHT_GREEN);
+    else if (timeRemaining > 10)
+        setColor(COLOR_YELLOW);
+    else
+        setColor(COLOR_LIGHT_RED);
+
+    if (timeRemaining > 0)
+        std::cout << timeRemaining << "s ";
+    else
+        std::cout << "BOOM!";
+
+    setColor(COLOR_LIGHT_CYAN);
+}
+
+resetColor();
 }
 void Screen::drawBox(int x, int y, int w, int h)
 {
@@ -606,7 +640,9 @@ void Screen::applyColor(char c) const
 	case '!':    // Torch
         setColor(COLOR_RED);
         break;
-
+    case 'A':
+        setColor(COLOR_YELLOW);  // Yellow for light switch
+        break;
     default:
         if (c >= '1' && c <= '9')   // door
             setColor(COLOR_LIGHT_CYAN);

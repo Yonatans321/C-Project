@@ -44,7 +44,7 @@ public:
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
-	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2 ,int timeRemaining);
+	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2 ,int timeRemaining, int gameTimer=-1);
 	static void drawBox(int x, int y, int width, int height);
 	static void clearBox(int x, int y, int width, int height);
 	static void drawAnimatedBox(int x, int y, int w, int h);

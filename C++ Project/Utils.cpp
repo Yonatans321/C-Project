@@ -62,3 +62,32 @@ void waitForKey()
         clearInputBuffer(); 
 		auto i = _getch();            
     }
+
+// Helper function to allocate and copy a string to const char*
+const char* allocateString(const std::string& str) {
+    char* newStr = new char[str.length() + 1];
+    strcpy_s(newStr, str.length() + 1, str.c_str());
+    return newStr;
+}
+
+// Helper function to replace \n with actual newlines
+std::string processNewlines(const std::string& str) {
+    std::string result;
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (i + 1 < str.length() && str[i] == '\\' && str[i + 1] == 'n') {
+            result += '\n';
+            ++i; // Skip the 'n'
+        }
+        else {
+            result += str[i];
+        }
+    }
+    return result;
+}
+
+// Helper function to convert string to boolean
+bool stringToBool(const std::string& value) {
+    return value == "true" || value == "TRUE";
+}
+
+

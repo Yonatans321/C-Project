@@ -7,28 +7,6 @@
 #include "Utils.h"
 #include <fstream>
 
-// Helper function to allocate and copy a string to const char*
-static const char* allocateString(const std::string& str) {
-    char* newStr = new char[str.length() + 1];
-    strcpy_s(newStr, str.length() + 1, str.c_str());
-    return newStr;
-}
-
-// Helper function to replace \n with actual newlines
-static std::string processNewlines(const std::string& str) {
-    std::string result;
-    for (size_t i = 0; i < str.length(); ++i) {
-        if (i + 1 < str.length() && str[i] == '\\' && str[i + 1] == 'n') {
-            result += '\n';
-            ++i; // Skip the 'n'
-        }
-        else {
-            result += str[i];
-        }
-    }
-    return result;
-}
-
 RiddleBank::RiddleBank() : riddleCount(0), loadedSuccessfully(false)
 {
     // Try to load riddles from file
@@ -47,7 +25,7 @@ RiddleBank::RiddleBank() : riddleCount(0), loadedSuccessfully(false)
     // Format: ID, Question, Answer, Hint (each on separate lines)
     std::string line;
     while (riddleCount < MAX_RIDDLES && std::getline(file, line)) {
-        // Read ID
+        // Read id
         int id = std::stoi(line);
 
         // Read Question
@@ -92,14 +70,14 @@ Riddle* RiddleBank::getRiddleById(int riddleID)
     }
     return nullptr; // Not found
 }
-void RiddleBank::addRiddle(const Riddle& r)
+void RiddleBank::addRiddle(const Riddle& r)// Add a riddle to the bank 
 {
     if (riddleCount < MAX_RIDDLES) {
         riddles[riddleCount++] = r;
     }
 }
-Riddle* RiddleBank::getRiddleAt(int x, int y)
-{
+Riddle* RiddleBank::getRiddleAt(int x, int y)// Retrieve a riddle by its position (x, y) on the screen
+{// Check each riddle's position
     for (size_t i = 0; i < riddleCount; ++i) {
         Point p = riddles[i].getPosition();
         if (p.getX() == x && p.getY() == y) {
@@ -112,6 +90,8 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
     const RoomMeta& meta = screen.getRoomMeta();
+    bool hasError = false;
+    std::string errorMessages = "";
 
     // First, assign riddles based on metadata
     for (int i = 0; i < meta.getRiddleCount(); i++)
@@ -122,10 +102,44 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
 
         // Find the riddle with this ID
         Riddle* r = getRiddleById(riddleID);
-        if (r && !r->isSolved())
+        if (!r)
+        {
+            hasError = true;
+            errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+                " not found in Riddles.txt!\n";
+            continue;
+        }
+		// Skip already solved riddles
+        if (r->isSolved())
+        {
+            continue;
+        }
+		// Validate position
+        if (x < 0 || x >= Screen::WIDTH || y < 0 || y >= Screen::MAP_HEIGHT)
+        {
+            hasError = true;
+            errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+                " has invalid position (" + std::to_string(x) +
+                ", " + std::to_string(y) + ")!\n";
+            continue;
+        }
+		char cell = screen.getCharAt(x, y);
+		if (cell == '?') // Correct placement
         {
             r->setPosition(Point(x, y));
+            continue;
         }
+		if (cell == ' ')// Empty cell - place the riddle here
+        {
+            r->setPosition(Point(x, y));
+            screen.setCharAt(x, y, '?'); // Place '?' at the position
+            continue;
+        }
+		hasError = true;// Cell is occupied
+        errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+            " position (" + std::to_string(x) + ", " +
+            std::to_string(y) + ") is not empty or '?'! Current: '" +
+            cell + "'\n";
     }
 
     // Then handle any remaining '?' marks without metadata (backward compatibility)
@@ -142,23 +156,21 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
             // Check if a riddle is already assigned here
             if (getRiddleAt(x, y) != nullptr)
                 continue;
-
-            // Find an unsolved riddle without a position
-            for (size_t i = 0; i < riddleCount; ++i)
-            {
-                if (riddles[i].isSolved())
-                    continue;
-
-                Point p = riddles[i].getPosition();
-                if (p.getX() != 0 || p.getY() != 0)
-                    continue;
-
-                riddles[i].setPosition(Point(x, y));
-                break;
-            }
+            screen.setCharAt(x, y, ' ');
         }
     }
+	// Display errors if any
+    if (hasError) {
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "RIDDLE PLACEMENT ERRORS:" << std::endl;
+        std::cout << "========================================" << std::endl;
+        std::cout << errorMessages;
+        std::cout << "========================================\n" << std::endl;
+        std::cout << "Press any key to continue..." << std::endl;
+        _getch();
+    }
 }
+
 // AI generated function to check the answer for a given riddle ID
 RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
