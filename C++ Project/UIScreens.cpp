@@ -74,20 +74,20 @@ void UIScreens::showInstructions()
         "   X - Down      A - Left                  M - Down      J - Left                ", // 8
         "   S - Stay      E - Action                K - Stay      O - Action              ", // 9
         "                                                                                ", // 10
-        "   ITEMS & ELEMENTS                                                             ", // 11
+        "                            ITEMS & ELEMENTS                                    ", // 11
         "                                                                                ", // 12
-        "   K    - Key         | Opens doors.you didnt expect something special...       ", // 13
+        "   K    - Key         | Opens doors. No, not your heart.                         ", // 13
         "   *    - Obstacle    | Push together (or cry).                                  ", // 14
-        "   @    - Bomb        | Big boom. Try not to be in the blast radius.             ", // 15
+        "   @    - Bomb        | Big boom. Destroys *, w. Try not to be nearby.            ", // 15
         "   !    - Torch       | Lights the way. Batteries not included.                  ", // 16
         "   ?    - Riddle      | Solve it or stare until it solves you.                   ", // 17
-        "   #    - Spring      | Launches you like you're in a cartoon.                   ", // 18
+        "   A    - Light Switch| Turns lights ON/OFF in dark rooms. Magic? No. Electricity.", // 18
         "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
         "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
-        "                                                                                ", // 21
-        "                     Press ANY key to return to the Main Menu...                ", // 22
-        "                                                                                ", // 23
-        "                                                                                "  // 24
+        "                                                                                 ", // 21
+        "        TIME LIMIT: 7 minutes. Fail to finish and you die. No pressure.          ", // 22
+        "       -   7 minutes in heaven... after it , it will become HELL...  -          ", // 23
+        "                      Press ANY key to return to the Main Menu...                 "  // 24
     };
 
     printScreen(INSTRUCTIONS_SCREEN);

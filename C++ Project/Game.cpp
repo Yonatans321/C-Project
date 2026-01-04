@@ -81,19 +81,19 @@ void Game::showMenu()
                     UIScreens::showMenu();
                 }
                 else {
-                    currStatus = GameModes::NEW_GAME;
+					currStatus = GameModes::NEW_GAME; // start new game
                     menu = false;
                 }
                 break;
 
             case INSTRUCTIONS_KEY:
-                currStatus = GameModes::INSTRUCTIONS;
+				currStatus = GameModes::INSTRUCTIONS; // show instructions
                 menu = false;
                 break;
 
             case Colors_ON_OFF: // Colors ON/OFF
                 ColorsEnabled = !ColorsEnabled;
-                UIScreens::showMenu();
+				UIScreens::showMenu(); // redraw menu to show updated color status
                 break;
             case EXIT_KEY:
                 currStatus = GameModes::EXIT;
