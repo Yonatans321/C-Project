@@ -15,8 +15,8 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
     }
     
 
-    int centerX = position.getX();
-    int centerY = position.getY();
+	int centerX = position.getX(); // Center of explosion
+	int centerY = position.getY(); // Center of explosion
 
     // 2. Destroy 'w' walls and '*' obstacles in range 1 (3x3 area)
     for (int y = -3; y <= 3; y++)
@@ -25,15 +25,15 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
         {
             if (x == 0 && y == 0) continue; // Skip the center
 
-            int targetX = centerX + x;
-            int targetY = centerY + y;
+			int targetX = centerX + x; // Target cell coordinates
+			int targetY = centerY + y; 
 
             char targetChar = screen.getCharAt(targetX, targetY);
-            if (targetChar == 'w' || targetChar == '*')
+			if (targetChar == 'w' || targetChar == '*') // Check for walls and obstacles
             {
-                screen.setCharAt(targetX, targetY, ' ');
+				screen.setCharAt(targetX, targetY, ' '); // Remove from logical map
                 if (isInCurrentRoom) {
-                    Point(targetX, targetY).draw(' ');
+					Point(targetX, targetY).draw(' '); // Remove from physical screen
                 }
                 
             }

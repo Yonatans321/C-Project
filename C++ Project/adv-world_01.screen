@@ -15,18 +15,18 @@ W   w      w           wwwwwwwwww                                              W
 W   w      w            * *     w                          wwwwwwwwwwwwwwwwwww W
 W   w      w           w        w                          wwwwwwwww wwwwwwwww W
 W   w      w           w !   1  w                          wwwwwwwww wwwwwwwww*W
-W   w      w           wwwwwwwwww                          wK       *wwwwwwwww*W
+W   w      w           wwwwwwwwww                          w K      *wwwwwwwww*W
 W   w      w      wwww                                     wwwwwwwww*wwwwwwwww W
 W   w      wwwwwwww  w                                     wwwwwww      **     W
 W   w                w                                    wwwwwwwww  wwwwwwwww w
 W   ? \          w    w                                   wwwwwwwww  wwwwwwwww W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-L                                                                                                                                         
+             L                                                                                                                                  
 																		
 # ROOM 1
 # DARK FALSE
-# KEY opens=1
+# KEY 61 17 opens=1
 # DOOR id=1 state=CLOSED leads=2
 # RIDDLE 12 3 3
 # RIDDLE 45 7 1 
-# RIDDLE 4 21 2 
+# RIDDLE 4 21 2

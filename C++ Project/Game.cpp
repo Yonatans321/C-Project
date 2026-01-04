@@ -82,19 +82,19 @@ void Game::showMenu()
                     UIScreens::showMenu();
                 }
                 else {
-                    currStatus = GameModes::NEW_GAME;
+					currStatus = GameModes::NEW_GAME; // start new game
                     menu = false;
                 }
                 break;
 
             case INSTRUCTIONS_KEY:
-                currStatus = GameModes::INSTRUCTIONS;
+				currStatus = GameModes::INSTRUCTIONS; // show instructions
                 menu = false;
                 break;
 
             case Colors_ON_OFF: // Colors ON/OFF
                 ColorsEnabled = !ColorsEnabled;
-                UIScreens::showMenu();
+				UIScreens::showMenu(); // redraw menu to show updated color status
                 break;
             case EXIT_KEY:
                 currStatus = GameModes::EXIT;
@@ -232,26 +232,26 @@ void Game::redrawGame()
 // Minimal redraw - just update what changed
 void Game::updateDisplay()
 {
-    // ✅ קבל את זמן הפצצה
+	// timer display
     int bombTimerDisplay = -1;  // -1 = אין פצצה
     if (activeBomb != nullptr)
     {
         bombTimerDisplay = activeBomb->getTimer();
     }
 
-    // ✅ צייר status bar עם bomb timer
+	// draw status bar
     currentScreen.drawStatusBar(
         player1.getHeldItem(), player1.getLives(), player1.getScore(),
         player2.getHeldItem(), player2.getLives(), player2.getScore(),
         bombTimerDisplay);
 
-    // צייר את השחקנים
+	// if players are active, draw them
     if (player1.isActive())
         player1.draw();
     if (player2.isActive())
         player2.draw();
 
-    // צייר פצצה אם יש
+	// if bomb is active, draw it
     if (activeBomb != nullptr)
     {
         Point bombPos = activeBomb->getPosition();
