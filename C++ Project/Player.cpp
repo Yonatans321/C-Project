@@ -22,18 +22,26 @@ void Player::erase() const
 	//if on a switch - redraw the switch
 	if (tile == '/' || tile == '\\')
 	{
-		//
+		
 		gotoxy(x, y);
-		if (tile == '/')
+		if(screen->isDark())
 		{
-			setColor(COLOR_LIGHT_GREEN); // COLOR GREEN
+			std::cout << ' '; // in dark rooms, draw as space
+			
 		}
-		else 
+		else
 		{
-			setColor(COLOR_LIGHT_RED);  // COLOR RED
+			if (tile == '/')
+			{
+				setColor(COLOR_LIGHT_GREEN); // COLOR GREEN
+			}
+			else
+			{
+				setColor(COLOR_LIGHT_RED);  // COLOR RED
+			}
+			std::cout << tile; //paint the switch
+			resetColor();
 		}
-		std::cout << tile; //paint the switch
-		resetColor();
 		return;
 	}
 

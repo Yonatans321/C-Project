@@ -11,7 +11,7 @@ bool Key::isValidPosition(const Screen& screen, int x, int y)
 
     char cell = screen.getCharAt(x, y);
     // Key can only be placed on empty space
-    return (cell == ' ');
+    return (cell == ' '||cell=='K'||cell=='k');
 }
 
 // Static helper function to check if there's already a 'K' in the map
@@ -77,10 +77,7 @@ bool Key::validateMetadataPosition(const Screen& screen, const std::string& file
     int keyX = roomMeta.getKeyX();
     int keyY = roomMeta.getKeyY();
 
-    // Check if there's already a 'K' in the map
-    if (existsInMap(screen))
-        return true;  // Map already has a key, metadata position will be ignored
-
+    
     // Validate that the position is on free space
     if (!isValidPosition(screen, keyX, keyY))
     {

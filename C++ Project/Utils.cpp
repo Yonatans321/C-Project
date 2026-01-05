@@ -13,7 +13,7 @@ bool ColorsEnabled = true;
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
     std::cout.flush();
-    COORD coord;
+    COORD coord = { 0,0 };
     coord.X = x;
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
