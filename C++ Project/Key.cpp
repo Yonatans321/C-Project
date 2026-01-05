@@ -48,7 +48,6 @@ void Key::placeFromMetadata(Screen& screen)
             screen.setCharAt(metaKeyX, metaKeyY, 'K');
         }
     }
-    // If no metadata position, leave any existing 'K' in the map 
 }
 // Helper function to remove all 'K' characters from the map
 void Key::removeAllKeysFromMap(Screen& screen)
@@ -85,13 +84,11 @@ bool Key::validateMetadataPosition(const Screen& screen, const std::string& file
         std::cout << "ERROR in " << filename << std::endl;
         std::cout << "Invalid KEY position at (" << keyX << ", " << keyY << ")" << std::endl;
         std::cout << "The key must be placed on empty space (' ')." << std::endl;
-
         char currentChar = screen.getCharAt(keyX, keyY);
         if (currentChar == 'W' || currentChar == 'w')
             std::cout << "Position contains a wall." << std::endl;
         else if (currentChar != ' ')
             std::cout << "Position contains: '" << currentChar << "'" << std::endl;
-
         std::cout << "========================================\n" << std::endl;
         return false;
     }

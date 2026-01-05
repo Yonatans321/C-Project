@@ -46,7 +46,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
 
     iss >> hash >> key;
 
-    // ----- DARK -----
+    //  DARK 
     if (key == "DARK")
     {
         std::string value;
@@ -54,7 +54,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         dark = stringToBool(value);
     }
 
-    // ----- KEY -----
+    //  KEY 
     else if (key == "KEY")
     {
         int x, y;
@@ -74,7 +74,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         }
     }
 
-    // ----- DOOR -----
+    //  DOOR 
     else if (key == "DOOR")
     { // Expected format: # DOOR id=1 state=open leads=2
         std::string token;
@@ -104,23 +104,23 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         // Set door properties if ID is valid
         if (id >= 0 && id < MAX_DOORS)
         {
-            //  ���� �� STATE �� �� �� ���� - validation ���� �� ������
+			// set door state
             if (stateStr == "open" || stateStr == "OPEN")
                 doorOpen[id] = true;
             else if (stateStr == "closed" || stateStr == "CLOSED")
                 doorOpen[id] = false;
             else if (!stateStr.empty())
             {
-                //  ���� ���� �STATE �� ����
+				// invalid state specified
                 doorOpen[id] = false;  // default to closed
-                doorInvalidState[id] = true;  // ��� �"�� ����"
+                doorInvalidState[id] = true;  
             }
 
             doorLeadsTo[id] = leads;
         }
     }
 
-	// ----- RIDDLE -----
+	// RIDDLE 
     else if (key == "RIDDLE")
     {
         // Expected format: # RIDDLE x y id , Example: # RIDDLE 4 22 1
@@ -137,7 +137,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         }
     }
 }
-
+// Light switch methods
 void RoomMeta::setLightSwitch(int x, int y)
 {
     lightSwitch.x = x;
@@ -309,7 +309,7 @@ void RoomMeta::placeLightSwitchFromMetadata(Screen& screen) const
             // Position is empty, place the light switch
             screen.setCharAt(switchX, switchY, 'A');
         }
-        // else: Position is occupied, don't place 'A'
+        
     }
     else
     {
