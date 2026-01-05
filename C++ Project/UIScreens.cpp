@@ -85,8 +85,8 @@ void UIScreens::showInstructions()
         "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
         "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
         "                                                                                 ", // 21
-        "        TIME LIMIT: 7 minutes. Fail to finish and you die. No pressure.          ", // 22
-        "       -   7 minutes in heaven... after it , it will become HELL...  -          ", // 23
+        "        TIME LIMIT: 6 minutes. Fail to finish and you die. No pressure.          ", // 22
+        "       -   6 minutes in heaven... after it , it will become HELL...  -          ", // 23
         "                      Press ANY key to return to the Main Menu...                 "  // 24
     };
 
@@ -163,6 +163,7 @@ void UIScreens::showWinScreen()
     };
 
     printScreen(WIN_SCREEN);
+    
 }
 
 void UIScreens::showExitMessage()
