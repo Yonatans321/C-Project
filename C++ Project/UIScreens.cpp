@@ -81,7 +81,7 @@ void UIScreens::showInstructions()
         "   @    - Bomb        | Big boom. Destroys *, w. Try not to be nearby.            ", // 15
         "   !    - Torch       | Lights the way. Batteries not included.                  ", // 16
         "   ?    - Riddle      | Solve it or stare until it solves you.                   ", // 17
-        "   A    - Light Switch| Turns lights ON/OFF in dark rooms. Magic? No. Electricity.", // 18
+        "   A    - Light Switch| Turns lights ON/OFF in dark rooms. Magic? No.            ", // 18
         "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
         "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
         "                                                                                 ", // 21

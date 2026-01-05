@@ -240,7 +240,7 @@ void Screen::drawMap() const
     }
     resetColor();
 }
-
+// LEGEND POSITION VALIDATION
 bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) // helper function to validate legend position
 {
 	if (x < 0 || x >= WIDTH - 1 || y < 0 || y >= HEIGHT - 1) { // out of bounds
@@ -285,7 +285,7 @@ void Screen::setCharAtSilent(int x, int y, char ch)
     // ONLY update the internal map data - do NOT draw to screen
     screen[y][x] = ch;
 }
-
+// DARKNESS MANAGEMENT
 void Screen::setDark(bool isDark)
 {
     dark = isDark;
@@ -295,7 +295,7 @@ bool Screen::isDark() const
     return dark;
 }
 
-
+// draw map with torchlight effect
 void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight effect
 {
     if (p.getHeldItem() != '!') // no torch
@@ -483,6 +483,7 @@ if (timeRemaining >= 0) {// only show if bomb is active
 
 resetColor();
 }
+// DRAW BOX
 void Screen::drawBox(int x, int y, int w, int h)
 {
     for (int row = 0; row < h; row++)

@@ -447,10 +447,6 @@ void Game::gameLoop()
             {
                 currentScreen.drawMapWithTorch(player2);
             }
-           /* else
-            {
-                currentScreen.drawDark();
-            }*/
         }
 		// draw bomb   
         drawActiveBomb();
@@ -483,8 +479,6 @@ void Game::gameLoop()
             activeDoor = ' ';
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
         }
-
-
 		// remember last positions
         p1PosLastFrame = player1.getPosition();
         p2PosLastFrame = player2.getPosition();
@@ -793,7 +787,7 @@ void Game::placePlayersAtEntrance(int specificDoor)
         }
     }
 }
-
+// Place players next to a door position
 void Game::placeNextToDoor(const Point& targetDoorPos)
 {
     int px = targetDoorPos.getX();
@@ -839,7 +833,7 @@ void Game::resetGame()
     gameTimer = 0;
     timerActive = false;
 }
-
+// Draw active bomb on screen
 void Game::drawActiveBomb()
 {
     if (activeBomb != nullptr && activeBomb->getRoomID() == currentLevelIdx)

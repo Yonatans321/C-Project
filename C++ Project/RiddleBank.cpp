@@ -12,7 +12,7 @@ RiddleBank::RiddleBank() : riddleCount(0), loadedSuccessfully(false)
     // Try to load riddles from file
     std::ifstream file("Riddles.txt");
 
-    if (!file.is_open()) {
+	if (!file.is_open()) {// File could not be opened
         std::cout << "\n========================================" << std::endl;
         std::cout << "ERROR: Could not open Riddles.txt file!" << std::endl;
         std::cout << "Please make sure Riddles.txt is in the same folder as the game." << std::endl;

@@ -81,11 +81,12 @@ public:
 	{
 		return roomMeta;
 	}
-
+	// Setter for roomMeta
 	void setRoomMeta(const RoomMeta& meta)
 	{
 		roomMeta = meta;
 	}
+	// Metadata placement and validation
 	bool validateMetadata(const std::string& filename);
 	bool validateKey(const std::string& filename);
 	bool validateDoors(const std::string& filename);
