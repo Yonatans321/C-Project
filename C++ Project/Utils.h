@@ -34,3 +34,4 @@ const char* allocateString(const std::string& str); // allocate and copy string 
 std::string processNewlines(const std::string& str); // convert \n escape sequences to actual newlines
 
 bool stringToBool(const std::string& value); // convert string to boolean
+

@@ -47,10 +47,9 @@ void Game::showMenu()
     // Check if riddles loaded successfully before showing menu
     if (!riddleBank.isLoaded()) {
         cls();
-        std::cout << "\n========================================" << std::endl;
+
         std::cout << "ERROR: Riddles.txt file is missing!" << std::endl;
         std::cout << "The game cannot start without riddles." << std::endl;
-        std::cout << "========================================\n" << std::endl;
         std::cout << "Press any key to return to menu..." << std::endl;
         waitForKey();
         currStatus = GameModes::MENU; // Stay in menu
@@ -71,11 +70,9 @@ void Game::showMenu()
             case START_KEY:
                 // Check if riddles are loaded before starting game
                 if (!riddleBank.isLoaded()) {
-                    cls();
-                    std::cout << "\n========================================" << std::endl;
+                    cls();  
                     std::cout << "ERROR: Cannot start game!" << std::endl;
                     std::cout << "Riddles.txt file is missing." << std::endl;
-                    std::cout << "========================================\n" << std::endl;
                     std::cout << "Press any key to return to menu..." << std::endl;
                     waitForKey();
                     UIScreens::showMenu();
@@ -364,7 +361,7 @@ void Game::gameLoop()
 	player1LastPos = p1PosLastFrame;
 	player2LastPos = p2PosLastFrame;
 	// timer tracker (taken from AI)
-    DWORD lastTickTime = GetTickCount();
+    ULONGLONG lastTickTime = GetTickCount64();
     const DWORD timerInterval = 1000;
     redrawGame(); // Draw full screen at start
 
@@ -372,7 +369,7 @@ void Game::gameLoop()
     {
         // Update timer
         if (timerActive) {
-            DWORD currentTime = GetTickCount();
+            ULONGLONG currentTime = GetTickCount64();
             if (currentTime - lastTickTime >= timerInterval) {
                 gameTimer--;
                 lastTickTime = currentTime;
@@ -439,7 +436,7 @@ void Game::gameLoop()
 
 		// draw based on dark / torch state if players moved
         bool isDark = currentScreen.getRoomMeta().isDark();
-        if (isDark && (p1Moved || p2Moved))
+        if (isDark)
         {
 			// check who has torch
             if (Torch::playerHasTorch(player1))
@@ -450,10 +447,10 @@ void Game::gameLoop()
             {
                 currentScreen.drawMapWithTorch(player2);
             }
-            else
+           /* else
             {
                 currentScreen.drawDark();
-            }
+            }*/
         }
 		// draw bomb   
         drawActiveBomb();
@@ -602,7 +599,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 
         if (afterPush == '*')
             return true;    // cannot move, obstacle not moved
-
+        
         player.setPosition(targetPos);// move player into obstacle's previous position
         return true;
     }
