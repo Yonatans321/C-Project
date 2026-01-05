@@ -117,7 +117,19 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     cls();
 	currentRoomMeta = currentScreen.getRoomMeta();// get current room metadata
 	currentScreen.resetTorchState();// reset torch state
-	Key::placeFromMetadata(currentScreen);// place key from metadata
+    if (currentRoomMeta.hasKeyPosition()) // checks key from metadata if exists
+    {
+
+		int doorID = currentRoomMeta.getKeyDoorID();
+        if (doorID != -1 && !Door::openDoors[doorID] &&
+            player1.getItemId() != doorID &&
+            player2.getItemId() != doorID)
+        {
+            Key::placeFromMetadata(currentScreen);// place key from metadata
+        }
+        
+    }
+	
 	currentRoomMeta.placeLightSwitchFromMetadata(currentScreen);// place light switch from metadata
     // Start timer on first level
     if (specificDoor == -1 && currentLevelIdx == 0)
@@ -524,11 +536,6 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
                 currentScreen.setRoomMeta(meta);
                 currentScreen.setDark(meta.isDark()); 
                 drawCurrentScreen(); // Redraw the screen with new lighting
-
-                // Get reference to other player
-                Player& otherPlayer = (&player == &player1) ? player2 : player1;
-                if (otherPlayer.isActive())
-                    otherPlayer.draw();
             }
         }
         break;
@@ -687,24 +694,26 @@ bool Game::checkLevel() // check if level is completed
 		allLevels[currentLevelIdx] = currentScreen; // save current screen state
 
         int doorId = activeDoor - '0';
-  Door* door = currentScreen.getDoorById(doorId); // get door object
-  if (!door) return false;
+        Door* door = currentScreen.getDoorById(doorId); // get door object
+        if (!door) return false;
 
-  int nextLevelIdx = door->getDestinationLevel();
+        int nextLevelIdx = door->getDestinationLevel();
 
-  // if next level index is valid, load next level
-  if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
-  {
-      char p1Item = player1.getHeldItem();
-      int p1ItemId = player1.getItemId();
-      char p2Item = player2.getHeldItem();
-      int p2ItemId = player2.getItemId();
+        // if next level index is valid, load next level
+        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
+        {
+			int oldLevelIdx = currentLevelIdx;// save old level index
+
+            char p1Item = player1.getHeldItem();
+            int p1ItemId = player1.getItemId();
+            char p2Item = player2.getHeldItem();
+            int p2ItemId = player2.getItemId();
 
 			// update current level index and screen
             currentLevelIdx = nextLevelIdx;
             currentScreen = allLevels[currentLevelIdx];
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
-            initLevel(screenFileNames[currentLevelIdx], doorId);
+            initLevel(screenFileNames[currentLevelIdx], oldLevelIdx);
             if (p1Item != ' ' && p1Item != 0)
                 player1.GrabItem(p1Item, p1ItemId);
             if (p2Item != ' ' && p2Item != 0)
@@ -721,16 +730,17 @@ bool Game::checkLevel() // check if level is completed
     }
     return false;
 }
-void Game::placePlayersAtEntrance(int specificDoor)
+void Game::placePlayersAtEntrance(int previousLevelIdx)
 {
     int targetDoorId = -1;
-	// step 1 look for door that leads to previous level
-    if (specificDoor != -1 && currentLevelIdx > 0)
+
+	//step 1: look for door that leads to previous level
+    if (previousLevelIdx != -1)
     {
         for (int i = 1; i <= 9; i++)
         {
             int leadsTo = currentScreen.getRoomMeta().getDoorLeadsTo(i);
-            if (leadsTo == currentLevelIdx - 1)
+			if (leadsTo == previousLevelIdx) //Check if this door leading to previous level
             {
                 targetDoorId = i;
                 break;
@@ -738,35 +748,13 @@ void Game::placePlayersAtEntrance(int specificDoor)
         }
     }
 
-	// step 2 : if not found, look for any door (lowest numbered)
+	// step 2: if not found, look for any door (lowest numbered)
     if (targetDoorId == -1)
     {
-        int lowestDoor = 10;
-        Point targetDoorPos;
-        bool found = false;
-
-        for (int y = 0; y < Screen::MAP_HEIGHT && !found; y++)
-        {
-            for (int x = 0; x < Screen::WIDTH && !found; x++)
-            {
-                char c = currentScreen.getCharAt(x, y);
-                if (c >= '1' && c <= '9')
-                {
-                    int id = c - '0';
-
-					// if there is a specific door to use, prioritize it
-                    if (specificDoor != -1 && id == specificDoor)
-                    {
-                        targetDoorId = id;
-                        found = true;
-                    }
-					// else find the lowest numbered door
-                    else if (id < lowestDoor)
-                    {
-                        lowestDoor = id;
-                        targetDoorId = id;
-                    }
-                }
+        for (int i = 1; i <= 9; i++) {
+            if (currentScreen.getRoomMeta().getDoorLeadsTo(i) != -1) {
+                targetDoorId = i;
+                break;
             }
         }
     }
@@ -787,6 +775,7 @@ void Game::placePlayersAtEntrance(int specificDoor)
         }
     }
 }
+
 // Place players next to a door position
 void Game::placeNextToDoor(const Point& targetDoorPos)
 {

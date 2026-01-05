@@ -251,7 +251,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) //
 		std::cout << "\n\nError: Legend (L) must be below the game arena in:" << filename << std::endl;
         return false;
     }
-	else if (x + 44 >= WIDTH) { // legend too far right
+	else if (x + 30 >= WIDTH) { // legend too far right
         std::cout << "\n\nError: Legend (L) is too far right in:" << filename << std::endl;
         return false;
 	}
