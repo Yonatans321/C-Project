@@ -20,7 +20,7 @@ void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch pos
         screen.setCharAt(pos.getX(), pos.getY(), '/');
 
 		// ON display
-        setColor(10);
+        setColor(COLOR_LIGHT_GREEN);
         gotoxy(pos.getX(), pos.getY());
         std::cout << "/";
         resetColor();

@@ -16,7 +16,7 @@ void RoomMeta::clear()
     dark = false;
     roomKey = Key(-1);
     
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_DOORS; i++)
     {
 		doorOpen[i] = false; // all doors closed by default
 		doorLeadsTo[i] = -1; // initialize to -1 (no destination)
@@ -102,7 +102,7 @@ void RoomMeta::loadFromLine(const std::string& line) // parse a metadata line he
         }
 
         // Set door properties if ID is valid
-        if (id >= 0 && id < 10)
+        if (id >= 0 && id < MAX_DOORS)
         {
             //  ���� �� STATE �� �� �� ���� - validation ���� �� ������
             if (stateStr == "open" || stateStr == "OPEN")
@@ -163,7 +163,7 @@ void RoomMeta::setDark(bool value)
 
 void RoomMeta::setDoorOpen(int id, bool open)
 {
-    if (id >= 0 && id < 10)
+    if (id >= 0 && id < MAX_DOORS)
         doorOpen[id] = open;
 }
 
@@ -237,7 +237,7 @@ bool RoomMeta::isDoorStateInvalid(int id) const
 // Riddle position management
 void RoomMeta::addRiddlePosition(int riddleID, int x, int y)
 {
-    if (riddleCount < 6)
+    if (riddleCount < MAX_RIDDLES)
     {
         riddlePositions[riddleCount].riddleID = riddleID;
         riddlePositions[riddleCount].x = x;

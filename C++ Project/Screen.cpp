@@ -1,5 +1,4 @@
 ﻿#include "Screen.h"
-#include "Rooms.h"
 #include "Player.h"
 #include "Key.h"
 #include <cstring>
@@ -19,7 +18,7 @@ Screen::Screen()
             screen[y][x] = ' ';
 
     // init doors
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_DOORS; i++)
         doors[i] = Door();
 }
 // CLEAR SCREEN BUFFER
@@ -91,12 +90,12 @@ bool Screen::loadMapFromFile(const std::string& filename)
     }
 
     // BUILD DOORS FROM MAP 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_DOORS; i++)
         doors[i] = Door();
 
-    for (int ty = 0; ty < MAP_HEIGHT; ty++) {
-        for (int tx = 0; tx < WIDTH; tx++) {
-            char c = screen[ty][tx];
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            char c = screen[y][x];
             if (c >= '1' && c <= '9') {
                 int id = c - '0';
                 bool shouldBeOpen = roomMeta.isDoorOpen(id) || Door::openDoors[id];
@@ -155,17 +154,17 @@ bool Screen::validateKey(const std::string& filename)
 // Helper function to validate door metadata
 bool Screen::validateDoors(const std::string& filename)
 {
-    for (int i = 1; i <= 9; i++)
+    for (int id = 1; id < MAX_DOORS; id++)
     {
-        if (roomMeta.isDoorStateInvalid(i))
+        if (roomMeta.isDoorStateInvalid(id))
         {
             std::cout << "\n\nERROR in " << filename << std::endl;
-            std::cout << "DOOR ID=" << i << " has invalid state!" << std::endl;
+            std::cout << "DOOR ID=" << id << " has invalid state!" << std::endl;
             std::cout << "Valid states are: \"open\" or \"closed\"" << std::endl;
             return false;
         }
 
-        int leadsTo = roomMeta.getDoorLeadsTo(i);
+        int leadsTo = roomMeta.getDoorLeadsTo(id);
 
 		// if LEADS is not defined, skip
         if (leadsTo == -1)
@@ -177,7 +176,7 @@ bool Screen::validateDoors(const std::string& filename)
         {
             for (int x = 0; x < WIDTH; x++)
             {
-                if (screen[y][x] == ('0' + i))
+                if (screen[y][x] == ('0' + id))
                 {
                     doorExistsInMap = true;
                     break;
@@ -189,16 +188,16 @@ bool Screen::validateDoors(const std::string& filename)
         if (!doorExistsInMap)
         {
             std::cout << "\n\nERROR in " << filename << std::endl;
-            std::cout << "DOOR ID=" << i
+            std::cout << "DOOR ID=" << id
                 << " defined in metadata but doesn't exist in map!" << std::endl;
             return false;
         }
 
 		// check that LEADS points to a valid room number
-        if (leadsTo < 0 || leadsTo >= 4)
+        if (leadsTo < 0 || leadsTo >= (int)RoomLevel::NUM_ROOMS)
         {
             std::cout << "\n\nERROR in " << filename << std::endl;
-            std::cout << "DOOR ID=" << i << " LEADS=" << (leadsTo + 1)
+            std::cout << "DOOR ID=" << id << " LEADS=" << (leadsTo + 1)
                 << " - invalid room number! Only rooms 1-4 exist." << std::endl;
             return false;
         }

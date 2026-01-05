@@ -12,10 +12,13 @@ private:
 public:
 	Door() : id(-1), open(false), destinationLevel(-1) {}
 	Door(int doorID, int dest = -1) : id(doorID), open(false), destinationLevel(dest) {}
+	
+	static constexpr int MAX_DOOR_ID = 10;
 
 	static bool switchesAreOn; // are all switches on ?
-	static bool openDoors[10]; // openDoors[1] -> door with id 1
-
+	static bool openDoors[MAX_DOOR_ID]; // openDoors[1] -> door with id 1
+	
+	
 	//GET DATA
 	int getId() const { return id; }
 	bool isOpen() const { return open; }

@@ -829,7 +829,7 @@ void Game::resetGame()
     riddleBank.resetAllRiddles();
 
     // reset doors
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < Door::MAX_DOOR_ID; i++)
         Door::openDoors[i] = false;
 
 	//reset bombs
