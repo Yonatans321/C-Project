@@ -8,6 +8,16 @@
 #include "Utils.h"
 #include "RoomMeta.h"
 
+
+enum class RoomLevel {
+	ROOM_1 = 0,      // room 1 leadsTo=1
+	ROOM_2 = 1,      // room 2 leadsTo=1
+	ROOM_3 = 2,      // room 3 leadsTo=1
+	ROOM_4 = 3,      //  WIN SCREEN
+	NUM_ROOMS = 4,   // total number of rooms
+	INVALID = -1     // invalid room
+};
+
 class Player; // forward declaration
 
 // class to manage the screen layout and interactions
@@ -17,16 +27,16 @@ public:
 	static constexpr int HEIGHT = 25;
 	static constexpr int MAP_HEIGHT = 23;
 	static constexpr int NUM_MAPS = 4;
-	
+	static constexpr int MAX_DOORS = 10;
+
 private:
 	
 	Door doors [10]; // array to hold doors
-	RoomMeta meta;
 	bool dark = false; // is the screen dark
-	Point legendPos;
-	void clearScreenBuffer();
-	bool isLegendPositionValid(int x, int y, const std::string& filename);
-	RoomMeta roomMeta;
+	Point legendPos; // position of the legend
+	void clearScreenBuffer(); // clears the screen buffer
+	bool isLegendPositionValid(int x, int y, const std::string& filename); // checks if the legend position is valid
+	RoomMeta roomMeta; // metadata for the room
 
 public:
 	Screen();

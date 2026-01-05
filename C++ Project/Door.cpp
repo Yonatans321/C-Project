@@ -5,7 +5,7 @@
 
 // Static member initialization
 bool Door::switchesAreOn = false;
-bool Door::openDoors[10] = { false }; // static array to track open doors
+bool Door::openDoors[MAX_DOOR_ID] = { false }; // static array to track open doors
 static bool justWarned = false;
 
 //DOOR LOGIC

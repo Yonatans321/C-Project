@@ -13,6 +13,10 @@ private:
     int doorLeadsTo[10];   // where each door leads
     bool doorInvalidState[10];
     Key roomKey;              // Key object for the room
+
+    static constexpr int MAX_DOORS = 10;
+    static constexpr int MAX_RIDDLES = 6;
+
 	// ---- Riddle positions ----
     struct RiddlePosition {
         int riddleID;

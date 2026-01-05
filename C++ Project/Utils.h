@@ -5,10 +5,10 @@ static constexpr int COLOR_CYAN = 3;     // Bombs '@'
 static constexpr int COLOR_RED = 4;              // Torch '!'
 static constexpr int COLOR_GOLD = 6;              // keys 'K'
 static constexpr int COLOR_GRAY = 8;              // obstacles
-static constexpr int COLOR_LIGHT_GREEN = 10;
-static constexpr int COLOR_LIGHT_CYAN = 11;
-static constexpr int COLOR_LIGHT_RED = 12;
-static constexpr int COLOR_YELLOW = 14;
+static constexpr int COLOR_LIGHT_GREEN = 10; 
+static constexpr int COLOR_LIGHT_CYAN = 11;    // doors
+static constexpr int COLOR_LIGHT_RED = 12; // bombs explosion
+static constexpr int COLOR_YELLOW = 14; 
 
 void gotoxy(int x, int y);// go to the position x,y in the screen
 
