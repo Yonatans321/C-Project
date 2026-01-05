@@ -114,13 +114,23 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
     Point newSpot(chain.back().getX() + dir.getX(),
         chain.back().getY() + dir.getY());
 
+    bool isDark = screen.isDark();
     // move obstacle from end to start
-    for (int i =(int)chain.size() - 1; i >= 0; i--)
+    for (int i = (int)chain.size() - 1; i >= 0; i--)
     {
         Point from = chain[i];
         Point to = (i == chain.size() - 1) ? newSpot : chain[i + 1];
+        // move obstacle
+        if (isDark)
+        {
+            screen.setCharAtSilent(to.getX(), to.getY(), '*');
+            screen.setCharAtSilent(from.getX(), from.getY(), ' ');
+        }
 
-        screen.setCharAt(to.getX(), to.getY(), '*');
-        screen.setCharAt(from.getX(), from.getY(), ' ');
+        else
+        {
+            screen.setCharAt(to.getX(), to.getY(), '*');
+            screen.setCharAt(from.getX(), from.getY(), ' ');
+        }
     }
 }

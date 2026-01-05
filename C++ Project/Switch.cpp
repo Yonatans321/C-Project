@@ -17,13 +17,27 @@ void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch pos
     // only OFF to ON
     if (c == '\\')
     {
-        screen.setCharAt(pos.getX(), pos.getY(), '/');
+        // Update the map data
+        screen.setCharAtSilent(pos.getX(), pos.getY(), '/');
 
-		// ON display
-        setColor(10);
+        // Check if room is dark
+        bool isDark = screen.isDark();
+
+        // Redraw the position
         gotoxy(pos.getX(), pos.getY());
-        std::cout << "/";
-        resetColor();
+
+        if (isDark)
+        {
+            // In dark rooms: draw as space (invisible)
+            std::cout << ' ';
+        }
+        else
+        {
+            // In lit rooms: draw the new switch
+            setColor(COLOR_LIGHT_GREEN);
+            std::cout << '/';
+            resetColor();
+        }
     }
 }
 bool Switch::allSwitchesOn(const Screen& screen) //checks if ALL switches are on

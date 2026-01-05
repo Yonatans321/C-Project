@@ -276,6 +276,17 @@ void Screen::setCharAt(int x, int y, char ch)
     std::cout << ch;
     resetColor();
 }
+
+// set character at position without drawing to screen
+void Screen::setCharAtSilent(int x, int y, char ch)
+{
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
+        return;
+
+    // ONLY update the internal map data - do NOT draw to screen
+    screen[y][x] = ch;
+}
+
 void Screen::setDark(bool isDark)
 {
     dark = isDark;

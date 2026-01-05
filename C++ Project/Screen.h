@@ -19,7 +19,7 @@ public:
 	static constexpr int NUM_MAPS = 4;
 	
 private:
-	char screen[HEIGHT][WIDTH + 1];
+	
 	Door doors [10]; // array to hold doors
 	RoomMeta meta;
 	bool dark = false; // is the screen dark
@@ -30,7 +30,7 @@ private:
 
 public:
 	Screen();
-	
+	char screen[HEIGHT][WIDTH + 1];
 	// Map drawing
 	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
 	//void loadMap(int level);
@@ -44,6 +44,7 @@ public:
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
+	void setCharAtSilent(int x, int y, char ch);
 	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2 ,int timeRemaining, int gameTimer=-1);
 	static void drawBox(int x, int y, int width, int height);
 	static void clearBox(int x, int y, int width, int height);

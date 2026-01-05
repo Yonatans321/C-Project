@@ -138,7 +138,7 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
 		hasError = true;// Cell is occupied
         errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
             " position (" + std::to_string(x) + ", " +
-            std::to_string(y) + ") is not empty or '?'! Current: '" +
+            std::to_string(y) + ") is not empty or '?'. Current: '" +
             cell + "'\n";
     }
 
@@ -161,13 +161,11 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
     }
 	// Display errors if any
     if (hasError) {
-        std::cout << "\n========================================" << std::endl;
-        std::cout << "RIDDLE PLACEMENT ERRORS:" << std::endl;
-        std::cout << "========================================" << std::endl;
+        gotoxy(0, 23);
         std::cout << errorMessages;
-        std::cout << "========================================\n" << std::endl;
         std::cout << "Press any key to continue..." << std::endl;
-        _getch();
+        waitForKey();
+        cls();
     }
 }
 
