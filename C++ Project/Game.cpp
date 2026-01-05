@@ -17,7 +17,7 @@ Game::Game() // initializer list
     player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
         { 'I','L','M','J','K','O' }),
 	player1LastPos(-1, -1),player2LastPos(-1,-1),
-    gameTimer(0), maxGameTime(420), timerActive(false)
+    gameTimer(0), maxGameTime(360), timerActive(false)
 {
     hideCursor();// hide cursor at the start of the game
     currStatus = GameModes::MENU;
@@ -379,6 +379,7 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
+       
         // Update timer
         if (timerActive) {
             ULONGLONG currentTime = GetTickCount64();
@@ -616,7 +617,8 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
-    waitForKey(); // wait for any key press
+    waitForKey();
+    cls();  // Clear after key press
 }
 
 
@@ -681,7 +683,6 @@ void Game::run() // main game loop
 
             //enter the main game loop
             gameLoop();
-
             currStatus = GameModes::MENU;
         }
     }
@@ -723,8 +724,9 @@ bool Game::checkLevel() // check if level is completed
         }
         else
         {
-			// you won the game
+            // you won the game
             showWinScreen();
+            resetGame();
             return true;
         }
     }
