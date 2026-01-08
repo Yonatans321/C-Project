@@ -132,6 +132,7 @@
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Results.h" />
     <ClInclude Include="Riddle.h" />
     <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="RoomMeta.h" />
@@ -151,6 +152,7 @@
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Results.cpp" />
     <ClCompile Include="Riddle.cpp" />
     <ClCompile Include="RiddleBank.cpp" />
     <ClCompile Include="RoomMeta.cpp" />
