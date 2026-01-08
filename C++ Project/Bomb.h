@@ -21,4 +21,5 @@ public:
 	int getTimer() const { return timer; } // Getter for timer
 };
 
+//the king guy
 //GUY PALATIN 
