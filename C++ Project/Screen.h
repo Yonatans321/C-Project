@@ -88,5 +88,5 @@ public:
 	}
 	bool validateMetadata(const std::string& filename);
 	bool validateKey(const std::string& filename);
-	bool validateDoors(const std::string& filename);
+	bool validateDoors (const std::string& filename);
 };
