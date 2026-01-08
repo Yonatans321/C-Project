@@ -4,9 +4,9 @@ W   w      w   wwwwwwwwww    s          wwwwwwwwwww                            W
 W   w       ?   w       w    s          w          w                           W
 W   w      w            w    s          w     \    w                           W
 W   w      www \        w    s          w          w                           W
-W   w      w   w        w    s          w          w                           W
+W  !w      w   w        w    s          w          w                           W
 W   w      w   wwwwwwwwww    s          wwwww?wwwwww                           W
-W   w      w                 s                                                 W
+W  Aw      w                 s                                                 W
 W   w      w                 s                                                 W
 W   w      wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwssssssssssssssssssssssW
 W   w      w                                                                   W
@@ -23,9 +23,10 @@ W   ? \          w    w                                   wwwwwwwww  wwwwwwwww W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 L                                         	
 # ROOM 1
-# DARK FALSE
+# DARK TRUE
 # KEY 62 17 opens=1
 # DOOR id=1 state=CLOSED leads=2
 # RIDDLE 12 3 3
 # RIDDLE 45 7 1 
 # RIDDLE 4 21 2 
+# LIGHT_SWITCH 3 8
