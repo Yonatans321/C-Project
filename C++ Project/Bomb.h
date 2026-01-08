@@ -21,3 +21,4 @@ public:
 	int getTimer() const { return timer; } // Getter for timer
 };
 
+//GUY PALATIN 
