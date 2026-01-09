@@ -17,7 +17,7 @@ private:
     static constexpr int MAX_DOORS = 10;
     static constexpr int MAX_RIDDLES = 6;
 
-	// ---- Riddle positions ----
+	//  Riddle positions 
     struct RiddlePosition {
         int riddleID;
         int x;
