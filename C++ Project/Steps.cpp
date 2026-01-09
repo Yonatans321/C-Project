@@ -1,81 +1,117 @@
 #include "Steps.h"
 #include <fstream>
+#include <iostream>
 
-// ---------- seed ----------
-
-void Steps::setSeed(long s)
-{
-    seed = s;
+// Add a step to the recording
+void Steps::addStep(size_t iteration, char step) {
+    steps.push_back(std::make_pair(iteration, step));
 }
 
-long Steps::getSeed() const
-{
-    return seed;
+// Load steps from file
+Steps Steps::loadSteps(const std::string& filename) {
+    Steps loadedSteps;
+    std::ifstream steps_file(filename);
+
+    if (!steps_file.is_open()) {
+        std::cerr << "Error: Could not open steps file: " << filename << std::endl;
+        return loadedSteps;
+    }
+
+    // Read number of steps (first line)
+    size_t size;
+    steps_file >> size;
+
+    // Read each step: iteration and key pressed
+    while (!steps_file.eof() && size-- != 0) {
+        size_t iteration;
+        char step;
+        steps_file >> iteration >> step;
+
+        // Only add if read was successful
+        if (steps_file.good()) {
+            loadedSteps.addStep(iteration, step);
+        }
+    }
+
+    steps_file.close();
+
+    std::cout << "Loaded " << loadedSteps.getStepCount()
+        << " steps from " << filename << std::endl;
+
+    return loadedSteps;
 }
 
-// ---------- רישום צעדים ----------
+// Save steps to file
+void Steps::saveSteps(const std::string& filename) const {
+    std::ofstream steps_file(filename);
 
-void Steps::add(size_t time, char key)
-{
-    steps.push_back({ time, key });
+    if (!steps_file.is_open()) {
+        std::cerr << "Error: Could not create steps file: " << filename << std::endl;
+        return;
+    }
+
+    // Write number of steps (first line)
+    steps_file << steps.size();
+
+    // Write each step: iteration and key
+    for (const auto& step : steps) {
+        steps_file << '\n' << step.first << ' ' << step.second;
+    }
+
+    steps_file.close();
+
+    std::cout << "Saved " << steps.size()
+        << " steps to " << filename << std::endl;
 }
 
-// ---------- load mode ----------
+// Get the next step for replay
+bool Steps::getNextStep(size_t currentIteration, char& outStep) {
+    // Check if we've exhausted all steps
+    if (currentStepIndex >= steps.size()) {
+        return false;
+    }
 
-bool Steps::hasStepAt(size_t time) const
-{
-    return !steps.empty() && steps.front().first == time;
+    // Check if the current iteration matches the next step's iteration
+    if (steps[currentStepIndex].first == currentIteration) {
+        outStep = steps[currentStepIndex].second;
+        currentStepIndex++;
+        return true;
+    }
+
+    // This iteration has no recorded step
+    return false;
 }
 
-char Steps::pop()
-{
-    char key = steps.front().second;
-    steps.pop_front();
-    return key;
+// Reset replay to beginning
+void Steps::resetReplay() {
+    currentStepIndex = 0;
 }
 
-bool Steps::empty() const
-{
+// Check if there are more steps to replay
+bool Steps::hasMoreSteps() const {
+    return currentStepIndex < steps.size();
+}
+
+// Get total number of steps
+size_t Steps::getStepCount() const {
+    return steps.size();
+}
+
+// Clear all steps
+void Steps::clear() {
+    steps.clear();
+    currentStepIndex = 0;
+}
+
+// Check if steps vector is empty
+bool Steps::isEmpty() const {
     return steps.empty();
 }
 
-// ---------- קבצים ----------
-
-void Steps::save(const std::string& filename) const
-{
-    std::ofstream out(filename);
-
-    // seed
-    out << seed << '\n';
-
-    // מספר צעדים
-    out << steps.size();
-
-    // צעדים
-    for (const auto& s : steps)
-    {
-        out << '\n' << s.first << ' ' << s.second;
+// Get a specific step by index (for debugging/verification)
+std::pair<size_t, char> Steps::getStepAt(size_t index) const {
+    if (index < steps.size()) {
+        return steps[index];
     }
-}
-
-void Steps::load(const std::string& filename)
-{
-    steps.clear();
-
-    std::ifstream in(filename);
-    size_t count;
-
-    // seed
-    in >> seed;
-
-    // מספר צעדים
-    in >> count;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        size_t time;
-        char key;
-        in >> time >> key;
-        steps.push_back({ time, key });
-    }
+    return std::make_pair(0, '\0');
 }

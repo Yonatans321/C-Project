@@ -1,32 +1,52 @@
 #pragma once
-
-#include <list>
+#include <vector>
 #include <string>
 #include <utility>
-#include <cstddef>
 
-// מחלקה ששומרת את הקלט של המשתמש לאורך המשחק
-// כל צעד = באיזה זמן (tick) נלחץ איזה מקש
 class Steps {
 private:
-    long seed = 0;  // seed לאקראיות (אם יש, אם לא – נשאר 0)
-    std::list<std::pair<size_t, char>> steps; // (time, key)
+    // Vector of pairs: (game cycle / iteration, key pressed)
+    std::vector<std::pair<size_t, char>> steps;
+
+    // Current step index for replay mode
+    size_t currentStepIndex;
 
 public:
-    // seed
-    void setSeed(long s);
-    long getSeed() const;
+    // Constructor
+    Steps() : currentStepIndex(0) {
+    }
 
-    // הוספת קלט (save mode)
-    void add(size_t time, char key);
+    // Destructor
+    ~Steps() {
+    }
 
-    // load mode – בדיקה ושליפה
-    bool hasStepAt(size_t time) const;
-    char pop();
+    // Add a step to the recording
+    void addStep(size_t iteration, char step);
 
-    // קבצים
-    void save(const std::string& filename) const;
-    void load(const std::string& filename);
+    // Load steps from file (static factory method)
+    static Steps loadSteps(const std::string& filename);
 
-    bool empty() const;
+    // Save steps to file
+    void saveSteps(const std::string& filename) const;
+
+    // Get the next step for replay mode
+    bool getNextStep(size_t currentIteration, char& outStep);
+
+    // Reset replay to the beginning
+    void resetReplay();
+
+    // Check if there are more steps to replay
+    bool hasMoreSteps() const;
+
+    // Get total number of recorded steps
+    size_t getStepCount() const;
+
+    // Clear all steps (reset everything)
+    void clear();
+
+    // Check if steps were loaded successfully
+    bool isEmpty() const;
+
+    // Get a specific step by index (for debugging/verification)
+    std::pair<size_t, char> getStepAt(size_t index) const;
 };
