@@ -1,6 +1,8 @@
 #include "SaveGame.h"
 #include <iostream>
-
+#include <conio.h>
+#include <windows.h>
+#include "Torch.h"
 void SaveGame::run()
 {
     std::cout << "\n========================================" << std::endl;
@@ -67,10 +69,13 @@ void SaveGame::run()
             }
             gameResults.setScreenFiles(screensString);
 
-            initLevel(screenFileNames[currentLevelIdx]);
-            gameLoop();
+            // ===== INITIALIZE SCREEN CHANGE EVENT =====
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
-            // ===== SAVE FILES =====
+            initLevel(screenFileNames[currentLevelIdx]);
+            saveGameLoop();  // Use custom game loop that records events
+
+            // ===== SAVE FILES AFTER GAME ENDS =====
             gameResults.save("adv-world.result");
 
             std::cout << "\n========================================" << std::endl;
@@ -84,4 +89,228 @@ void SaveGame::run()
     }
 
     UIScreens::showExitMessage();
+}
+
+// ============================================================================
+// CUSTOM GAME LOOP THAT RECORDS EVENTS
+// ============================================================================
+void SaveGame::saveGameLoop()
+{
+    bool gameRunning = true;
+    Point p1PosLastFrame = player1.getPosition();
+    Point p2PosLastFrame = player2.getPosition();
+    player1LastPos = p1PosLastFrame;
+    player2LastPos = p2PosLastFrame;
+
+    ULONGLONG lastTickTime = GetTickCount64();
+    const DWORD timerInterval = 1000;
+    redrawGame();
+
+    while (gameRunning)
+    {
+        eventTimer++;
+
+        // Update timer
+        if (timerActive)
+        {
+            ULONGLONG currentTime = GetTickCount64();
+            if (currentTime - lastTickTime >= timerInterval)
+            {
+                gameTimer--;
+                lastTickTime = currentTime;
+
+                if (gameTimer <= 0)
+                {
+                    // Game over - time ran out
+                    UIScreens::showGameOverMessage();
+                    gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
+                    resetGame();
+                    currStatus = GameModes::MENU;
+                    gameRunning = false;
+                    break;
+                }
+            }
+        }
+
+        // Handle pause request from riddle
+        if (pauseRequestedFromRiddle)
+        {
+            pauseRequestedFromRiddle = false;
+            handlePause(currentScreen, gameRunning);
+            clearInputBuffer();
+            if (!gameRunning)
+            {
+                gameResults.addGameExit(eventTimer, player1.getScore(), player2.getScore());
+                break;
+            }
+            redrawGame();
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
+            continue;
+        }
+
+        // Handle input
+        if (_kbhit())
+        {
+            char ch = _getch();
+
+            if (ch == ESC)
+            {
+                handlePause(currentScreen, gameRunning);
+                clearInputBuffer();
+                if (!gameRunning)
+                {
+                    gameResults.addGameExit(eventTimer, player1.getScore(), player2.getScore());
+                    break;
+                }
+                redrawGame();
+                p1PosLastFrame = player1.getPosition();
+                p2PosLastFrame = player2.getPosition();
+                continue;
+            }
+            else
+            {
+                player1.keyPressed(ch);
+                player2.keyPressed(ch);
+            }
+        }
+
+        // Update game state
+        updateBomb();
+        updatePlayers();
+
+        player1LastPos = p1PosLastFrame;
+        player2LastPos = p2PosLastFrame;
+
+        bool p1Moved = player1.isActive() &&
+            ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
+                (p1PosLastFrame.getY() != player1.getPosition().getY()));
+        bool p2Moved = player2.isActive() &&
+            ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||
+                (p2PosLastFrame.getY() != player2.getPosition().getY()));
+
+        // Draw based on dark / torch state
+        bool isDark = currentScreen.getRoomMeta().isDark();
+        if (isDark)
+        {
+            if (Torch::playerHasTorch(player1))
+            {
+                currentScreen.drawMapWithTorch(player1);
+            }
+            else if (Torch::playerHasTorch(player2))
+            {
+                currentScreen.drawMapWithTorch(player2);
+            }
+        }
+
+        drawActiveBomb();
+        updateDisplay();
+
+        // Check end conditions
+        if (checkGameOver())
+        {
+            gameRunning = false;
+        }
+
+        // Handle door transitions
+        if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
+        {
+            if (player1.isActive())
+            {
+                player1.rememberPosition();
+                player1.erase();
+            }
+            if (player2.isActive())
+            {
+                player2.rememberPosition();
+                player2.erase();
+            }
+            redrawGame();
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
+            player1LastPos = p1PosLastFrame;
+            player2LastPos = p2PosLastFrame;
+            activeDoor = ' ';
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+        }
+
+        p1PosLastFrame = player1.getPosition();
+        p2PosLastFrame = player2.getPosition();
+
+        Sleep(GAME_DELAY);
+    }
+}
+
+// ============================================================================
+// OVERRIDE checkGameOver to handle game completion
+// ============================================================================
+bool SaveGame::checkGameOver()
+{
+    if (player1.isDead() || player2.isDead())
+    {
+        UIScreens::showGameOverMessage();
+        gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
+        resetGame();
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    if (checkLevel())
+    {
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    return false;
+}
+
+// ============================================================================
+// OVERRIDE checkLevel to record screen changes
+// ============================================================================
+bool SaveGame::checkLevel()
+{
+    if (!player1.isActive() && !player2.isActive())
+    {
+        allLevels[currentLevelIdx] = currentScreen;
+
+        int doorId = activeDoor - '0';
+        Door* door = currentScreen.getDoorById(doorId);
+        if (!door) return false;
+
+        int nextLevelIdx = door->getDestinationLevel();
+
+        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
+        {
+            char p1Item = player1.getHeldItem();
+            int p1ItemId = player1.getItemId();
+            char p2Item = player2.getHeldItem();
+            int p2ItemId = player2.getItemId();
+
+            currentLevelIdx = nextLevelIdx;
+            currentScreen = allLevels[currentLevelIdx];
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+            initLevel(screenFileNames[currentLevelIdx], doorId);
+
+            // ===== RECORD SCREEN CHANGE =====
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
+
+            if (p1Item != ' ' && p1Item != 0)
+                player1.GrabItem(p1Item, p1ItemId);
+            if (p2Item != ' ' && p2Item != 0)
+                player2.GrabItem(p2Item, p2ItemId);
+            activeDoor = ' ';
+            return false;
+        }
+        else
+        {
+            // You won the game
+            showWinScreen();
+
+            // ===== RECORD GAME FINISHED =====
+            gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
+
+            return true;
+        }
+    }
+    return false;
 }

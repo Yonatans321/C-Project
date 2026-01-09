@@ -8,7 +8,8 @@ enum class EventType {
     LifeLost,       // Player lost a life
     Riddle,         // Riddle attempted
     GameOver,       // Game ended - player died
-    GameFinished    // Game ended - player won
+    GameFinished,   // Game ended - player won
+    GameExit        // Game ended - player quit/exited
 };
 
 enum class RiddleResult {
@@ -44,6 +45,7 @@ public:
         const std::string& answer, bool solved);
     void addGameOver(size_t time, int score1, int score2);
     void addGameFinished(size_t time, int score1, int score2);
+    void addGameExit(size_t time, int score1, int score2);  // NEW
 
     void save(const std::string& filename) const;
     void load(const std::string& filename);

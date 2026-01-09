@@ -54,6 +54,15 @@ void Results::addGameFinished(size_t time, int score1, int score2)
     events.push_back(event);
 }
 
+void Results::addGameExit(size_t time, int score1, int score2)
+{
+    Event event;
+    event.time = time;
+    event.type = EventType::GameExit;
+    event.info = std::to_string(score1) + "|" + std::to_string(score2);
+    events.push_back(event);
+}
+
 void Results::save(const std::string& filename) const
 {
     std::ofstream file(filename);
@@ -104,6 +113,14 @@ void Results::save(const std::string& filename) const
             std::string score2 = event.info.substr(pos + 1);
 
             file << "GameFinished score1= " << score1 << " score2= " << score2;
+        }
+        else if (event.type == EventType::GameExit)
+        {
+            size_t pos = event.info.find('|');
+            std::string score1 = event.info.substr(0, pos);
+            std::string score2 = event.info.substr(pos + 1);
+
+            file << "GameExit score1= " << score1 << " score2= " << score2;
         }
 
         file << "\n";
@@ -202,6 +219,19 @@ void Results::parseEventLine(const std::string& line, Event& event)
     else if (eventPart.find("GameFinished") == 0)
     {
         event.type = EventType::GameFinished;
+
+        pos = line.find("score1= ");
+        size_t endPos = line.find(" score2= ", pos);
+        std::string score1 = line.substr(pos + 8, endPos - pos - 8);
+
+        pos = line.find("score2= ");
+        std::string score2 = line.substr(pos + 8);
+
+        event.info = score1 + "|" + score2;
+    }
+    else if (eventPart.find("GameExit") == 0)
+    {
+        event.type = EventType::GameExit;
 
         pos = line.find("score1= ");
         size_t endPos = line.find(" score2= ", pos);

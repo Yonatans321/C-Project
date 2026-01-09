@@ -1,0 +1,19 @@
+﻿  Bomb.cpp
+  Door.cpp
+  Game.cpp
+  Key.cpp
+  LoadGame.cpp
+  Obstacle.cpp
+  Player.cpp
+  Point.cpp
+  Riddle.cpp
+  RiddleBank.cpp
+  RoomMeta.cpp
+  SaveGame.cpp
+  Screen.cpp
+  Switch.cpp
+  Torch.cpp
+  UIScreens.cpp
+  main.cpp
+  Generating Code...
+  C++ Project.vcxproj -> C:\Users\bache\C++ project\TEXT ADVENTURE PROJECT\x64\Debug\C++ Project.exe

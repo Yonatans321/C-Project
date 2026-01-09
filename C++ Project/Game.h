@@ -33,7 +33,7 @@ protected:
 	void updateBomb();        // update bomb state
 	void drawActiveBomb();   // draw the active bomb
 	void updatePlayers();      // draw both players
-	bool checkGameOver();      // check if game over
+	virtual bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
     void getAllScreenFileNames(std::vector<std::string>& vec_to_fill); 	//function to get all screen file names from the directory
 	void showMenu();
@@ -46,7 +46,7 @@ protected:
 	void resetGame();// reset game to initial state
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
 	void handlePause(Screen& currentScreen, bool& gameRunning);
-	bool checkLevel();// check if level is completed
+	virtual bool checkLevel();// check if level is completed
 
     //int currentLevel = 0;
    

@@ -9,6 +9,8 @@
 #include "Utils.h"
 #include "Torch.h"
 
+bool SAVE_MODE = false;  // Define the global flag
+
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 
 Game::Game() // initializer list
@@ -352,9 +354,7 @@ bool Game::checkGameOver()
 {
     if (player1.isDead() || player2.isDead())
     {
-        UIScreens::showGameOverMessage();
-        gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
-        gameResults.save("adv-world.result");
+        UIScreens::showGameOverMessage();;
         resetGame();
         currStatus = GameModes::MENU;
         return true;
@@ -395,8 +395,6 @@ void Game::gameLoop()
                 // Check if time's up
                 if (gameTimer <= 0) {
                     UIScreens::showGameOverMessage();
-                    gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
-                    gameResults.save("adv-world.result");
                     resetGame();
                     currStatus = GameModes::MENU;
                     gameRunning = false;
@@ -741,8 +739,6 @@ bool Game::checkLevel() // check if level is completed
         {
             // you won the game
             showWinScreen();
-            gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
-            gameResults.save("adv-world.result");
             return true;
         }
     }
