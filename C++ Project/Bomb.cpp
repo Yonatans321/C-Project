@@ -48,14 +48,14 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
             p1.loseLife();
 			if (gameResults != nullptr)  // if are writing results
             {
-                gameResults->addLifeLost(eventTimer);
+                gameResults->addLifeLost(eventTimer, PlayerType::Player1);
             }
         }
         if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
             p2.loseLife();
             if (gameResults != nullptr)  // if are writing results
             {
-                gameResults->addLifeLost(eventTimer);
+                gameResults->addLifeLost(eventTimer, PlayerType::Player2);
             }
         }
      }

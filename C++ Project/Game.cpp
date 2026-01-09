@@ -341,7 +341,7 @@ bool Game::checkGameOver()
     if (player1.isDead() || player2.isDead())
     {
         UIScreens::showGameOverMessage();
-        gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+        gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
         gameResults.save("adv-world.result");
         resetGame();
         currStatus = GameModes::MENU;
@@ -383,7 +383,7 @@ void Game::gameLoop()
                 // Check if time's up
                 if (gameTimer <= 0) {
                     UIScreens::showGameOverMessage();
-                    gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+                    gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
                     gameResults.save("adv-world.result");
                     resetGame();
                     currStatus = GameModes::MENU;
@@ -738,7 +738,7 @@ bool Game::checkLevel() // check if level is completed
         {
 			// you won the game
             showWinScreen();
-            gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+            gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
             gameResults.save("adv-world.result");
             return true;
         }

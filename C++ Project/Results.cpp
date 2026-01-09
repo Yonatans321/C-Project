@@ -7,11 +7,12 @@ void Results::setScreenFiles(const std::string& files)
     screenFiles = files;
 }
 
-void Results::addLifeLost(size_t time)
+void Results::addLifeLost(size_t time, PlayerType player)
 {
     Event event;
     event.time = time;
     event.type = EventType::LifeLost;
+    event.player = player;
     events.push_back(event);
 }
 
@@ -35,11 +36,20 @@ void Results::addRiddle(size_t time, int riddleId, const std::string& riddleText
     events.push_back(event);
 }
 
-void Results::addGameEnd(size_t time, int score1, int score2)
+void Results::addGameOver(size_t time, int score1, int score2)
 {
     Event event;
     event.time = time;
-    event.type = EventType::GameEnd;
+    event.type = EventType::GameOver;
+    event.info = std::to_string(score1) + "|" + std::to_string(score2);
+    events.push_back(event);
+}
+
+void Results::addGameFinished(size_t time, int score1, int score2)
+{
+    Event event;
+    event.time = time;
+    event.type = EventType::GameFinished;
     event.info = std::to_string(score1) + "|" + std::to_string(score2);
     events.push_back(event);
 }
@@ -60,7 +70,8 @@ void Results::save(const std::string& filename) const
         }
         else if (event.type == EventType::LifeLost)
         {
-            file << "LifeLost";
+            std::string playerName = (event.player == PlayerType::Player1) ? "Player1" : "Player2";
+            file << "LifeLost player= " << playerName;
         }
         else if (event.type == EventType::Riddle)
         {
@@ -78,13 +89,21 @@ void Results::save(const std::string& filename) const
                 << " answer= " << answer
                 << " result= " << result;
         }
-        else if (event.type == EventType::GameEnd)
+        else if (event.type == EventType::GameOver)
         {
             size_t pos = event.info.find('|');
             std::string score1 = event.info.substr(0, pos);
             std::string score2 = event.info.substr(pos + 1);
 
-            file << "GameEnd score1= " << score1 << " score2= " << score2;
+            file << "GameOver score1= " << score1 << " score2= " << score2;
+        }
+        else if (event.type == EventType::GameFinished)
+        {
+            size_t pos = event.info.find('|');
+            std::string score1 = event.info.substr(0, pos);
+            std::string score2 = event.info.substr(pos + 1);
+
+            file << "GameFinished score1= " << score1 << " score2= " << score2;
         }
 
         file << "\n";
@@ -138,6 +157,12 @@ void Results::parseEventLine(const std::string& line, Event& event)
     else if (eventPart.find("LifeLost") == 0)
     {
         event.type = EventType::LifeLost;
+        pos = line.find("player= ");
+        if (pos != std::string::npos)
+        {
+            std::string playerName = line.substr(pos + 8);
+            event.player = (playerName == "Player1") ? PlayerType::Player1 : PlayerType::Player2;
+        }
     }
     else if (eventPart.find("Riddle") == 0)
     {
@@ -161,9 +186,22 @@ void Results::parseEventLine(const std::string& line, Event& event)
 
         event.info = riddleId + "|" + riddleText + "|" + answer;
     }
-    else if (eventPart.find("GameEnd") == 0)
+    else if (eventPart.find("GameOver") == 0)
     {
-        event.type = EventType::GameEnd;
+        event.type = EventType::GameOver;
+
+        pos = line.find("score1= ");
+        size_t endPos = line.find(" score2= ", pos);
+        std::string score1 = line.substr(pos + 8, endPos - pos - 8);
+
+        pos = line.find("score2= ");
+        std::string score2 = line.substr(pos + 8);
+
+        event.info = score1 + "|" + score2;
+    }
+    else if (eventPart.find("GameFinished") == 0)
+    {
+        event.type = EventType::GameFinished;
 
         pos = line.find("score1= ");
         size_t endPos = line.find(" score2= ", pos);
