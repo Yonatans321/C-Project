@@ -28,7 +28,7 @@ private:
     size_t riddleCount = 0;
     bool loadedSuccessfully = false;
 	Results* gameResults = nullptr;  // pointer to Results object
-	size_t eventTimer = 0;           // timer for events
+    size_t* eventTimerPtr = nullptr;           // pointer timer for events
 
 public:
     // Constructor
@@ -64,5 +64,5 @@ public:
 	// Reset all riddles to unsolved state
     void resetAllRiddles();
 
-    void attachResults(Results* results, size_t timer);
+    void attachResults(Results* results, size_t* timerPtr);
 };

@@ -360,7 +360,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         screen.setCharAt(x, y, ' ');
 		if (gameResults != nullptr)  //check if are writing results
         {
-			gameResults->addRiddle(eventTimer, r->getRiddleID(), r->getQuestion(), answer, true); // mark the riddle as true
+            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
         }
     }
     else
@@ -371,7 +371,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         screen.setCharAt(x, y, '?');  // put the riddle symbol back
         if (gameResults != nullptr)  //check if are writing results
         {
-            gameResults->addRiddle(eventTimer, r->getRiddleID(), r->getQuestion(), answer, false);  // mark the riddle as false
+            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
         }
     }
 
@@ -394,8 +394,8 @@ void RiddleBank::resetAllRiddles() // Reset all riddles to unsolved state
     }
 }
 
-void RiddleBank::attachResults(Results* results, size_t timer)
+void RiddleBank::attachResults(Results* results, size_t* timerPtr)
 {
     gameResults = results;
-    eventTimer = timer;
+    eventTimerPtr = timerPtr;
 };

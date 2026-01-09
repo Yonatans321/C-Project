@@ -128,7 +128,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     drawCurrentScreen();
 	// Attach riddle positions to the room
     riddleBank.attachPositionToRoom(currentScreen);
-    riddleBank.attachResults(&gameResults, eventTimer);
+    riddleBank.attachResults(&gameResults, &eventTimer);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
