@@ -128,6 +128,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     drawCurrentScreen();
 	// Attach riddle positions to the room
     riddleBank.attachPositionToRoom(currentScreen);
+    riddleBank.attachResults(&gameResults, eventTimer);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
@@ -289,11 +290,13 @@ void Game::updateBomb()
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
     {
         activeBomb = new Bomb(player1.getPosition(), player1.getChar(),currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
         player1.clearBombRequest();
     }
     else if (player2.hasDroppedBomb() && activeBomb == nullptr)
     {
         activeBomb = new Bomb(player2.getPosition(), player2.getChar(), currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
         player2.clearBombRequest();
     }    
 }
@@ -367,6 +370,7 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
+		eventTimer++; // update event timer
         // Update timer
         if (timerActive) {
             ULONGLONG currentTime = GetTickCount64();

@@ -1,10 +1,8 @@
 #pragma once
-
 #include <list>
 #include <string>
 #include <cstddef>
 
-// איזה דברים חשובים קרו במשחק
 enum class EventType {
     ScreenChange,
     LifeLost,
@@ -12,36 +10,37 @@ enum class EventType {
     GameEnd
 };
 
-// תוצאה של חידה
 enum class RiddleResult {
     Solved,
     Failed
 };
 
-// אירוע אחד בזמן מסוים
-struct GameEvent {
-    size_t time;                 // מונה צעדים של המשחק
-    EventType type;              // סוג האירוע
-    RiddleResult riddleResult;   // רלוונטי רק ל־RIDDLE
-    std::string info;            // שם חדר / ניקוד וכו'
+struct Event {
+    size_t time = 0;
+    EventType type = EventType::LifeLost;
+    RiddleResult riddle = RiddleResult::Failed;
+    std::string info;
 };
 
 class Results {
 private:
-    std::list<GameEvent> events;
+    std::list<Event> events;
+    std::string screenFiles;
+
+    void parseEventLine(const std::string& line, Event& event);
 
 public:
-    // --- ADDON בלבד: רישום אירועים ---
-    void lifeLost(size_t time);
-    void screenChanged(size_t time, const std::string& screenName);
-    void riddleAnswered(size_t time, bool solved);
-    void gameEnded(size_t time, int score);
+    void setScreenFiles(const std::string& files);
 
-    // --- קבצים ---
-    void saveToFile(const std::string& filename) const;
-    void loadFromFile(const std::string& filename);
+    void addLifeLost(size_t time);
+    void addScreenChange(size_t time, const std::string& screenName);
+    void addRiddle(size_t time, int riddleId, const std::string& riddleText,
+        const std::string& answer, bool solved);
+    void addGameEnd(size_t time, int score1, int score2);
 
-    // --- שימוש ב-load / silent ---
+    void save(const std::string& filename) const;
+    void load(const std::string& filename);
+
     bool empty() const;
-    GameEvent popNext();
+    Event pop();
 };
