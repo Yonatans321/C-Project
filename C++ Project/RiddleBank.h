@@ -3,7 +3,7 @@
 #include "Riddle.h"
 #include "Player.h"
 #include "Screen.h"
-
+# include "Results.h"
 // Stores and manages multiple riddles
 // Possible outcomes when asking or checking a riddle
 
@@ -27,7 +27,9 @@ private:
     Riddle riddles[MAX_RIDDLES];
     size_t riddleCount = 0;
     bool loadedSuccessfully = false;
-   
+	Results* gameResults = nullptr;  // pointer to Results object
+    size_t* eventTimerPtr = nullptr;           // pointer timer for events
+
 public:
     // Constructor
     RiddleBank();
@@ -62,4 +64,5 @@ public:
 	// Reset all riddles to unsolved state
     void resetAllRiddles();
 
+    void attachResults(Results* results, size_t* timerPtr);
 };

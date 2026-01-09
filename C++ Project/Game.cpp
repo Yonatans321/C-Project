@@ -140,6 +140,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
     drawCurrentScreen();
 	// Attach riddle positions to the room
     riddleBank.attachPositionToRoom(currentScreen);
+    riddleBank.attachResults(&gameResults, &eventTimer);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
@@ -301,11 +302,13 @@ void Game::updateBomb()
     if (player1.hasDroppedBomb() && activeBomb == nullptr)
     {
         activeBomb = new Bomb(player1.getPosition(), player1.getChar(),currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
         player1.clearBombRequest();
     }
     else if (player2.hasDroppedBomb() && activeBomb == nullptr)
     {
         activeBomb = new Bomb(player2.getPosition(), player2.getChar(), currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
         player2.clearBombRequest();
     }    
 }
@@ -350,6 +353,8 @@ bool Game::checkGameOver()
     if (player1.isDead() || player2.isDead())
     {
         UIScreens::showGameOverMessage();
+        gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+        gameResults.save("adv-world.result");
         resetGame();
         currStatus = GameModes::MENU;
         return true;
@@ -379,7 +384,7 @@ void Game::gameLoop()
 
     while (gameRunning)
     {
-       
+		eventTimer++; // update event timer
         // Update timer
         if (timerActive) {
             ULONGLONG currentTime = GetTickCount64();
@@ -390,6 +395,8 @@ void Game::gameLoop()
                 // Check if time's up
                 if (gameTimer <= 0) {
                     UIScreens::showGameOverMessage();
+                    gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+                    gameResults.save("adv-world.result");
                     resetGame();
                     currStatus = GameModes::MENU;
                     gameRunning = false;
@@ -677,7 +684,14 @@ void Game::run() // main game loop
 
             // set current screen
             currentScreen = allLevels[currentLevelIdx];
-
+            gameResults = Results();
+            std::string screensString = "";
+            for (size_t i = 0; i < screenFileNames.size(); i++)
+            {
+                if (i > 0) screensString += "|";
+                screensString += screenFileNames[i];
+            }
+            gameResults.setScreenFiles(screensString);
             //start the first level
             initLevel(screenFileNames[currentLevelIdx]);
 
@@ -714,7 +728,8 @@ bool Game::checkLevel() // check if level is completed
             currentLevelIdx = nextLevelIdx;
             currentScreen = allLevels[currentLevelIdx];
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
-            initLevel(screenFileNames[currentLevelIdx], oldLevelIdx);
+            initLevel(screenFileNames[currentLevelIdx], doorId);
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
             if (p1Item != ' ' && p1Item != 0)
                 player1.GrabItem(p1Item, p1ItemId);
             if (p2Item != ' ' && p2Item != 0)
@@ -726,7 +741,8 @@ bool Game::checkLevel() // check if level is completed
         {
             // you won the game
             showWinScreen();
-            resetGame();
+            gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+            gameResults.save("adv-world.result");
             return true;
         }
     }
