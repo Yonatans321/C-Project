@@ -132,10 +132,12 @@
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Results.h" />
     <ClInclude Include="Riddle.h" />
     <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="RoomMeta.h" />
     <ClInclude Include="Screen.h" />
+    <ClInclude Include="Steps.h" />
     <ClInclude Include="Switch.h" />
     <ClInclude Include="Torch.h" />
     <ClInclude Include="UIScreens.h" />
@@ -151,10 +153,12 @@
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Results.cpp" />
     <ClCompile Include="Riddle.cpp" />
     <ClCompile Include="RiddleBank.cpp" />
     <ClCompile Include="RoomMeta.cpp" />
     <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Steps.cpp" />
     <ClCompile Include="Switch.cpp" />
     <ClCompile Include="Torch.cpp" />
     <ClCompile Include="UIScreens.cpp" />

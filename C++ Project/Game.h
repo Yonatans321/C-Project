@@ -1,6 +1,7 @@
 #pragma once
 #include <array> // for std::array (taken from AI)
 #include "Player.h"
+#include "Results.h"
 #include "Screen.h"
 #include "RiddleBank.h"
 #include "UIScreens.h"
@@ -40,6 +41,7 @@ private:
 	RoomMeta currentRoomMeta;       // current room metadata
 	std::vector<Screen> allLevels;    // all game levels
 	int currentLevelIdx = 0;         // current level index         
+	size_t eventTimer = 0;		// game timer
 
 	//function to get all screen file names from the directory
     void getAllScreenFileNames(std::vector<std::string>& vec_to_fill);
@@ -52,7 +54,7 @@ private:
     Player player1;         
     Player player2;
 	RiddleBank riddleBank;
-
+	Results gameResults;
     
     void showMenu();        
     void showInstructions(); 

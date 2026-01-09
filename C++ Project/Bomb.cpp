@@ -1,6 +1,7 @@
 #include "Bomb.h"
 #include "Screen.h"
 #include "Player.h"
+#include "Results.h"
 #include "Utils.h"
 #include <cmath> // For std::abs
 #include <iostream>
@@ -45,9 +46,17 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
         // If player is within 3 cells (including diagonals), they lose a life
         if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
             p1.loseLife();
+			if (gameResults != nullptr)  // if are writing results
+            {
+                gameResults->addLifeLost(eventTimer);
+            }
         }
         if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
             p2.loseLife();
+            if (gameResults != nullptr)  // if are writing results
+            {
+                gameResults->addLifeLost(eventTimer);
+            }
         }
      }
 }
@@ -66,4 +75,12 @@ bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
         return true;     // Bomb has finished its life cycle
     }
     return false;        // Bomb is still active
+
+
+}
+
+void Bomb::attachResults(Results* results, size_t timer)
+{
+    gameResults = results;
+    eventTimer = timer;
 }
