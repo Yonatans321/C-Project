@@ -129,6 +129,7 @@
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Key.h" />
+    <ClInclude Include="LoadGame.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Riddle.h" />
     <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="RoomMeta.h" />
+    <ClInclude Include="SaveGame.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Steps.h" />
     <ClInclude Include="Switch.h" />
@@ -149,6 +151,7 @@
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Key.cpp" />
+    <ClCompile Include="LoadGame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -157,6 +160,7 @@
     <ClCompile Include="Riddle.cpp" />
     <ClCompile Include="RiddleBank.cpp" />
     <ClCompile Include="RoomMeta.cpp" />
+    <ClCompile Include="SaveGame.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Steps.cpp" />
     <ClCompile Include="Switch.cpp" />

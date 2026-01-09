@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Results.h"
 #include "Utils.h"
+#include "SaveGame.h"
 #include <cmath> // For std::abs
 #include <iostream>
 
@@ -46,16 +47,16 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
         // If player is within 3 cells (including diagonals), they lose a life
         if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
             p1.loseLife();
-			if (gameResults != nullptr)  // if are writing results
+            if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
             {
-                gameResults->addLifeLost(eventTimer);
+                gameResults->addLifeLost(eventTimer, PlayerType::Player1);
             }
         }
         if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
             p2.loseLife();
-            if (gameResults != nullptr)  // if are writing results
+            if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
             {
-                gameResults->addLifeLost(eventTimer);
+                gameResults->addLifeLost(eventTimer, PlayerType::Player2);
             }
         }
      }
@@ -79,7 +80,7 @@ bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
 
 }
 
-void Bomb::attachResults(Results* results, size_t timer)
+void Bomb::attachResults(Results* results, size_t timer) // Attach results to the results file
 {
     gameResults = results;
     eventTimer = timer;
