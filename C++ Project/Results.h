@@ -4,25 +4,25 @@
 #include <cstddef>
 
 enum class EventType {
-    ScreenChange,
-    LifeLost,
-    Riddle,
-    GameEnd
+	ScreenChange,  // Changed Screen
+	LifeLost, // Player lost a life
+	Riddle, // Riddle attempted
+	GameEnd// Game Over->player lost all lives
 };
 
-enum class RiddleResult {
+enum class RiddleResult { // Result of a riddle attempt
     Solved,
     Failed
 };
 
-struct Event {
+struct Event { // Represents a game event
     size_t time = 0;
     EventType type = EventType::LifeLost;
     RiddleResult riddle = RiddleResult::Failed;
     std::string info;
 };
 
-class Results {
+class Results { // Manages game results and events
 private:
     std::list<Event> events;
     std::string screenFiles;
