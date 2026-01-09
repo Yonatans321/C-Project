@@ -2,51 +2,37 @@
 #include <vector>
 #include <string>
 #include <utility>
-
+#include "Player.h"
 class Steps {
-private:
-    // Vector of pairs: (game cycle / iteration, key pressed)
-    std::vector<std::pair<size_t, char>> steps;
-
-    // Current step index for replay mode
-    size_t currentStepIndex;
-
 public:
-    // Constructor
-    Steps() : currentStepIndex(0) {
+    struct Step
+    {
+        size_t iteration; // Game cycle / iteration
+        int PlayerNum;  // Player number (1 or 2)  
+        char key;        // Key pressed
+    };
+
+private:
+    std::vector<Step> steps; // Vector of pairs: (game cycle / iteration, key pressed)
+    size_t currentStepIndex;  // Current step index for replay mode
+	std::string screenFiles; // Names of screen files associated with the steps
+public:
+    Steps() : currentStepIndex(0) {  // Constructor
     }
+	void setScreenFiles(const std::string& files) // Set screen file names
+    { 
+        screenFiles = files; 
+    } 
+    void addStep(size_t iteration,int playerNum, char step); // Add a step to the recording
 
-    // Destructor
-    ~Steps() {
-    }
+    static Steps loadSteps(const std::string& filename);   // Load steps from file (static factory method)
+    void saveSteps(const std::string& filename) const;    // Save steps to file
 
-    // Add a step to the recording
-    void addStep(size_t iteration, char step);
+    bool getNextStep(size_t currentIteration, Step& outStep);  // Get the next step for replay mode
+    void resetReplay(); // Reset replay to the beginning
+	bool hasMoreSteps() const; // Check if there are more steps to replay
+    void clearSteps();  // Clear all steps (reset everything)  
+	void initForRecording(const std::vector<std::string>& fileNames); // Initialize for recording with screen file names
+	void addStepIfValid(size_t iteration, char ch, const Player& p1, const Player& p2);// Add step if key belongs to a player
 
-    // Load steps from file (static factory method)
-    static Steps loadSteps(const std::string& filename);
-
-    // Save steps to file
-    void saveSteps(const std::string& filename) const;
-
-    // Get the next step for replay mode
-    bool getNextStep(size_t currentIteration, char& outStep);
-
-    // Reset replay to the beginning
-    void resetReplay();
-
-    // Check if there are more steps to replay
-    bool hasMoreSteps() const;
-
-    // Get total number of recorded steps
-    size_t getStepCount() const;
-
-    // Clear all steps (reset everything)
-    void clear();
-
-    // Check if steps were loaded successfully
-    bool isEmpty() const;
-
-    // Get a specific step by index (for debugging/verification)
-    std::pair<size_t, char> getStepAt(size_t index) const;
 };
