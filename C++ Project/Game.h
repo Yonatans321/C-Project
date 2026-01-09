@@ -13,7 +13,7 @@
 #include <filesystem> // for directory iteration
 
 class Game {
-private:
+protected:
 	// Constants
     static constexpr int ESC = 27;
     static constexpr int GAME_DELAY = 80;
@@ -23,10 +23,10 @@ private:
     static constexpr int P2_START_X = 77;
     static constexpr int P2_START_Y = 2;
 	// Menu keys
-    static constexpr char START_KEY = '1';
-    static constexpr char INSTRUCTIONS_KEY = '8';
-    static constexpr char EXIT_KEY = '9';
-    static constexpr char Colors_ON_OFF = '2';
+	static constexpr char START_KEY = '1'; // start new game
+	static constexpr char INSTRUCTIONS_KEY = '8'; // show instructions
+	static constexpr char EXIT_KEY = '9'; // exit game
+	static constexpr char Colors_ON_OFF = '2'; // toggle colors
 
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
@@ -35,6 +35,21 @@ private:
 	void updatePlayers();      // draw both players
 	bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
+    void getAllScreenFileNames(std::vector<std::string>& vec_to_fill); 	//function to get all screen file names from the directory
+	void showMenu();
+	void showInstructions();
+	void initLevel(const std::string& filename, int specificDoor = -1);  //run the game
+	virtual void gameLoop();// main game loop -> virtual for derived classes       
+	bool handleTile(Player& player);// handle tile interaction for a player
+	void showWinScreen();
+	void placePlayersAtEntrance(int apecificDoor = -1);// place players next to the door they entered from (manager)
+	void resetGame();// reset game to initial state
+	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
+	void handlePause(Screen& currentScreen, bool& gameRunning);
+	bool checkLevel();// check if level is completed
+
+    //int currentLevel = 0;
+   
 
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      
@@ -42,32 +57,16 @@ private:
 	std::vector<Screen> allLevels;    // all game levels
 	int currentLevelIdx = 0;         // current level index         
 	size_t eventTimer = 0;		// game timer
-
-	//function to get all screen file names from the directory
-    void getAllScreenFileNames(std::vector<std::string>& vec_to_fill);
-
-    //int currentLevel = 0;
+	
 	char activeDoor = ' '; // to track last door used
-   
+	GameModes currStatus = GameModes::MENU;
+
     // Game modes - options of the game
-    GameModes currStatus = GameModes::MENU;
     Player player1;         
     Player player2;
 	RiddleBank riddleBank;
 	Results gameResults;
     
-    void showMenu();        
-    void showInstructions(); 
-    void initLevel(const std::string& filename, int specificDoor = -1);  //run the game
-	void gameLoop();// main game loop       
-	bool handleTile(Player& player);// handle tile interaction for a player
-	void showWinScreen();
-	void placePlayersAtEntrance(int apecificDoor = -1);// place players next to the door they entered from (manager)
-	void resetGame();// reset game to initial state
-	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
-    void handlePause(Screen& currentScreen, bool& gameRunning);
-	bool checkLevel();// check if level is completed
-
 	Point player1LastPos; // last position of player 1
 	Point player2LastPos;// last position of player 2
     Bomb* activeBomb = nullptr;
@@ -78,6 +77,7 @@ private:
     
 public:
     Game(); 
-    void run(); 
-    static bool pauseRequestedFromRiddle;
+	virtual ~Game() = default;
+	virtual void run();
+	static bool pauseRequestedFromRiddle;
 };
