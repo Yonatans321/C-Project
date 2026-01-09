@@ -16,27 +16,23 @@ int main(int argc, char* argv[]) {
     }
 
     // Parse command-line arguments
-    if (strcmp(argv[1], "-save") == 0) {
-        // ===== SAVE MODE =====
+	if (strcmp(argv[1], "-save") == 0) { // save mode
         SAVE_MODE = true;
         SaveGame game;
         game.run();
     }
-    else if (strcmp(argv[1], "-load") == 0) {
-        // ===== LOAD MODE =====
+	else if (strcmp(argv[1], "-load") == 0) { // load mode
         SAVE_MODE = false;
         bool silent = false;
 
-        // Check for -silent flag
-        if (argc > 2 && strcmp(argv[2], "-silent") == 0) {
+		if (argc > 2 && strcmp(argv[2], "-silent") == 0) { // silent mode
             silent = true;
         }
-
         LoadGame game(silent);
         game.run();
     }
     else {
-        std::cout << "ERROR: Unknown argument '" << argv[1] << "'\n";
+		std::cout << "ERROR: Unknown argument '" << argv[1] << "'\n"; // unknown argument
     }
 
     return 0;

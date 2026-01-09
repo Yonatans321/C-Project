@@ -3,12 +3,8 @@
 #include <conio.h>
 #include <windows.h>
 #include "Torch.h"
-void SaveGame::run()
+void SaveGame::run() // override run method helped by AI
 {
-    std::cout << "\n========================================" << std::endl;
-    std::cout << "       SAVE MODE - Game Recording" << std::endl;
-    std::cout << "========================================\n" << std::endl;
-
     while (currStatus != GameModes::EXIT)
     {
         if (currStatus == GameModes::MENU)
@@ -91,10 +87,7 @@ void SaveGame::run()
     UIScreens::showExitMessage();
 }
 
-// ============================================================================
-// CUSTOM GAME LOOP THAT RECORDS EVENTS
-// ============================================================================
-void SaveGame::saveGameLoop()
+void SaveGame::saveGameLoop() // custom game loop that records events
 {
     bool gameRunning = true;
     Point p1PosLastFrame = player1.getPosition();
@@ -241,10 +234,7 @@ void SaveGame::saveGameLoop()
     }
 }
 
-// ============================================================================
-// OVERRIDE checkGameOver to handle game completion
-// ============================================================================
-bool SaveGame::checkGameOver()
+bool SaveGame::checkGameOver() // override checkGameOver to record game over event
 {
     if (player1.isDead() || player2.isDead())
     {
@@ -264,10 +254,7 @@ bool SaveGame::checkGameOver()
     return false;
 }
 
-// ============================================================================
-// OVERRIDE checkLevel to record screen changes
-// ============================================================================
-bool SaveGame::checkLevel()
+bool SaveGame::checkLevel() // override checkLevel to record screen changes
 {
     if (!player1.isActive() && !player2.isActive())
     {

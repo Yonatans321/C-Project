@@ -14,9 +14,11 @@
 
 class Game {
 protected:
+
 	// Constants
     static constexpr int ESC = 27;
     static constexpr int GAME_DELAY = 80;
+
 	// Player starting positions
     static constexpr int P1_START_X = 2;
     static constexpr int P1_START_Y = 2;
@@ -36,21 +38,19 @@ protected:
 	virtual bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
     void getAllScreenFileNames(std::vector<std::string>& vec_to_fill); 	//function to get all screen file names from the directory
-	void showMenu();
-	void showInstructions();
+	void showMenu(); // show main menu
+	void showInstructions(); // show instructions screen
 	void initLevel(const std::string& filename, int specificDoor = -1);  //run the game
 	virtual void gameLoop();// main game loop -> virtual for derived classes       
 	bool handleTile(Player& player);// handle tile interaction for a player
-	void showWinScreen();
+	void showWinScreen(); // show win screen
 	void placePlayersAtEntrance(int apecificDoor = -1);// place players next to the door they entered from (manager)
 	void resetGame();// reset game to initial state
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
 	void handlePause(Screen& currentScreen, bool& gameRunning);
 	virtual bool checkLevel();// check if level is completed
 
-    //int currentLevel = 0;
-   
-
+  
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      
 	RoomMeta currentRoomMeta;       // current room metadata
@@ -59,9 +59,7 @@ protected:
 	size_t eventTimer = 0;		// game timer
 	
 	char activeDoor = ' '; // to track last door used
-	GameModes currStatus = GameModes::MENU;
-
-    // Game modes - options of the game
+	GameModes currStatus = GameModes::MENU; // Game modes - options of the game
     Player player1;         
     Player player2;
 	RiddleBank riddleBank;
@@ -76,8 +74,8 @@ protected:
 	bool timerActive;        // Is timer running
     
 public:
-    Game(); 
-	virtual ~Game() = default;
-	virtual void run();
-	static bool pauseRequestedFromRiddle;
+	Game(); // constructor
+	virtual ~Game() = default; // virtual destructor
+	virtual void run(); // main game loop
+	static bool pauseRequestedFromRiddle; // stop in the middle of riddle
 };

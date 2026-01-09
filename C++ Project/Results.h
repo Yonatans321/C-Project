@@ -12,7 +12,7 @@ enum class EventType {
     GameExit        // Game ended - player quit/exited
 };
 
-enum class RiddleResult {
+enum class RiddleResult { // Riddle attempt result
     Solved,
     Failed
 };
@@ -22,7 +22,7 @@ enum class PlayerType {
     Player2   // Player $
 };
 
-struct Event {
+struct Event { // Game event structure
     size_t time = 0;
     EventType type = EventType::LifeLost;
     RiddleResult riddle = RiddleResult::Failed;
@@ -30,26 +30,25 @@ struct Event {
     std::string info;
 };
 
-class Results {
+class Results { // 
 private:
-    std::list<Event> events;
-    std::string screenFiles;
-    void parseEventLine(const std::string& line, Event& event);
+	std::list<Event> events; // List of game events
+	std::string screenFiles; // Screen files used
+    void parseEventLine(const std::string& line, Event& event); // 
 
 public:
-    void setScreenFiles(const std::string& files);
+	void setScreenFiles(const std::string& files); // Set screen files used
 
-    void addLifeLost(size_t time, PlayerType player);
-    void addScreenChange(size_t time, const std::string& screenName);
-    void addRiddle(size_t time, int riddleId, const std::string& riddleText,
-        const std::string& answer, bool solved);
-    void addGameOver(size_t time, int score1, int score2);
-    void addGameFinished(size_t time, int score1, int score2);
-    void addGameExit(size_t time, int score1, int score2);  // NEW
+	void addLifeLost(size_t time, PlayerType player); // Log life lost event
+	void addScreenChange(size_t time, const std::string& screenName); // Log screen change event
+	void addRiddle(size_t time, int riddleId, const std::string& riddleText, const std::string& answer, bool solved); // Log riddle attempt event
+	void addGameOver(size_t time, int score1, int score2); // Log game over event
+	void addGameFinished(size_t time, int score1, int score2); // Log game finished event
+	void addGameExit(size_t time, int score1, int score2);  // Log game exit event
 
-    void save(const std::string& filename) const;
-    void load(const std::string& filename);
+	void save(const std::string& filename) const; // Save results to file
+	void load(const std::string& filename); // Load results from file
 
-    bool empty() const;
-    Event pop();
+	bool empty() const; // Check if results are empty
+	Event pop(); // Pop the first event
 };

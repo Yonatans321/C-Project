@@ -1,14 +1,14 @@
 #pragma once
 #include "Game.h"
 
-extern bool SAVE_MODE;
+extern bool SAVE_MODE; // Global flag indicating save mode
 
-class SaveGame : public Game {
+class SaveGame : public Game { // derived from Game
 public:
-    SaveGame() = default;
-    virtual ~SaveGame() = default;
+	SaveGame() = default; // default constructor
+	virtual ~SaveGame() = default; // virtual destructor
 
-    void run() override;
+	void run() override; // override run method
 
 protected:
     // Custom game loop that records events

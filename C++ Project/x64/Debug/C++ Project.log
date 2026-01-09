@@ -6,6 +6,7 @@
   Obstacle.cpp
   Player.cpp
   Point.cpp
+  Results.cpp
   Riddle.cpp
   RiddleBank.cpp
   RoomMeta.cpp

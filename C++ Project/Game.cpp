@@ -10,7 +10,6 @@
 #include "Torch.h"
 
 bool SAVE_MODE = false;  // Define the global flag
-
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 
 Game::Game() // initializer list
@@ -60,7 +59,6 @@ void Game::showMenu()
     else {
         UIScreens::showMenu();
     }
-
     bool menu = true;
     while (menu)
     {
@@ -848,7 +846,6 @@ void Game::drawActiveBomb()
         if (ColorsEnabled) {
 			setColor(COLOR_RED); // set bomb color
         }
-
         std::cout << '@';
 
         if (ColorsEnabled) {

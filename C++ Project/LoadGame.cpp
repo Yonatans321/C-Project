@@ -4,7 +4,7 @@
 #include <windows.h>
 #include "Torch.h"
 
-void LoadGame::run()
+void LoadGame::run() // override run method helped by AI
 {
     if (!isSilentMode)
     {
@@ -130,8 +130,7 @@ void LoadGame::replayGameLoop()
             }
         }
 
-        // ===== CRITICAL: IGNORE USER INPUT (including ESC) =====
-        // Just consume keyboard input without processing
+		// ignore user input
         if (_kbhit())
         {
             _getch();  // Consume key but don't process it
