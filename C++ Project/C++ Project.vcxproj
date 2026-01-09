@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -136,6 +136,7 @@
     <ClInclude Include="RiddleBank.h" />
     <ClInclude Include="RoomMeta.h" />
     <ClInclude Include="Screen.h" />
+    <ClInclude Include="Steps.h" />
     <ClInclude Include="Switch.h" />
     <ClInclude Include="Torch.h" />
     <ClInclude Include="UIScreens.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="RiddleBank.cpp" />
     <ClCompile Include="RoomMeta.cpp" />
     <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Steps.cpp" />
     <ClCompile Include="Switch.cpp" />
     <ClCompile Include="Torch.cpp" />
     <ClCompile Include="UIScreens.cpp" />
