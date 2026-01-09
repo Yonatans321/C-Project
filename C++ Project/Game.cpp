@@ -341,6 +341,8 @@ bool Game::checkGameOver()
     if (player1.isDead() || player2.isDead())
     {
         UIScreens::showGameOverMessage();
+        gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+        gameResults.save("adv-world.result");
         resetGame();
         currStatus = GameModes::MENU;
         return true;
@@ -381,6 +383,8 @@ void Game::gameLoop()
                 // Check if time's up
                 if (gameTimer <= 0) {
                     UIScreens::showGameOverMessage();
+                    gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+                    gameResults.save("adv-world.result");
                     resetGame();
                     currStatus = GameModes::MENU;
                     gameRunning = false;
@@ -678,7 +682,14 @@ void Game::run() // main game loop
 
             // set current screen
             currentScreen = allLevels[currentLevelIdx];
-
+            gameResults = Results();
+            std::string screensString = "";
+            for (size_t i = 0; i < screenFileNames.size(); i++)
+            {
+                if (i > 0) screensString += "|";
+                screensString += screenFileNames[i];
+            }
+            gameResults.setScreenFiles(screensString);
             //start the first level
             initLevel(screenFileNames[currentLevelIdx]);
 
@@ -715,6 +726,7 @@ bool Game::checkLevel() // check if level is completed
             currentScreen = allLevels[currentLevelIdx];
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
             initLevel(screenFileNames[currentLevelIdx], doorId);
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
             if (p1Item != ' ' && p1Item != 0)
                 player1.GrabItem(p1Item, p1ItemId);
             if (p2Item != ' ' && p2Item != 0)
@@ -726,6 +738,8 @@ bool Game::checkLevel() // check if level is completed
         {
 			// you won the game
             showWinScreen();
+            gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
+            gameResults.save("adv-world.result");
             return true;
         }
     }
