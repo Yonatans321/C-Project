@@ -51,4 +51,7 @@ public:
 
 	bool empty() const; // Check if results are empty
 	Event pop(); // Pop the first event
+    bool compareWith(const Results& other, std::string& failureReason) const;
+	std::string eventTypeToString(EventType type) const; // Convert EventType to string
+
 };

@@ -10,7 +10,7 @@ public:
 
 protected:
 	bool isSilentMode; // flag for silent mode
-
+	void gameLoop(); 
     // Replay game loop that ignores user input
     void replayGameLoop();
 };
