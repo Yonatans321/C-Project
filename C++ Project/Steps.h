@@ -13,11 +13,12 @@ public:
     };
 
 private:
+    size_t riddleStepIndex;   // For riddle system 
     std::vector<Step> steps; // Vector of pairs: (game cycle / iteration, key pressed)
     size_t currentStepIndex;  // Current step index for replay mode
 	std::string screenFiles; // Names of screen files associated with the steps
 public:
-    Steps() : currentStepIndex(0) {  // Constructor
+    Steps() : currentStepIndex(0),riddleStepIndex(0) {  // Constructor
     }
 	void setScreenFiles(const std::string& files) // Set screen file names
     { 
@@ -34,5 +35,6 @@ public:
     void clearSteps();  // Clear all steps (reset everything)  
 	void initForRecording(const std::vector<std::string>& fileNames); // Initialize for recording with screen file names
 	void addStepIfValid(size_t iteration, char ch, const Player& p1, const Player& p2);// Add step if key belongs to a player
-
+	bool getNextRiddleStep (Step& outStep);
+   
 };

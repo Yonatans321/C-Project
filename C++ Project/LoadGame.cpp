@@ -114,7 +114,7 @@ void LoadGame::run()
 	gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);  // initial screen change events
 
     initLevel(screenFileNames[currentLevelIdx]);
-
+	riddleBank.attachSteps(&loadedSteps, true);
     // Run game loop (will ignore user input)
     replayGameLoop();
 
@@ -139,6 +139,8 @@ void LoadGame::run()
     }
     else
     {
+        cls();
+		gotoxy(18, 10);
         std::cout << "\n========================================" << std::endl;
         std::cout << "       GAME REPLAY COMPLETED" << std::endl;
         std::cout << "========================================\n" << std::endl;
@@ -285,3 +287,7 @@ void LoadGame::replayGameLoop()
     gameResults.save("adv-world.result");
     
 }
+
+
+
+//el yan 3 years contractror at microsoft

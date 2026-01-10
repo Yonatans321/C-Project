@@ -132,6 +132,7 @@ bool Steps::getNextStep(size_t currentIteration, Step& outStep) {
 // Reset replay to beginning
 void Steps::resetReplay() {
     currentStepIndex = 0;
+	riddleStepIndex = 0;
 }
 
 // Check if there are more steps to replay
@@ -144,6 +145,7 @@ bool Steps::hasMoreSteps() const {
 void Steps::clearSteps() {
     steps.clear();
     currentStepIndex = 0;
+	riddleStepIndex = 0;
     screenFiles = "";
 }
 // Initialize for recording with screen file names
@@ -168,4 +170,17 @@ void Steps::addStepIfValid(size_t iteration, char ch, const Player& p1, const Pl
 	else if (p2.isMyKey(ch)) { // player 2 is identified with the sign '$' - we will register it as playerNum 2
         addStep(iteration, 2, ch);
     }
+}
+// Get next riddle step (PlayerNum == 0)
+bool Steps::getNextRiddleStep(Step& outStep) {
+    // Scan forward from riddleStepIndex looking for PlayerNum == 0
+    while (riddleStepIndex < steps.size()) {
+        if (steps[riddleStepIndex].PlayerNum == 0) {
+            outStep = steps[riddleStepIndex];
+            riddleStepIndex++;
+            return true;
+        }
+        riddleStepIndex++;  // Skip non-riddle steps
+    }
+    return false;  // No more riddle steps
 }
