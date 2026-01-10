@@ -255,3 +255,111 @@ Event Results::pop()
     events.pop_front();
     return event;
 }
+
+bool Results::compareWith(const Results& other, std::string& failureReason) const
+{
+    // Check 1: Screen files must match
+    if (screenFiles != other.screenFiles)
+    {
+        failureReason = "Screen files don't match!\n";
+        failureReason += "Expected: " + other.screenFiles + "\n";
+        failureReason += "Got: " + screenFiles;
+        return false;
+    }
+
+    // Check 2: Event count must match
+    if (events.size() != other.events.size())
+    {
+        failureReason = "Event count mismatch!\n";
+        failureReason += "Expected: " + std::to_string(other.events.size()) + " events\n";
+        failureReason += "Got: " + std::to_string(events.size()) + " events";
+        return false;
+    }
+
+    // Check 3: Compare each event
+    auto it1 = events.begin();
+    auto it2 = other.events.begin();
+    int eventIndex = 0;
+
+    while (it1 != events.end() && it2 != other.events.end())
+    {
+        const Event& actualEvent = *it1;
+        const Event& expectedEvent = *it2;
+
+        // Check event time
+        if (actualEvent.time != expectedEvent.time)
+        {
+            failureReason = "Event #" + std::to_string(eventIndex) + ": Time mismatch!\n";
+            failureReason += "Expected time: " + std::to_string(expectedEvent.time) + "\n";
+            failureReason += "Got time: " + std::to_string(actualEvent.time);
+            return false;
+        }
+
+        // Check event type
+        if (actualEvent.type != expectedEvent.type)
+        {
+            failureReason = "Event #" + std::to_string(eventIndex) + ": Event type mismatch!\n";
+            failureReason += "Expected: " + eventTypeToString(expectedEvent.type) + "\n";
+            failureReason += "Got: " + eventTypeToString(actualEvent.type);
+            return false;
+        }
+
+        // Check event data (for relevant events)
+        if (actualEvent.info != expectedEvent.info)
+        {
+            failureReason = "Event #" + std::to_string(eventIndex) + ": Event data mismatch!\n";
+            failureReason += "Expected: " + expectedEvent.info + "\n";
+            failureReason += "Got: " + actualEvent.info;
+            return false;
+        }
+
+        // For LifeLost and Riddle events, check player/result
+        if (actualEvent.type == EventType::LifeLost)
+        {
+            if (actualEvent.player != expectedEvent.player)
+            {
+                failureReason = "Event #" + std::to_string(eventIndex) + ": Player mismatch!\n";
+                std::string expectedPlayer = (expectedEvent.player == PlayerType::Player1) ? "Player1" : "Player2";
+                std::string gotPlayer = (actualEvent.player == PlayerType::Player1) ? "Player1" : "Player2";
+                failureReason += "Expected: " + expectedPlayer + "\n";
+                failureReason += "Got: " + gotPlayer;
+                return false;
+            }
+        }
+
+        if (actualEvent.type == EventType::Riddle)
+        {
+            if (actualEvent.riddle != expectedEvent.riddle)
+            {
+                failureReason = "Event #" + std::to_string(eventIndex) + ": Riddle result mismatch!\n";
+                std::string expectedResult = (expectedEvent.riddle == RiddleResult::Solved) ? "Solved" : "Failed";
+                std::string gotResult = (actualEvent.riddle == RiddleResult::Solved) ? "Solved" : "Failed";
+                failureReason += "Expected: " + expectedResult + "\n";
+                failureReason += "Got: " + gotResult;
+                return false;
+            }
+        }
+
+        ++it1;
+        ++it2;
+        ++eventIndex;
+    }
+
+    // If we got here, everything matches!
+    return true;
+}
+
+// Helper function to convert EventType to string
+std::string Results::eventTypeToString(EventType type) const
+{
+    switch (type)
+    {
+    case EventType::ScreenChange:   return "ScreenChange";
+    case EventType::LifeLost:       return "LifeLost";
+    case EventType::Riddle:         return "Riddle";
+    case EventType::GameOver:       return "GameOver";
+    case EventType::GameFinished:   return "GameFinished";
+    case EventType::GameExit:       return "GameExit";
+    default:                        return "Unknown";
+    }
+}

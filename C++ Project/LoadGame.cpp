@@ -1,10 +1,11 @@
 #include "LoadGame.h"
 #include <iostream>
+#include <fstream>
 #include <conio.h>
 #include <windows.h>
 #include "Torch.h"
 
-void LoadGame::run() // override run method helped by AI
+void LoadGame::run()
 {
     if (!isSilentMode)
     {
@@ -27,9 +28,36 @@ void LoadGame::run() // override run method helped by AI
         {
             std::cout << "ERROR: Could not load adv-world.result!" << std::endl;
             std::cout << "Make sure you ran -save mode first." << std::endl;
+            std::cout << "Press any key to continue..." << std::endl;
+            waitForKey();
+        }
+        else
+        {
+            std::cout << "ERROR: adv-world.result not found!" << std::endl;
+            std::cout << "Make sure you ran -save mode first." << std::endl;
         }
         return;
     }
+
+    // Check if adv-world.steps exists
+    std::ifstream stepsFile("adv-world.steps");
+    if (!stepsFile.is_open())
+    {
+        if (!isSilentMode)
+        {
+            std::cout << "ERROR: Could not load adv-world.steps!" << std::endl;
+            std::cout << "Steps file not found. Make sure you ran -save mode first." << std::endl;
+            std::cout << "Press any key to continue..." << std::endl;
+            waitForKey();
+        }
+        else
+        {
+            std::cout << "ERROR: adv-world.steps not found!" << std::endl;
+            std::cout << "Steps file not found. Make sure you ran -save mode first." << std::endl;
+        }
+        return;
+    }
+    stepsFile.close();
 
     // Load all screen files from directory
     getAllScreenFileNames(screenFileNames);
@@ -37,6 +65,12 @@ void LoadGame::run() // override run method helped by AI
     if (screenFileNames.empty())
     {
         if (!isSilentMode)
+        {
+            std::cout << "ERROR: No screen files found!" << std::endl;
+            std::cout << "Press any key to continue..." << std::endl;
+            waitForKey();
+        }
+        else
         {
             std::cout << "ERROR: No screen files found!" << std::endl;
         }
@@ -51,6 +85,12 @@ void LoadGame::run() // override run method helped by AI
         if (!tempScreen.loadMapFromFile(fileName))
         {
             if (!isSilentMode)
+            {
+                std::cout << "ERROR: Could not load screen file: " << fileName << std::endl;
+                std::cout << "Press any key to continue..." << std::endl;
+                waitForKey();
+            }
+            else
             {
                 std::cout << "ERROR: Could not load screen file: " << fileName << std::endl;
             }
@@ -80,7 +120,21 @@ void LoadGame::run() // override run method helped by AI
     // Validation in silent mode
     if (isSilentMode)
     {
-        std::cout << "TEST PASSED: Game replay completed successfully!" << std::endl;
+        std::string failureReason;
+        bool testPassed = gameResults.compareWith(expectedResults, failureReason);
+
+        std::cout << "\n========================================" << std::endl;
+        if (testPassed)
+        {
+            std::cout << "TEST PASSED: Game replay matches expected results!" << std::endl;
+        }
+        else
+        {
+            std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
+            std::cout << "\nFAILURE DETAILS:" << std::endl;
+            std::cout << failureReason << std::endl;
+        }
+        std::cout << "========================================\n" << std::endl;
     }
     else
     {
@@ -92,6 +146,12 @@ void LoadGame::run() // override run method helped by AI
 }
 
 // Override game loop to ignore user input and handle silent mode
+void LoadGame::gameLoop()
+{
+    replayGameLoop();
+}
+
+// Replay game loop that ignores all user input
 void LoadGame::replayGameLoop()
 {
     bool gameRunning = true;
@@ -130,7 +190,7 @@ void LoadGame::replayGameLoop()
             }
         }
 
-		// ignore user input
+        // Ignore all user input (including ESC)
         if (_kbhit())
         {
             _getch();  // Consume key but don't process it
@@ -170,7 +230,7 @@ void LoadGame::replayGameLoop()
         }
         else
         {
-            // Silent mode - minimal sleep
+            // Silent mode - no rendering, minimal sleep
             Sleep(1);
         }
 
