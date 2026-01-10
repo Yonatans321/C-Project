@@ -11,6 +11,9 @@
 #include <vector>   // vector for storing screen file names
 #include <string>   // for string handling
 #include <filesystem> // for directory iteration
+#include "Steps.h"  
+
+enum class Mode { REGULAR, SAVE, LOAD };
 
 class Game {
 protected:
@@ -73,6 +76,10 @@ protected:
 	int maxGameTime;         // Starting time 
 	bool timerActive;        // Is timer running
     
+	Steps recordedSteps;          // steps for replay mode
+	Mode currentMode = Mode::REGULAR; //current game mode
+	bool silentMode = false;      // silent mode flag
+
 public:
 	Game(); // constructor
 	virtual ~Game() = default; // virtual destructor

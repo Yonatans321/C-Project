@@ -1,32 +1,38 @@
 #pragma once
-
-#include <list>
+#include <vector>
 #include <string>
 #include <utility>
-#include <cstddef>
-
-// מחלקה ששומרת את הקלט של המשתמש לאורך המשחק
-// כל צעד = באיזה זמן (tick) נלחץ איזה מקש
+#include "Player.h"
 class Steps {
-private:
-    long seed = 0;  // seed לאקראיות (אם יש, אם לא – נשאר 0)
-    std::list<std::pair<size_t, char>> steps; // (time, key)
-
 public:
-    // seed
-    void setSeed(long s);
-    long getSeed() const;
+    struct Step
+    {
+        size_t iteration; // Game cycle / iteration
+        int PlayerNum;  // Player number (1 or 2)  
+        char key;        // Key pressed
+    };
 
-    // הוספת קלט (save mode)
-    void add(size_t time, char key);
+private:
+    std::vector<Step> steps; // Vector of pairs: (game cycle / iteration, key pressed)
+    size_t currentStepIndex;  // Current step index for replay mode
+	std::string screenFiles; // Names of screen files associated with the steps
+public:
+    Steps() : currentStepIndex(0) {  // Constructor
+    }
+	void setScreenFiles(const std::string& files) // Set screen file names
+    { 
+        screenFiles = files; 
+    } 
+    void addStep(size_t iteration,int playerNum, char step); // Add a step to the recording
 
-    // load mode – בדיקה ושליפה
-    bool hasStepAt(size_t time) const;
-    char pop();
+    static Steps loadSteps(const std::string& filename);   // Load steps from file (static factory method)
+    void saveSteps(const std::string& filename) const;    // Save steps to file
 
-    // קבצים
-    void save(const std::string& filename) const;
-    void load(const std::string& filename);
+    bool getNextStep(size_t currentIteration, Step& outStep);  // Get the next step for replay mode
+    void resetReplay(); // Reset replay to the beginning
+	bool hasMoreSteps() const; // Check if there are more steps to replay
+    void clearSteps();  // Clear all steps (reset everything)  
+	void initForRecording(const std::vector<std::string>& fileNames); // Initialize for recording with screen file names
+	void addStepIfValid(size_t iteration, char ch, const Player& p1, const Player& p2);// Add step if key belongs to a player
 
-    bool empty() const;
 };

@@ -235,5 +235,13 @@ void Player::dropHeldItem()
 		}
 	}
 }
-	
-
+// check if the key move belongs to the player
+bool Player::isMyKey(char ch) const {
+	char lowerCh = std::tolower(ch);
+	for (char key : keys) { 
+		if (std::tolower(key) == lowerCh) {
+			return true;
+		}
+	}
+	return false;
+}
