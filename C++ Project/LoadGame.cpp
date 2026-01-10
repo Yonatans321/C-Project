@@ -273,4 +273,5 @@ void LoadGame::replayGameLoop()
 
     // Save the replay results for comparison
     gameResults.save("adv-world.result");
+    
 }

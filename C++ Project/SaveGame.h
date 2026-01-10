@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#include "Steps.h"
 
 extern bool SAVE_MODE; // Global flag indicating save mode
 
@@ -17,4 +18,6 @@ protected:
     // Override methods to record events
     bool checkGameOver() override;
     bool checkLevel() override;
+
+	Steps recordedSteps; // steps for recording player actions
 };

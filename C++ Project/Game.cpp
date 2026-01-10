@@ -429,7 +429,7 @@ void Game::gameLoop()
                 continue;
             }
             else{
-                recordedSteps.addStepIfValid(eventTimer, ch, player1, player2);
+              
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }

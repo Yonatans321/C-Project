@@ -65,6 +65,8 @@ void SaveGame::run() // override run method helped by AI
             }
             gameResults.setScreenFiles(screensString);
 
+            // ===== INITIALIZE STEPS RECORDING =====
+            recordedSteps.initForRecording(screenFileNames);
             // ===== INITIALIZE SCREEN CHANGE EVENT =====
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
@@ -73,10 +75,11 @@ void SaveGame::run() // override run method helped by AI
 
             // ===== SAVE FILES AFTER GAME ENDS =====
             gameResults.save("adv-world.result");
-
+			recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
             std::cout << "\n========================================" << std::endl;
             std::cout << "       GAME SAVED SUCCESSFULLY" << std::endl;
             std::cout << "  - adv-world.result" << std::endl;
+            std::cout << "  - adv-world.steps" << std::endl;
             std::cout << "========================================\n" << std::endl;
             waitForKey();
 
@@ -163,6 +166,7 @@ void SaveGame::saveGameLoop() // custom game loop that records events
             }
             else
             {
+				recordedSteps.addStepIfValid(eventTimer, ch, player1, player2); // Record valid player steps
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }
