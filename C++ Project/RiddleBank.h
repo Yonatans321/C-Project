@@ -31,7 +31,8 @@ private:
 	Results* gameResults = nullptr;  // pointer to Results object
     size_t* eventTimerPtr = nullptr;           // pointer timer for events
 	Steps* recordedSteps = nullptr; // pointer to Steps riddles
-
+	bool isLoadMode = false; // is the game in load mode
+    char getRiddleInputChar();
 public:
     // Constructor
     RiddleBank();
@@ -67,5 +68,5 @@ public:
     void resetAllRiddles();
 
     void attachResults(Results* results, size_t* timerPtr);
-    void attachSteps(Steps* steps);
+    void attachSteps(Steps* steps,bool loadmode=false);
 };

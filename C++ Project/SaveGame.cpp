@@ -67,7 +67,7 @@ void SaveGame::run() // override run method helped by AI
 
             // ===== INITIALIZE STEPS RECORDING =====
             recordedSteps.initForRecording(screenFileNames);
-			riddleBank.attachSteps(&recordedSteps);
+			riddleBank.attachSteps(&recordedSteps,false);
             // ===== INITIALIZE SCREEN CHANGE EVENT =====
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 

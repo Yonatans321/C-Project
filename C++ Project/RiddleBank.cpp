@@ -230,15 +230,15 @@ std::string RiddleBank::getUserAnswer(int bx, int answerLine, int answerInputLin
     // Input loop
     while (true)
     {
-        char c = _getch(); // get character from user
-		// Record the keystroke if in SAVE_MODE
-        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        if (eventTimerPtr != nullptr)
         {
-            // Record ALL keystrokes during riddle input
-            // We'll use player 0 to indicate it's a riddle input, not player movement
-            recordedSteps->addStep(*eventTimerPtr, 0, c);
+            (*eventTimerPtr)++;
         }
-
+        Sleep(20);
+        char c = getRiddleInputChar(); //call get input char function
+        if (isLoadMode && c == '\0') {
+            continue;
+        }
         // ESC → pause the game
         if (c == ESC)
         {
@@ -302,11 +302,14 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
     while (true)
     {
-        char choice = _getch();
-		// Record the choice if in SAVE_MODE
-        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        if (eventTimerPtr != nullptr)
         {
-            recordedSteps->addStep(*eventTimerPtr, 0, choice);
+            (*eventTimerPtr)++;
+        }
+        Sleep(20);
+        char choice = getRiddleInputChar();
+        if (isLoadMode && choice == '\0') {
+            continue;
         }
         // ESC → pause
         if (choice == ESC)
@@ -416,7 +419,48 @@ void RiddleBank::attachResults(Results* results, size_t* timerPtr)
     eventTimerPtr = timerPtr;
 };
 
-void RiddleBank::attachSteps(Steps* steps)
+void RiddleBank::attachSteps(Steps* steps,bool loadmode)
 {
     recordedSteps = steps;
+    isLoadMode = loadmode;
 };  
+
+char RiddleBank::getRiddleInputChar()
+{
+    char c;
+
+    
+    if (isLoadMode && recordedSteps != nullptr && eventTimerPtr != nullptr)
+    {
+        while (true)
+        {
+            Steps::Step step;
+            if (recordedSteps->getNextStep(*eventTimerPtr, step))
+            {
+                if (step.PlayerNum == 0)  // Riddle input
+                {
+                    c = step.key;
+                    Sleep(100);  // Small delay to see the replay
+                    return c;
+                }
+				continue; // Not a riddle step, keep waiting
+            }
+
+            // No riddle step at this time - wait for next frame
+			(*eventTimerPtr)++;
+            Sleep(20);
+        }
+    }
+    else  // ===== NORMAL MODE: GET KEYSTROKE FROM USER =====
+    {
+        c = _getch();
+
+        // Record keystroke in save mode
+        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        {
+            recordedSteps->addStep(*eventTimerPtr, 0, c);
+        }
+
+        return c;
+    }
+}
