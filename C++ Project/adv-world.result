@@ -1,12 +1,17 @@
 screens= adv-world_01.screen|adv-world_02.screen|adv-world_03.screen
 time= 0 event= ScreenChange screenName= adv-world_01.screen
 time= 29 event= Riddle riddleId= 2 riddleText= What does this print?
-for(int i=0;i<3;i++) cout << i;	 answer= 1 result= Failed
-time= 29 event= LifeLost player= Player1
-time= 37 event= Riddle riddleId= 2 riddleText= What does this print?
-for(int i=0;i<3;i++) cout << i;	 answer= 2 result= Failed
-time= 37 event= LifeLost player= Player1
-time= 45 event= Riddle riddleId= 2 riddleText= What does this print?
-for(int i=0;i<3;i++) cout << i;	 answer= 1 result= Failed
-time= 45 event= LifeLost player= Player1
-time= 45 event= GameOver score1= 0 score2= 0
+for(int i=0;i<3;i++) cout << i;	 answer= 012 result= Solved
+time= 95 event= Riddle riddleId= 1 riddleText= What's the output?
+int x = 3;
+cout << x + ++x; answer= u result= Failed
+time= 95 event= LifeLost player= Player2
+time= 99 event= Riddle riddleId= 1 riddleText= What's the output?
+int x = 3;
+cout << x + ++x; answer= 6 result= Failed
+time= 99 event= LifeLost player= Player2
+time= 105 event= Riddle riddleId= 1 riddleText= What's the output?
+int x = 3;
+cout << x + ++x; answer= 6 result= Failed
+time= 105 event= LifeLost player= Player2
+time= 105 event= GameOver score1= 100 score2= 0

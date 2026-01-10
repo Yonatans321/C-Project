@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#include "Steps.h"
 
 class LoadGame : public Game { // derived from Game
 public:
@@ -13,4 +14,5 @@ protected:
 	void gameLoop(); 
     // Replay game loop that ignores user input
     void replayGameLoop();
+	Steps loadedSteps; // steps loaded from file
 };

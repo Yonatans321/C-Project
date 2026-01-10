@@ -17,34 +17,76 @@ Steps Steps::loadSteps(const std::string& filename) {
         std::cout << "Error: Could not open steps file: " << filename << std::endl;
         return loadedSteps;
     }
-	// Read screen files line (first line)
+    std::cout << "Successfully opened steps file: " << filename << std::endl;
+
+    // Read screen files line (first line) - format: "Loading the screens: file1|file2|file3"
     std::string screensLine;
     if (std::getline(steps_file, screensLine)) {
-        loadedSteps.setScreenFiles(screensLine);
-    }
-    // Read number of steps (first line)
-    size_t size;
-    if (!(steps_file >> size)) {
-        steps_file.close();
-        return loadedSteps;
+        size_t pos = screensLine.find(':');
+        if (pos != std::string::npos) {
+            std::string screens = screensLine.substr(pos + 1);
+            // Trim leading space
+            size_t start = screens.find_first_not_of(" \t\r\n");
+            if (start != std::string::npos) {
+                screens = screens.substr(start);
+            }
+            loadedSteps.setScreenFiles(screens);
+            std::cout << "Loaded screens: " << screens << std::endl;
+        }
     }
 
-    // Read each step: iteration and key pressed
-    for (size_t i = 0; i < size; ++i) {
-        size_t iteration;
-        int playerNum;
-        char step;
+    // Read number of steps line (second line) - format: "Number of steps: 7"
+    std::string numberLine;
+    if (std::getline(steps_file, numberLine)) {
+        size_t pos = numberLine.find(':');
+        if (pos != std::string::npos) {
+            std::string numStr = numberLine.substr(pos + 1);
+            // Trim whitespace
+            size_t start = numStr.find_first_not_of(" \t\r\n");
+            if (start != std::string::npos) {
+                numStr = numStr.substr(start);
+            }
+            size_t size = std::stoul(numStr);
+            std::cout << "Loading " << size << " steps..." << std::endl;
 
-		// Read iteration, player number, and key
-        if (steps_file >> iteration >> playerNum >> step) {
-            loadedSteps.addStep(iteration, playerNum, step);
+            // Read each step - format: "TIME: 6 PLAYER: 1 KEY: d"
+            std::string line;
+            for (size_t i = 0; i < size; ++i) {
+                if (std::getline(steps_file, line)) {
+                    // Find positions of keywords
+                    size_t timePos = line.find("TIME:");
+                    size_t playerPos = line.find("PLAYER:");
+                    size_t keyPos = line.find("KEY:");
+
+                    if (timePos != std::string::npos &&
+                        playerPos != std::string::npos &&
+                        keyPos != std::string::npos) {
+
+                        // Extract time (between "TIME: " and " PLAYER:")
+                        std::string timeStr = line.substr(timePos + 6, playerPos - timePos - 7);
+                        size_t iteration = std::stoul(timeStr);
+
+                        // Extract player number (between "PLAYER: " and " KEY:")
+                        std::string playerStr = line.substr(playerPos + 8, keyPos - playerPos - 9);
+                        int playerNum = std::stoi(playerStr);
+
+                        // Extract key (after "KEY: ")
+                        std::string keyStr = line.substr(keyPos + 5);
+                        char key = keyStr[0];
+
+                        loadedSteps.addStep(iteration, playerNum, key);
+                        std::cout << "Step " << (i + 1) << ": TIME=" << iteration
+                            << " PLAYER=" << playerNum << " KEY=" << key << std::endl;
+                    }
+                }
+            }
         }
     }
 
     steps_file.close();
+    std::cout << "Successfully loaded " << loadedSteps.steps.size() << " steps!" << std::endl;
     return loadedSteps;
 }
-
 // Save steps to file
 void Steps::saveSteps(const std::string& filename) const {
     std::ofstream steps_file(filename);

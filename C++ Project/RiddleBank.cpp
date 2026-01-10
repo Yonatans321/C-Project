@@ -231,6 +231,13 @@ std::string RiddleBank::getUserAnswer(int bx, int answerLine, int answerInputLin
     while (true)
     {
         char c = _getch(); // get character from user
+		// Record the keystroke if in SAVE_MODE
+        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        {
+            // Record ALL keystrokes during riddle input
+            // We'll use player 0 to indicate it's a riddle input, not player movement
+            recordedSteps->addStep(*eventTimerPtr, 0, c);
+        }
 
         // ESC → pause the game
         if (c == ESC)
@@ -296,6 +303,11 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     while (true)
     {
         char choice = _getch();
+		// Record the choice if in SAVE_MODE
+        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        {
+            recordedSteps->addStep(*eventTimerPtr, 0, choice);
+        }
         // ESC → pause
         if (choice == ESC)
         {
@@ -403,3 +415,8 @@ void RiddleBank::attachResults(Results* results, size_t* timerPtr)
     gameResults = results;
     eventTimerPtr = timerPtr;
 };
+
+void RiddleBank::attachSteps(Steps* steps)
+{
+    recordedSteps = steps;
+};  

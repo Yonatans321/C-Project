@@ -40,8 +40,8 @@ void LoadGame::run()
     }
 
     // Check if adv-world.steps exists
-    std::ifstream stepsFile("adv-world.steps");
-    if (!stepsFile.is_open())
+	loadedSteps = Steps::loadSteps("adv-world.steps");
+    if (!loadedSteps.hasMoreSteps())
     {
         if (!isSilentMode)
         {
@@ -57,7 +57,7 @@ void LoadGame::run()
         }
         return;
     }
-    stepsFile.close();
+	loadedSteps.resetReplay();
 
     // Load all screen files from directory
     getAllScreenFileNames(screenFileNames);
@@ -111,6 +111,7 @@ void LoadGame::run()
         screensString += screenFileNames[i];
     }
     gameResults.setScreenFiles(screensString);
+	gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);  // initial screen change events
 
     initLevel(screenFileNames[currentLevelIdx]);
 
@@ -189,7 +190,16 @@ void LoadGame::replayGameLoop()
                 }
             }
         }
+        Steps::Step currentStep;
+        if (loadedSteps.getNextStep(eventTimer, currentStep))
+        {
+            // Replay the recorded keystroke
+            char key = currentStep.key;
 
+            // Send key to BOTH players - they will filter it themselves using isMyKey()
+            player1.keyPressed(key);
+            player2.keyPressed(key);
+        }
         // Ignore all user input (including ESC)
         if (_kbhit())
         {

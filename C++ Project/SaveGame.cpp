@@ -67,6 +67,7 @@ void SaveGame::run() // override run method helped by AI
 
             // ===== INITIALIZE STEPS RECORDING =====
             recordedSteps.initForRecording(screenFileNames);
+			riddleBank.attachSteps(&recordedSteps);
             // ===== INITIALIZE SCREEN CHANGE EVENT =====
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
@@ -76,6 +77,8 @@ void SaveGame::run() // override run method helped by AI
             // ===== SAVE FILES AFTER GAME ENDS =====
             gameResults.save("adv-world.result");
 			recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
+            cls();  // Clear the screen first
+            gotoxy(18, 10);
             std::cout << "\n========================================" << std::endl;
             std::cout << "       GAME SAVED SUCCESSFULLY" << std::endl;
             std::cout << "  - adv-world.result" << std::endl;
