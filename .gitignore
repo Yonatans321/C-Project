@@ -3,5 +3,7 @@ x64/
 Debug/
 Release/
 *.obj
-*.log
 *.tlog
+*.log
+*.ilk
+*.pdb

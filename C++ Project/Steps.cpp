@@ -54,9 +54,9 @@ void Steps::saveSteps(const std::string& filename) const {
         return;
     }
 
-	steps_file << screenFiles << '\n'; // Write screen files line (first line)
+	steps_file <<"Loading the screens: " << screenFiles << '\n'; // Write screen files line (first line)
  
-	steps_file << steps.size() << "\n";  // Write number of steps (second line)
+	steps_file<<"Number of steps: " << steps.size() << "\n";  // Write number of steps (second line)
 
     // Write each step: iteration and key
     for (const auto& step : steps) {
