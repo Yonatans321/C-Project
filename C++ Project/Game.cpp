@@ -3,59 +3,94 @@
 #include <windows.h>
 #include <iostream>
 #include "Door.h"
+#include "Key.h"
 #include "Obstacle.h"
 #include "Switch.h"
 #include "Utils.h"
+#include "Torch.h"
 
-
+bool SAVE_MODE = false;  // Define the global flag
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 
 Game::Game() // initializer list
     : player1(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'),
         { 'W','D','X','A','S','E' }),
     player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
-        { 'I','L','M','J','K','O' })
+        { 'I','L','M','J','K','O' }),
+	player1LastPos(-1, -1),player2LastPos(-1,-1),
+    gameTimer(0), maxGameTime(360), timerActive(false)
 {
-	hideCursor();// hide cursor at the start of the game
+    hideCursor();// hide cursor at the start of the game
     currStatus = GameModes::MENU;
-	// Load all maps
-    for (int i = 0;i < MAX_LEVELS;i++)
-    {
-        gameScreens[i].loadMap(i);
-    }
-	// Assign initial screen to players
-    player1.setScreen(gameScreens[0]);
-    player2.setScreen(gameScreens[0]);
+    getAllScreenFileNames(screenFileNames);
 }
+//taken from exrecise 7
+void Game::getAllScreenFileNames(std::vector<std::string>& vec_to_fill) {
+    namespace fs = std::filesystem;
+    vec_to_fill.clear(); //clear the vector before filling it
 
+    // Iterate through files in the current directory
+    for (const auto& entry : fs::directory_iterator(fs::current_path())) {
+        auto filename = entry.path().filename();
+        auto filenameStr = filename.string();
+
+        // Check if the filename starts with "adv-world" and ends with ".screen"
+        if (filenameStr.find("adv-world") == 0 && filename.extension() == ".screen") {
+
+            vec_to_fill.push_back(filenameStr);
+        }
+    }
+}
+// Show main menu and handle input
 void Game::showMenu()
 {
     clearInputBuffer();
-    UIScreens::showMenu();
+    // Check if riddles loaded successfully before showing menu
+    if (!riddleBank.isLoaded()) {
+        cls();
 
+        std::cout << "ERROR: Riddles.txt file is missing!" << std::endl;
+        std::cout << "The game cannot start without riddles." << std::endl;
+        std::cout << "Press any key to return to menu..." << std::endl;
+        waitForKey();
+        currStatus = GameModes::MENU; // Stay in menu
+        UIScreens::showMenu();
+    }
+    else {
+        UIScreens::showMenu();
+    }
     bool menu = true;
-
     while (menu)
     {
         if (_kbhit())
         {
             char input = _getch();
-
             switch (input)
             {
             case START_KEY:
-                currStatus = GameModes::NEW_GAME;
-                menu = false;
+                // Check if riddles are loaded before starting game
+                if (!riddleBank.isLoaded()) {
+                    cls();  
+                    std::cout << "ERROR: Cannot start game!" << std::endl;
+                    std::cout << "Riddles.txt file is missing." << std::endl;
+                    std::cout << "Press any key to return to menu..." << std::endl;
+                    waitForKey();
+                    UIScreens::showMenu();
+                }
+                else {
+					currStatus = GameModes::NEW_GAME; // start new game
+                    menu = false;
+                }
                 break;
 
             case INSTRUCTIONS_KEY:
-                currStatus = GameModes::INSTRUCTIONS;
+				currStatus = GameModes::INSTRUCTIONS; // show instructions
                 menu = false;
                 break;
 
             case Colors_ON_OFF: // Colors ON/OFF
                 ColorsEnabled = !ColorsEnabled;
-                UIScreens::showMenu(); 
+				UIScreens::showMenu(); // redraw menu to show updated color status
                 break;
             case EXIT_KEY:
                 currStatus = GameModes::EXIT;
@@ -65,52 +100,70 @@ void Game::showMenu()
         }
     }
 
-	clearInputBuffer();// clear any extra input
+    clearInputBuffer();// clear any extra input
 }
 
-
+// Show instructions screen
 void Game::showInstructions()
 {
     UIScreens::showInstructions();
-	waitForKey(); // wait for any key press
-   
+    waitForKey(); // wait for any key press
+
     currStatus = GameModes::MENU;
 }
-// Initialize level 
-void Game::initLevel(int specificDoor)
+// Initialize level
+void Game::initLevel(const std::string& filename, int specificDoor)
 {
-    Screen& currentScreen = gameScreens[currentLevel];
-
     cls();
-    currentScreen.drawMap();
-	riddleBank.attachPositionToRoom(currentScreen); // attach riddles to the current screen
+	currentRoomMeta = currentScreen.getRoomMeta();// get current room metadata
+	currentScreen.resetTorchState();// reset torch state
+    if (currentRoomMeta.hasKeyPosition()) // checks key from metadata if exists
+    {
 
-    // Assign screen to players
+		int doorID = currentRoomMeta.getKeyDoorID();
+        if (doorID != -1 && !Door::openDoors[doorID] &&
+            player1.getItemId() != doorID &&
+            player2.getItemId() != doorID)
+        {
+            Key::placeFromMetadata(currentScreen);// place key from metadata
+        }
+        
+    }
+	
+	currentRoomMeta.placeLightSwitchFromMetadata(currentScreen);// place light switch from metadata
+    // Start timer on first level
+    if (specificDoor == -1 && currentLevelIdx == 0)
+    {
+        gameTimer = maxGameTime;
+        timerActive = true;
+    }
+    drawCurrentScreen();
+	// Attach riddle positions to the room
+    riddleBank.attachPositionToRoom(currentScreen);
+    riddleBank.attachResults(&gameResults, &eventTimer);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
-	// Reset players' positions
-    player1.activate();
-    player2.activate();
-    
-    if (activeDoor >= '1' && activeDoor <= '9')
-    {
-        placePlayersAtEntrance(specificDoor);
-    }
+	if (!player1.isActive()) // activate players
+        player1.activate();
+	if (!player2.isActive()) // activate players
+        player2.activate();
+
+	if (specificDoor != -1) // if coming from a door, place players there
+        placePlayersAtEntrance(specificDoor); 
     else
     {
         player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
         player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'));
     }
-
+    drawCurrentScreen();
     player1.draw();
     player2.draw();
 
-    if (!Switch::exists(currentScreen))
-    {
+	if (!Switch::exists(currentScreen)) // if no switches, set allSwitchesAreOn to true
         Door::allSwitchesAreOn();
-    }
 }
+
 // Handle pause function
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
@@ -136,135 +189,339 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     }
 
     clearInputBuffer();
-    currentScreen.drawMap();
-    player1.draw();
+	if (currentScreen.isDark()) // redraw based on dark/torch state
+        currentScreen.drawMapWithTorch(player1);
+    else
+        currentScreen.drawMap();;    player1.draw();
     player2.draw();
 }
+// Helper function to handle screen drawing based on torch / dark state
+void Game::drawCurrentScreen()
+{
+    bool isDark = currentScreen.getRoomMeta().isDark();
+
+    if (isDark)
+    {
+		bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2); // check if any player has torch
+
+		if (hasTorch) // draw with torch
+        {
+            if (Torch::playerHasTorch(player1))
+                currentScreen.drawMapWithTorch(player1);
+            else if (Torch::playerHasTorch(player2))
+                currentScreen.drawMapWithTorch(player2);
+        }
+        else
+        {
+            currentScreen.drawDark();
+            currentScreen.resetTorchState();
+        }
+    }
+    else
+    {
+        currentScreen.resetTorchState();
+        currentScreen.drawMap();
+    }
+}
+
+// Helper function to redraw everything after pause or game state change
+void Game::redrawGame()
+{
+    drawCurrentScreen();
+	if (player1.isActive())
+        player1.draw();
+	if (player2.isActive())
+        player2.draw();
+
+    int bombTimerDisplay = -1;
+    if (activeBomb != nullptr)
+    {
+        bombTimerDisplay = activeBomb->getTimer();
+    }
+
+    currentScreen.drawStatusBar(
+        player1.getHeldItem(), player1.getLives(), player1.getScore(),
+        player2.getHeldItem(), player2.getLives(), player2.getScore(),
+        bombTimerDisplay, timerActive ? gameTimer : -1);
+}
+
+// Minimal redraw - just update what changed
+void Game::updateDisplay()
+{
+	// get bomb timer
+	int bombTimerDisplay = -1;  // -1 = if no bomb
+    if (activeBomb != nullptr)
+    {
+        bombTimerDisplay = activeBomb->getTimer();
+    }
+
+	// draw status bar
+    currentScreen.drawStatusBar(
+        player1.getHeldItem(), player1.getLives(), player1.getScore(),
+        player2.getHeldItem(), player2.getLives(), player2.getScore(),
+        bombTimerDisplay, timerActive ? gameTimer : -1);
+
+	// draw players if active
+    if (player1.isActive())
+        player1.draw();
+    if (player2.isActive())
+        player2.draw();
+
+	// draw bomb if active
+    if (activeBomb != nullptr)
+    {
+        Point bombPos = activeBomb->getPosition();
+        gotoxy(bombPos.getX(), bombPos.getY());
+        setColor(COLOR_RED);
+        std::cout << '@';
+        resetColor();
+    }
+}
+
+// Handle bomb creation
+void Game::updateBomb()
+{
+    if (activeBomb != nullptr)
+    {
+        int bombRoomID = activeBomb->getRoomID();
+        if (bombRoomID == currentLevelIdx)
+        {
+            if (activeBomb->tick(currentScreen, player1, player2, currentLevelIdx))
+            {
+                delete activeBomb;
+                activeBomb = nullptr;
+            }
+        }
+        else 
+        {       
+            delete activeBomb;
+            activeBomb = nullptr;
+   
+        }
+    }
+    if (player1.hasDroppedBomb() && activeBomb == nullptr)
+    {
+        activeBomb = new Bomb(player1.getPosition(), player1.getChar(),currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
+        player1.clearBombRequest();
+    }
+    else if (player2.hasDroppedBomb() && activeBomb == nullptr)
+    {
+        activeBomb = new Bomb(player2.getPosition(), player2.getChar(), currentLevelIdx);
+        activeBomb->attachResults(&gameResults, eventTimer);
+        player2.clearBombRequest();
+    }    
+}
+
+// Handle player movement and collisions
+void Game::updatePlayers()
+{
+	char underPlayer1 = ' ';// to track what is under each player
+    char underPlayer2 = ' ';
+
+    if (player1.isActive())
+    {
+        underPlayer1 = currentScreen.getCharAt(player1.getX(), player1.getY());
+        player1.erase();
+        // Restore 'A' if it was there
+        if (underPlayer1 == 'A')
+            currentScreen.setCharAt(player1.getX(), player1.getY(), 'A');
+    }
+        
+
+    if (player2.isActive())
+    {
+        underPlayer2 = currentScreen.getCharAt(player2.getX(), player2.getY());
+        player2.erase();
+        // Restore 'A' if it was there
+        if (underPlayer2 == 'A')
+            currentScreen.setCharAt(player2.getX(), player2.getY(), 'A');
+    }
+
+    bool stop1 = handleTile(player1);
+    bool stop2 = handleTile(player2);
+
+    if (!stop1)
+        player1.move();
+    if (!stop2)
+        player2.move();
+}
+
+// Check game end conditions
+bool Game::checkGameOver()
+{
+    if (player1.isDead() || player2.isDead())
+    {
+        UIScreens::showGameOverMessage();;
+        resetGame();
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    if (checkLevel())
+    {
+        currStatus = GameModes::MENU;
+        return true;
+    }
+
+    return false;
+}
+
 // Main game loop 
 void Game::gameLoop()
 {
     bool gameRunning = true;
+    Point p1PosLastFrame = player1.getPosition();
+    Point p2PosLastFrame = player2.getPosition();
+	player1LastPos = p1PosLastFrame;
+	player2LastPos = p2PosLastFrame;
+	// timer tracker (taken from AI)
+    ULONGLONG lastTickTime = GetTickCount64();
+    const DWORD timerInterval = 1000;
+    redrawGame(); // Draw full screen at start
 
     while (gameRunning)
     {
-        if (pauseRequestedFromRiddle) // stop in the middle of riddle
+		eventTimer++; // update event timer
+        // Update timer
+        if (timerActive) {
+            ULONGLONG currentTime = GetTickCount64();
+            if (currentTime - lastTickTime >= timerInterval) {
+                gameTimer--;
+                lastTickTime = currentTime;
+
+                // Check if time's up
+                if (gameTimer <= 0) {
+                    UIScreens::showGameOverMessage();
+                    resetGame();
+                    currStatus = GameModes::MENU;
+                    gameRunning = false;
+                    break;
+                }
+            }
+        }
+        // Handle pause request from riddle
+        if (pauseRequestedFromRiddle)
         {
             pauseRequestedFromRiddle = false;
-            Screen& cs = gameScreens[currentLevel];
-            handlePause(cs, gameRunning);
+            handlePause(currentScreen, gameRunning);
             clearInputBuffer();
-            if (!gameRunning)
-            {
-                break;
-            }
-            cls();
-            cs.drawMap();
-            player1.draw();
-            player2.draw();
-
-            cs.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
+            if (!gameRunning) break;
+            redrawGame();
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
+            continue;
         }
-
-        Screen& currentScreen = gameScreens[currentLevel];
 
         // Handle input 
         if (_kbhit())
         {
             char ch = _getch();
 
-            // PAUSE → Escape key
             if (ch == ESC)
             {
                 handlePause(currentScreen, gameRunning);
                 clearInputBuffer();
-
-                if (!gameRunning)
-                    break;
-
-                // Redraw after pause
-                currentScreen.drawMap();
-                player1.draw();
-                player2.draw();
-                currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
+                if (!gameRunning) break;
+                redrawGame();
+                p1PosLastFrame = player1.getPosition();
+                p2PosLastFrame = player2.getPosition();
+                continue;
             }
-            else
-            {
+            else{
+              
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }
         }
 
-        // --- Bomb Creation Logic ---
-        // Check if any player requested to drop a bomb via flag
-        if (player1.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player1.getLastDropPos());
-            player1.clearBombRequest();
-        }
-        else if (player2.hasDroppedBomb() && activeBomb == nullptr)
-        {
-            activeBomb = new Bomb(player2.getLastDropPos());
-            player2.clearBombRequest();
-        }
+        // Update game state
+        updateBomb();
+        updatePlayers();
+        
+		player1LastPos = p1PosLastFrame;// update last positions after movement
+		player2LastPos = p2PosLastFrame;
 
-        // Update players
-        player1.erase();
-        player2.erase();
+		// check if players moved
+        bool p1Moved = player1.isActive() &&
+            ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
+                (p1PosLastFrame.getY() != player1.getPosition().getY()));
+        bool p2Moved = player2.isActive() &&
+            ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||
+                (p2PosLastFrame.getY() != player2.getPosition().getY()));
 
-        bool stop1 = handleTile(player1);
-        bool stop2 = handleTile(player2);
-
-        if (!stop1)
+		// draw based on dark / torch state if players moved
+        bool isDark = currentScreen.getRoomMeta().isDark();
+        if (isDark)
         {
-            player1.move();
-        }
-        if (!stop2)
-        {
-            player2.move();
-        }
-
-        player1.draw();
-        player2.draw();
-
-        // --- Bomb Update Logic ---
-        // Tick the bomb independently of keyboard input
-        if (activeBomb != nullptr)
-        {
-            // Execute bomb logic from Bomb.cpp (timer update and explosion)
-            if (activeBomb->tick(currentScreen, player1, player2))
+			// check who has torch
+            if (Torch::playerHasTorch(player1))
             {
-                delete activeBomb; // Explosion finished, clean memory
-                activeBomb = nullptr;
+                currentScreen.drawMapWithTorch(player1);
+            }
+            else if (Torch::playerHasTorch(player2))
+            {
+                currentScreen.drawMapWithTorch(player2);
             }
         }
+		// draw bomb   
+        drawActiveBomb();
+        // Update players and status bar
+        updateDisplay();
 
-        currentScreen.drawStatusBar(player1.getHeldItem(), player1.getLives(), player1.getScore(), player2.getHeldItem(), player2.getLives(), player2.getScore());
 
-        if (checkLevel() == true)
+        // Check end conditions
+        if (checkGameOver())
         {
-            gameRunning = false;      // level completed
-            currStatus = GameModes::MENU; // return to menu
-            break;                    // exit game loop
+            gameRunning = false;
         }
+
+		// when a player goes through a door
+        if ((!player1.isActive() || !player2.isActive()) && activeDoor != ' ')
+        {
+            if (player1.isActive()) {
+                player1.rememberPosition();
+                player1.erase();
+            }
+            if (player2.isActive()) {
+                player2.rememberPosition();
+                player2.erase();
+            }
+            redrawGame();
+            p1PosLastFrame = player1.getPosition();
+            p2PosLastFrame = player2.getPosition();
+            player1LastPos = p1PosLastFrame;
+            player2LastPos = p2PosLastFrame;
+            activeDoor = ' ';
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+        }
+		// remember last positions
+        p1PosLastFrame = player1.getPosition();
+        p2PosLastFrame = player2.getPosition();
 
         Sleep(GAME_DELAY);
     }
 }
 
-
 bool Game::handleTile(Player& player)// handle tile interaction for a player
 {
-	// get reference to the other player
-    Screen& currentScreen = gameScreens[currentLevel];
+    // get reference to the other player
     Point pos = player.getPosition();
     Point targetPos = pos;
     targetPos.move();
     char cell = currentScreen.getCharAt(pos);
     char targetCell = currentScreen.getCharAt(targetPos);
+	Point& lastPos = (&player == &player1) ? player1LastPos : player2LastPos;
 
-    if (targetCell == 'K' || targetCell == '@') {
+    if (targetCell == 'K' || targetCell == '@' || targetCell == '!') {
         if (player.getHeldItem() != ' ' && player.getHeldItem() != 0) {
-            UIScreens::showInventoryFullMessage(gameScreens[currentLevel]);
+            UIScreens::showInventoryFullMessage(currentScreen);
+
+            if (currentScreen.isDark())
+                currentScreen.drawMapWithTorch(player);
+            else
+                currentScreen.drawMap();
+
             player.stepBack();
             player.draw();
             return true;
@@ -272,74 +529,99 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     }
     switch (cell)
     {
-	case '?':// riddle
-        riddleBank.handleRiddle(player, currentScreen, currentLevel);
+    case 'A': // light switch
+        if (currentRoomMeta.hasLightSwitchAt(pos.getX(), pos.getY()))
+        {
+			if (lastPos.getX() != pos.getX() || lastPos.getY() != pos.getY()) // Check if switch position changed
+            {
+                // Get the room meta by reference and activate switch
+                RoomMeta meta = currentScreen.getRoomMeta();
+                meta.activateLightSwitch();
+                currentScreen.setRoomMeta(meta);
+                currentScreen.setDark(meta.isDark()); 
+                drawCurrentScreen(); // Redraw the screen with new lighting
+            }
+        }
         break;
 
-	case 'K':// key
-        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
-            player.GrabItem('K', currentLevel + 1);
+    case '?':// riddle
+        riddleBank.handleRiddle(player, currentScreen, currentLevelIdx);
+        break;
+
+    case 'K':// key
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+        {
+            Key keyFromRoom = currentRoomMeta.getRoomKey();  // get the key info from room meta
+            player.GrabItem('K', keyFromRoom.getDoorID());   
             currentScreen.setCharAt(pos, ' ');
         }
         else
             return true;
         break;
-        case '@':// bomb
-            if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
-                player.GrabItem('@');
-                currentScreen.setCharAt(pos, ' ');
-            }
-            else
-                return true;
-            break; 
-    // switch
+
+    case '!': // Torch
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+        {
+            player.GrabItem('!');
+            currentScreen.setCharAt(pos, ' ');
+        }
+        else
+            return true;
+        break;
+    case '@':// bomb
+        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
+            player.GrabItem('@');
+            currentScreen.setCharAt(pos, ' ');
+        }
+        else
+            return true;
+        break;
+        // switch
     case '\\':
     case '/':
         Switch::handleSwitch(player, currentScreen);
         return false;
     }
 
-	switch (targetCell)// check target cell
+    switch (targetCell)// check target cell
     {
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-		bool doorOpened = Door::handleDoor(player, currentScreen, currentLevel, activeDoor);// try to handle door
+        bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
         if (doorOpened)
         {
-			player.setPosition(targetPos);// move player through door
             return true;
         }
         break;
 
     }
-	case '*':// obstacle
+    case '*':// obstacle
     {
-		Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
+        Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
 
-		char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
+        char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
 
         if (afterPush == '*')
-			return true;    // cannot move, obstacle not moved
-
-		player.setPosition(targetPos);// move player into obstacle's previous position
+            return true;    // cannot move, obstacle not moved
+        
+        player.setPosition(targetPos);// move player into obstacle's previous position
         return true;
     }
 
-	case 's':// switch wall
+    case 's':// switch wall
         return true;
-        break;
-
     }
 
-	return false; // the player can move
-    
+    return false; // the player can move
+
 }
 
 void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
-	waitForKey(); // wait for any key press
+    waitForKey();
+    cls();  // Clear after key press
 }
 
 
@@ -349,100 +631,163 @@ void Game::run() // main game loop
     {
         if (currStatus == GameModes::MENU)
         {
-			cls();// clear screen
-			clearInputBuffer();// clear any extra input
-			showMenu();// show menu
+            cls();              // clear screen
+            clearInputBuffer(); // clear any extra input
+            showMenu();         // show menu
         }
         else if (currStatus == GameModes::INSTRUCTIONS)
         {
             showInstructions();
         }
-		else if (currStatus == GameModes::NEW_GAME) // start new game
+        else if (currStatus == GameModes::NEW_GAME) // start new game
         {
-			resetGame();// reset game state
-			initLevel();// initialize first level
-			gameLoop(); //  start game loop
+            getAllScreenFileNames(screenFileNames);  //get all screen file names from the directory
+            // check if any screen files were found
+            if (screenFileNames.empty()) {
+                cls();
+                std::cout << "No screen files found (adv-world*.screen) in the directory!" << std::endl;
+                waitForKey();
+                currStatus = GameModes::MENU;
+                continue;
+            }
 
+            // load all levels into memory
+            allLevels.clear();
+            bool successload = true;
+            for (const auto& fileName : screenFileNames) {
+                Screen tempScreen;
+                if (!tempScreen.loadMapFromFile(fileName)) {
+                    successload = false;
+                    break;
+                }
+                allLevels.push_back(tempScreen);
+            }
+            if (!successload) {
+                std::cout << "\nPress any key to return to Menu..." << std::endl;
+                waitForKey();
+                currStatus = GameModes::MENU;
+                continue;
+            }
+
+
+            //review loaded levels
+            resetGame();
+
+            // start from level 0
+            currentLevelIdx = 0;
+
+            // set current screen
+            currentScreen = allLevels[currentLevelIdx];
+            gameResults = Results();
+            std::string screensString = "";
+            for (size_t i = 0; i < screenFileNames.size(); i++)
+            {
+                if (i > 0) screensString += "|";
+                screensString += screenFileNames[i];
+            }
+			gameResults.setScreenFiles(screensString); 
+			recordedSteps.initForRecording(screenFileNames); // initialize steps recording
+            //start the first level
+            initLevel(screenFileNames[currentLevelIdx]);
+
+            //enter the main game loop
+            gameLoop();
             currStatus = GameModes::MENU;
         }
     }
     UIScreens::showExitMessage();
 }
-
 bool Game::checkLevel() // check if level is completed
 {
-	if (!player1.isActive() && !player2.isActive()) // both players went through a door
+    if (!player1.isActive() && !player2.isActive())
     {
-		int doorId = activeDoor - '0'; // convert char to int
-		int targetDoor = -1; // door to place players at
+		allLevels[currentLevelIdx] = currentScreen; // save current screen state
 
-		if (activeDoor == '3') // final door (for now)
+        int doorId = activeDoor - '0';
+        Door* door = currentScreen.getDoorById(doorId); // get door object
+        if (!door) return false;
+
+        int nextLevelIdx = door->getDestinationLevel();
+
+        // if next level index is valid, load next level
+        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
         {
-            showWinScreen();
+			int oldLevelIdx = currentLevelIdx;// save old level index
+
+            char p1Item = player1.getHeldItem();
+            int p1ItemId = player1.getItemId();
+            char p2Item = player2.getHeldItem();
+            int p2ItemId = player2.getItemId();
+
+			// update current level index and screen
+            currentLevelIdx = nextLevelIdx;
+            currentScreen = allLevels[currentLevelIdx];
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+            initLevel(screenFileNames[currentLevelIdx], doorId);
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
+            if (p1Item != ' ' && p1Item != 0)
+                player1.GrabItem(p1Item, p1ItemId);
+            if (p2Item != ' ' && p2Item != 0)
+                player2.GrabItem(p2Item, p2ItemId);
             activeDoor = ' ';
+            return false;
+        }
+        else
+        {
+            // you won the game
+            showWinScreen();
             return true;
         }
-
-		if (doorId == currentLevel + 1) // going to next level
-        {
-            currentLevel++;
-            targetDoor = -1;
-        }
-		else if (doorId == currentLevel) // going back to previous level
-        {
-			currentLevel--;
-            targetDoor = doorId;
-        }
-        
-		initLevel(targetDoor); // initialize new level
-        activeDoor = ' ';
     }
     return false;
 }
-
-void Game::placePlayersAtEntrance(int specificDoor) // place players next to the door they entered from (manager)
+void Game::placePlayersAtEntrance(int previousLevelIdx)
 {
-    Screen& currentScreen = gameScreens[currentLevel];
+    int targetDoorId = -1;
 
-	int lowestDoor = 10; // higher than any door id
-    Point targetDoorPos;
-    bool found = false;
-
-	// Search for doors in the current screen (helped by AI)
-    for (int y = 0; y < Screen::MAP_HEIGHT; y++)
+	//step 1: look for door that leads to previous level
+    if (previousLevelIdx != -1)
     {
-        for (int x = 0; x < Screen::WIDTH; x++)
+        for (int i = 1; i <= 9; i++)
         {
-			char c = currentScreen.getCharAt(x, y);// get character at position
-            if (c >= '1' && c <= '9')
+            int leadsTo = currentScreen.getRoomMeta().getDoorLeadsTo(i);
+			if (leadsTo == previousLevelIdx) //Check if this door leading to previous level
             {
-                int id = c - '0';
-                if (specificDoor != -1)
+                targetDoorId = i;
+                break;
+            }
+        }
+    }
+
+	// step 2: if not found, look for any door (lowest numbered)
+    if (targetDoorId == -1)
+    {
+        for (int i = 1; i <= 9; i++) {
+            if (currentScreen.getRoomMeta().getDoorLeadsTo(i) != -1) {
+                targetDoorId = i;
+                break;
+            }
+        }
+    }
+
+	// step 3: place players next to the target door
+    if (targetDoorId != -1)
+    {
+        for (int y = 0; y < Screen::MAP_HEIGHT; y++)
+        {
+            for (int x = 0; x < Screen::WIDTH; x++)
+            {
+                if (currentScreen.getCharAt(x, y) == ('0' + targetDoorId))
                 {
-					if (id == specificDoor)// found the specific door
-                    {
-						targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' '); // set target position
-						found = true;  // mark as found
-						goto EndSearch;// exit both loops (helped by AI)
-                    }
-                }
-				else if (id < lowestDoor) // find the lowest door id    
-                {
-                    lowestDoor = id;
-                    targetDoorPos = Point(x, y, Direction::directions[Direction::STAY], ' ');
-                    found = true;
+                    placeNextToDoor(Point(x, y, Direction::directions[Direction::STAY], ' '));
+                    return;
                 }
             }
         }
     }
-    
-EndSearch:// exit point for goto (helped by AI)
-	if (!found) return;
-
-	placeNextToDoor(targetDoorPos); // place players next to the found door
-      
 }
 
+// Place players next to a door position
 void Game::placeNextToDoor(const Point& targetDoorPos)
 {
     int px = targetDoorPos.getX();
@@ -462,25 +807,49 @@ void Game::placeNextToDoor(const Point& targetDoorPos)
 
 void Game::resetGame()
 {
-	// reset game state
-    currentLevel = 0;
+    // reset game state
+    currentLevelIdx = 0;
     activeDoor = ' ';
     Door::switchesAreOn = false;
 
     player1.resetStats();
     player2.resetStats();
-	
 
-	// reset riddles
+
+    // reset riddles
     riddleBank.resetAllRiddles();
 
-	// reset doors
-    for (int i = 0; i < 10; i++)
+    // reset doors
+    for (int i = 0; i < Door::MAX_DOOR_ID; i++)
         Door::openDoors[i] = false;
 
-	// reload maps
-    for (int i = 0; i < MAX_LEVELS; i++)   
-        gameScreens[i].loadMap(i);
+	//reset bombs
+    if (activeBomb != nullptr)
+    {
+        delete activeBomb;
+        activeBomb = nullptr;
+	}
+    // Reset timer
+    gameTimer = 0;
+    timerActive = false;
+}
+// Draw active bomb on screen
+void Game::drawActiveBomb()
+{
+    if (activeBomb != nullptr && activeBomb->getRoomID() == currentLevelIdx)
+    {
+        Point pos = activeBomb->getPosition();
 
+		// draw bomb at its position
+        gotoxy(pos.getX(), pos.getY());
+        if (ColorsEnabled) {
+			setColor(COLOR_RED); // set bomb color
+        }
+        std::cout << '@';
+
+        if (ColorsEnabled) {
+            resetColor();
+        }
+    }
 }
 

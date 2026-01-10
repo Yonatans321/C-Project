@@ -1,17 +1,24 @@
 #include "Bomb.h"
 #include "Screen.h"
 #include "Player.h"
+#include "Results.h"
+#include "Utils.h"
+#include "SaveGame.h"
 #include <cmath> // For std::abs
+#include <iostream>
 
 // Update signature to match Bomb.h (3 arguments)
-void Bomb::explode(Screen& screen, Player& p1, Player& p2)
+void Bomb::explode(Screen& screen, Player& p1, Player& p2,bool isInCurrentRoom)
 {
     // 1. Remove the bomb from logical map and physical screen
     screen.setCharAt(position, ' ');
-    position.draw(' ');
+    if (isInCurrentRoom) {
+        position.draw(' ');
+    }
+    
 
-    int centerX = position.getX();
-    int centerY = position.getY();
+	int centerX = position.getX(); // Center of explosion
+	int centerY = position.getY(); // Center of explosion
 
     // 2. Destroy 'w' walls and '*' obstacles in range 1 (3x3 area)
     for (int y = -3; y <= 3; y++)
@@ -20,41 +27,61 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2)
         {
             if (x == 0 && y == 0) continue; // Skip the center
 
-            int targetX = centerX + x;
-            int targetY = centerY + y;
+			int targetX = centerX + x; // Target cell coordinates
+			int targetY = centerY + y; 
 
             char targetChar = screen.getCharAt(targetX, targetY);
-            if (targetChar == 'w' || targetChar == '*')
+			if (targetChar == 'w' || targetChar == '*') // Check for walls and obstacles
             {
-                screen.setCharAt(targetX, targetY, ' ');
-                Point(targetX, targetY).draw(' ');
+				screen.setCharAt(targetX, targetY, ' '); // Remove from logical map
+                if (isInCurrentRoom) {
+					Point(targetX, targetY).draw(' '); // Remove from physical screen
+                }
+                
             }
         }
     }
-
-    // 3. Check for player damage in range 3 (Chebyshev distance)
-    // If player is within 3 cells (including diagonals), they lose a life
-    if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
-        p1.loseLife();
-    }
-    if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
-        p2.loseLife();
-    }
+    if (isInCurrentRoom) 
+    {
+        // 3. Check for player damage in range 3 (Chebyshev distance)
+        // If player is within 3 cells (including diagonals), they lose a life
+        if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
+            p1.loseLife();
+            if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
+            {
+                gameResults->addLifeLost(eventTimer, PlayerType::Player1);
+            }
+        }
+        if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
+            p2.loseLife();
+            if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
+            {
+                gameResults->addLifeLost(eventTimer, PlayerType::Player2);
+            }
+        }
+     }
 }
 
-// Update signature to match Bomb.h (3 arguments)
-bool Bomb::tick(Screen& screen, Player& p1, Player& p2)
+
+bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
 {
+    
     // Decrease internal timer
     timer--;
 
-    // Redraw the bomb icon so it doesn't disappear when players move over it
-    position.draw('@');
-
+	bool isInCurrentRoom = (this->roomID == currentRoomID);
     if (timer <= 0)
     {
-        explode(screen, p1, p2); // Trigger explosion with player references
+        explode(screen, p1, p2, isInCurrentRoom); // Trigger explosion with player references
         return true;     // Bomb has finished its life cycle
     }
     return false;        // Bomb is still active
+
+
+}
+
+void Bomb::attachResults(Results* results, size_t timer) // Attach results to the results file
+{
+    gameResults = results;
+    eventTimer = timer;
 }

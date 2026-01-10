@@ -5,7 +5,7 @@
 
 // Static member initialization
 bool Door::switchesAreOn = false;
-bool Door::openDoors[10] = { false }; // static array to track open doors
+bool Door::openDoors[MAX_DOOR_ID] = { false }; // static array to track open doors
 static bool justWarned = false;
 
 //DOOR LOGIC
@@ -30,7 +30,7 @@ bool Door::tryOpen(int keyId)
 }
 
 // Handle door interaction for the player (helped by AI)
-bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundDoor)
+bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 {
 	if (!p.isActive()) return false; // do nothing if player is inactive
 
@@ -54,74 +54,71 @@ bool Door::handleDoor(Player& p, Screen& screen, int& currentLevel, char& foundD
 			int doorIndex = cell - '0';
 			Door* door = screen.getDoor(checkPos);// get door object
 			if (door == nullptr) continue;
-
+			// If door is already open, move player through
+			if (Door::openDoors[doorIndex]) {
+				p.setInactive();
+				p.erase();
+				foundDoor = cell;
+				return true;
+			}
 			bool doorCanPass = false;
-			if (doorIndex <= currentLevel)// door to previous or current level	
+			bool doorOpen = door->isOpen();
+			if (!doorOpen)// door is closed
 			{
-				doorCanPass = true;
-			}
-			if (doorIndex != (currentLevel + 1)) // door to future level
-			{
-				if (door->isOpen() || openDoors[doorIndex] == true)
-				{
-					doorCanPass = true;
-				}
-			}
-
-			// Check if the door is already open
-			if (door->isOpen() || openDoors[doorIndex] == true)
-			{
-				doorCanPass = true;
-			}
-			// Try to use key for the door
-			else
-			{
-				// Check if switches are on
-				if (!Door::switchesAreOn)
+				if (!Door::switchesAreOn) // Check if switches are on
 				{
 					Screen::drawAnimatedBox(10, 5, 50, 12);// draw message box
 					gotoxy(13, 7);
 					std::cout << "you cannot enter";
 					gotoxy(15, 9);
-					std::cout << "All switcehs must be ON!";
+					std::cout << "All switches must be ON!";
 					Sleep(1200);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();// move player back
-					screen.drawMap();
-					p.draw();
+					screen.drawMap(); // redraw map to clear any artifacts
+					p.draw(); // redraw player
 					return false;
 				}
-
-				if (p.useKeyForDoor(cell))// check if player has the correct key
+				char heldKey = p.getHeldItem();
+				int keyId = p.getItemId();
+				if (heldKey == 'K' && keyId == doorIndex)// player is holding a key that matches the door
 				{
-					door->tryOpen(doorIndex);// open the door
-					openDoors[doorIndex] = true;// mark door as open
+					door->setOpen();
+					Door::openDoors[doorIndex] = true;
 					p.keyUsed();// mark key as used
+					Screen::drawAnimatedBox(10, 5, 50, 12);
+					gotoxy(17, 7);
+					std::cout << "Door " << doorIndex << " unlocked!";
+					Sleep(1100);
+					Screen::closeAnimatedBox(10, 5, 50, 12);
 					doorCanPass = true;
 				}
-				else
-				{
+				else // player is not holding a key that matches the door 
+				{  
 					Screen::drawAnimatedBox(10, 5, 50, 12);
 					gotoxy(17, 7);
 					std::cout << "you need the correct key!";
 					Sleep(1100);
 					Screen::closeAnimatedBox(10, 5, 50, 12);
 					p.stepBack();
-					screen.drawMap();
-					p.draw();
+					screen.drawMap(); // redraw map to clear any artifacts
+					p.draw(); // redraw player
 					return false;
 				}
 			}
-
-			if (doorCanPass)
+			else
 			{
-				// Move the player through the door
-				p.setInactive();
-				p.erase();
+				doorCanPass = true; // door is open
+			}
+			if (doorCanPass) // move player through door
+			{
+				p.setInactive(); // deactivate player
+				p.erase(); // erase player from current position
 				foundDoor = cell;
-				return false;
+				return true;
 			}
 		}
+
 	}
 	return false;
 }

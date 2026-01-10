@@ -1,30 +1,65 @@
 ﻿#include "RiddleBank.h"
-#include "Game.h" 
+#include "Game.h"
+#include "SaveGame.h"
+
 #include <iostream>
 #include <string>
 #include <conio.h>
 #include <Windows.h>
 #include "Utils.h"
+#include <fstream>
 
-
-RiddleBank::RiddleBank() : riddleCount(0)
+RiddleBank::RiddleBank() : riddleCount(0), loadedSuccessfully(false)
 {
-    // Initialize with some riddles
-    riddles[riddleCount++] = Riddle(1, "What's the output?\nint x = 3;\ncout << x + ++x;", "7","Remember:++x increments BEFORE use");
-    riddles[riddleCount++] = Riddle(2, "What does this print?\nfor(int i=0;i<3;i++) cout << i;", "012", "Remember:Loop just like C");
-    riddles[riddleCount++] = Riddle(3, "What's the output?\nbool a = true;\nbool b = false;\ncout << (a && b);", "0", "Remember:the outcome can be in numbers");
-    riddles[riddleCount++] = Riddle(4, "What is the output?\ncout << 7 / 2;", "3", "Remember:how Divide works..?");
-    riddles[riddleCount++] = Riddle(5, "What does this print?\nstring s = \"Hello\";\ncout << s.length();", "5", "Remember:just like in C");
-    riddles[riddleCount++] = Riddle(6, "What's the output?\nint arr[] = {1,2,3};\ncout << arr[1];", "2", "Remember:you start counting from 0");
-    riddles[riddleCount++] = Riddle(7, "What's the output?\ncout << (5 > 3 ? 10 : 20);", "10", "Remember:if/else outcome..");
+    // Try to load riddles from file
+    std::ifstream file("Riddles.txt");
 
-    //fun riddlers
-    riddles[riddleCount++] = Riddle(8,"what has keys but can't open locks?","Keyboard", "you are using it right now...");
-	riddles[riddleCount++] = Riddle(9, "what has a head and a tail but no body?", "Coin", "possibility of 50% to guess it");
-	riddles[riddleCount++] = Riddle(10, "who will win the world cup 2026?", "Argentina", "They've won in 2022...");
-    riddles[riddleCount++] = Riddle(11, "How much will you give us on this project?", "100", "please we worked really hard! :)");
-    riddles[riddleCount++] = Riddle(12, "Quick Math : 1*2*3*4*5*6", "720", "Really? Boaz will be disapoointed");
-    riddles[riddleCount++] = Riddle(13, "what is the sum of numbers between 1-100", "5050", "50 precent both players you will get this");
+	if (!file.is_open()) {// File could not be opened
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "ERROR: Could not open Riddles.txt file!" << std::endl;
+        std::cout << "Please make sure Riddles.txt is in the same folder as the game." << std::endl;
+        std::cout << "========================================\n" << std::endl;
+        loadedSuccessfully = false;
+        return;
+    }
+
+	// Read riddles from file helped by AI
+    // Format: ID, Question, Answer, Hint (each on separate lines)
+    std::string line;
+    while (riddleCount < MAX_RIDDLES && std::getline(file, line)) {
+        // Read id
+        int id = std::stoi(line);
+
+        // Read Question
+        std::string question;
+        if (!std::getline(file, question)) break;
+        question = processNewlines(question);
+
+        // Read Answer
+        std::string answer;
+        if (!std::getline(file, answer)) break;
+
+        // Read Hint
+        std::string hint;
+        if (!std::getline(file, hint)) break;
+
+        // Create riddle with allocated strings
+        riddles[riddleCount++] = Riddle(id,
+            allocateString(question),
+            allocateString(answer),
+            allocateString(hint));
+    }
+
+    file.close();
+
+    if (riddleCount > 0) {
+        std::cout << "Successfully loaded " << riddleCount << " riddles from Riddles.txt" << std::endl;
+        loadedSuccessfully = true;
+    }
+    else {
+        std::cout << "ERROR: No riddles were loaded from Riddles.txt!" << std::endl;
+        loadedSuccessfully = false;
+    }
 }
 // Retrieve a riddle by its ID (returns nullptr if not found)
 Riddle* RiddleBank::getRiddleById(int riddleID)
@@ -35,16 +70,16 @@ Riddle* RiddleBank::getRiddleById(int riddleID)
             return &riddles[i];
         }
     }
-	return nullptr; // Not found
+    return nullptr; // Not found
 }
-void RiddleBank::addRiddle(const Riddle& r)
+void RiddleBank::addRiddle(const Riddle& r)// Add a riddle to the bank 
 {
-    if(riddleCount < MAX_RIDDLES) {
+    if (riddleCount < MAX_RIDDLES) {
         riddles[riddleCount++] = r;
-	}
+    }
 }
-Riddle* RiddleBank::getRiddleAt(int x, int y)
-{
+Riddle* RiddleBank::getRiddleAt(int x, int y)// Retrieve a riddle by its position (x, y) on the screen
+{// Check each riddle's position
     for (size_t i = 0; i < riddleCount; ++i) {
         Point p = riddles[i].getPosition();
         if (p.getX() == x && p.getY() == y) {
@@ -56,10 +91,63 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
 // AI generated function to attach positions to unsolved riddles based on '?' locations on the screen
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
+    const RoomMeta& meta = screen.getRoomMeta();
+    bool hasError = false;
+    std::string errorMessages = "";
+
+    // First, assign riddles based on metadata
+    for (int i = 0; i < meta.getRiddleCount(); i++)
+    {
+        int riddleID = meta.getRiddleID(i);
+        int x = meta.getRiddleX(i);
+        int y = meta.getRiddleY(i);
+
+        // Find the riddle with this ID
+        Riddle* r = getRiddleById(riddleID);
+        if (!r)
+        {
+            hasError = true;
+            errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+                " not found in Riddles.txt!\n";
+            continue;
+        }
+		// Skip already solved riddles
+        if (r->isSolved())
+        {
+            continue;
+        }
+		// Validate position
+        if (x < 0 || x >= Screen::WIDTH || y < 0 || y >= Screen::MAP_HEIGHT)
+        {
+            hasError = true;
+            errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+                " has invalid position (" + std::to_string(x) +
+                ", " + std::to_string(y) + ")!\n";
+            continue;
+        }
+		char cell = screen.getCharAt(x, y);
+		if (cell == '?') // Correct placement
+        {
+            r->setPosition(Point(x, y));
+            continue;
+        }
+		if (cell == ' ')// Empty cell - place the riddle here
+        {
+            r->setPosition(Point(x, y));
+            screen.setCharAt(x, y, '?'); // Place '?' at the position
+            continue;
+        }
+		hasError = true;// Cell is occupied
+        errorMessages += "ERROR: Riddle ID " + std::to_string(riddleID) +
+            " position (" + std::to_string(x) + ", " +
+            std::to_string(y) + ") is not empty or '?'. Current: '" +
+            cell + "'\n";
+    }
+
+    // Then handle any remaining '?' marks without metadata (backward compatibility)
     const int W = Screen::WIDTH;
     const int H = Screen::MAP_HEIGHT;
 
-	// for each '?' on the screen
     for (int y = 0; y < H; ++y)
     {
         for (int x = 0; x < W; ++x)
@@ -67,101 +155,41 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
             if (screen.getCharAt(x, y) != '?')
                 continue;
 
-			//check if a riddle is already assigned here
+            // Check if a riddle is already assigned here
             if (getRiddleAt(x, y) != nullptr)
                 continue;
-
-			// find an unsolved riddle without a position
-            for (size_t i = 0; i < riddleCount; ++i)
-            {
-                if (riddles[i].isSolved())
-                    continue;
-
-                Point p = riddles[i].getPosition();
-                if (p.getX() != 0 || p.getY() != 0)
-                    continue;
-
-                
-                riddles[i].setPosition(Point(x, y));
-                break;
-            }
+            screen.setCharAt(x, y, ' ');
         }
     }
+	// Display errors if any
+    if (hasError) {
+        gotoxy(0, 23);
+        std::cout << errorMessages;
+        std::cout << "Press any key to continue..." << std::endl;
+        waitForKey();
+        cls();
+    }
 }
+
 // AI generated function to check the answer for a given riddle ID
 RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
     Riddle* r = getRiddleById(riddleID);
-    if (!r) return RiddleOutcome::NotFound;
+	if (!r) return RiddleOutcome::NotFound; // Riddle ID not found
 
-    if (r->isSolved()) return RiddleOutcome::AlreadySolved;
+	if (r->isSolved()) return RiddleOutcome::AlreadySolved; // Already solved
 
     if (r->checkAnswer(answer.c_str())) {
         return RiddleOutcome::Correct;
     }
     return RiddleOutcome::Incorrect;
 }
-
-// AI genertaed func to help handle the Riddle when player steps on '?'
-void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
+// AI generated function to display the riddle question inside a box
+void RiddleBank::displayRiddleQuestion(Riddle* r, int bx, int by)
 {
-    int x = player.getX();
-    int y = player.getY();
-    char cell = screen.getCharAt(x, y);
-
-    if (cell != '?')
-        return;
-
-    Riddle* r = getRiddleAt(x, y);
-    if (!r || r->isSolved())
-        return;
-
-    const int bx = 15, by = 5, bw = 50, bh = 12;
-
-    
-    // YES/NO question
-    screen.drawAnimatedBox(bx, by, bw, bh);
-    gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
-    gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
-    
-    while (true)
-    {
-        char choice = _getch();
-        // ESC → pause
-        if (choice == ESC)
-        {
-            Game::pauseRequestedFromRiddle = true;
-            screen.closeAnimatedBox(bx, by, bw, bh);
-            player.stepBack();
-            return;
-        }
-        if (choice == 'N' || choice == 'n')
-        {
-            screen.closeAnimatedBox(bx, by, bw, bh);
-            player.stepBack(); // move player back to avoid re-triggering
-            //bring the '?' back
-            screen.setCharAt(x, y, '?');
-
-            // draw map and player again
-            screen.drawMap();
-            player.draw();
-
-            return;
-        }
-
-        if (choice == 'Y' || choice == 'y')
-        {
-            break;
-        }
-    }
-    screen.closeAnimatedBox(bx, by, bw, bh);
-
-    screen.drawAnimatedBox(bx, by, bw, bh);
-
     gotoxy(bx + 2, by + 1);
     std::cout << "Riddle:";
 
-    // print the question
     std::string q = r->getQuestion();
     int line = by + 3;
     std::string temp;
@@ -181,124 +209,258 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         gotoxy(bx + 2, line++);
         std::cout << temp;
     }
+}
 
-    int  answerLine = line + 1;
-    int answerInputLine = line + 2;
-    int hintorResultLine = line + 3; 
-    bool answered = false;
+// AI generated function to get user answer with hint support
+std::string RiddleBank::getUserAnswer(int bx, int answerLine, int answerInputLine,
+    int hintorResultLine, Riddle* r)
+{
+    // Display prompt
+    gotoxy(bx, answerLine);
+    std::cout << "Answer (press H for hint): ";
+    gotoxy(bx, answerInputLine);
+    std::cout << ">>> " << std::string(40, ' ');
 
-    while (!answered)
+    std::string ans = "";
+    int promptX = bx;
+    int cursorX = promptX + 4;
+    int cursorY = answerInputLine;
+
+    gotoxy(cursorX, cursorY);
+    // Input loop
+    while (true)
     {
-        // Prompt
-        gotoxy(bx + 2, answerLine);
-        std::cout << "Answer (press H for hint): ";
-		gotoxy(bx + 2, answerInputLine);
-        std::cout << ">>> " << std::string(40, ' ');
-        std::string ans = "";
-            
-		int promptX = bx + 2;
-        int cursorX = promptX + 4;
-	    int cursorY = answerInputLine;
-		
-        gotoxy(cursorX, cursorY);
+        if (eventTimerPtr != nullptr)
+        {
+            (*eventTimerPtr)++;
+        }
+        Sleep(20);
+        char c = getRiddleInputChar(); //call get input char function
+        if (isLoadMode && c == '\0') {
+            continue;
+        }
+        // ESC → pause the game
+        if (c == ESC)
+        {
+            Game::pauseRequestedFromRiddle = true;
+            return "";
+        }
 
-            while (true)
-            {
-                char c = _getch();
-                // ESC → pause the game
-                if (c == ESC)
-                {
-                    Game::pauseRequestedFromRiddle = true;
-                    screen.closeAnimatedBox(bx, by, bw, bh);
-                    player.stepBack();
-                    return;
-                } 
-                if (c == '\r')   // ENTER
-                {
-                    break; // end riddle input
-                }
-                else if ((c == 'H' || c == 'h') && ans.empty())
-                {
-                    // show hint
-                    gotoxy(bx + 2, hintorResultLine);
-                    std::cout << std::string(50, ' ');
-                    gotoxy(bx + 2, hintorResultLine);
-                    std::cout << "Hint: " << r->getHint();
-                    gotoxy(cursorX + (int)ans.length(), cursorY);
-					continue;
-                }
-                if (c == '\b') // BACKSPACE
-                {
-                    if (!ans.empty())
-                    {
-						ans.pop_back();
-						gotoxy(cursorX + (int)ans.length(), cursorY);
-						std::cout << ' ';
-                        gotoxy(cursorX + (int)ans.length(), cursorY);
-                    }
-                    continue;
-				}
-                if (ans.length()<40)
-                {
-                    ans.push_back(c);
-					gotoxy(cursorX + (int)ans.length() - 1, cursorY);
-					std::cout << c;
-                }
-            }
-
-            // CHECK ANSWER
-            bool correct = r->checkAnswer(ans.c_str());
-            //Clear hint line
-            gotoxy(bx + 2, hintorResultLine);
+        if (c == '\r')   // ENTER
+        {
+            return ans;
+        }
+        else if ((c == HINT || c == tolower(HINT)) && ans.empty()) // HINT
+        {
+            // show hint
+            gotoxy(bx, hintorResultLine);
             std::cout << std::string(50, ' ');
-
-            gotoxy(bx + 2, hintorResultLine);// Write feedback
-
-            if (correct)
+            gotoxy(bx, hintorResultLine);
+            std::cout << "Hint: " << r->getHint();
+            gotoxy(cursorX + (int)ans.length(), cursorY);
+            continue;
+        }
+        if (c == BACKSPACE) // BACKSPACE
+        {
+            if (!ans.empty())
             {
-                std::cout << "Correct! +100 points";
-                player.addPoints(100);
-                r->markAsSolved();
-
-                // remove '?'
-                screen.setCharAt(x, y, ' ');
+                ans.pop_back();
+                gotoxy(cursorX + (int)ans.length(), cursorY);
+                std::cout << ' ';
+                gotoxy(cursorX + (int)ans.length(), cursorY);
             }
-            else
-            {
-                std::cout << "Wrong! -1 life";
-                player.loseLife();
-                if (player.getLives() <= 0)
-                {
-                    player.addLives(); 
-
-					// special message for no lives left
-                    std::string msg = "No lives left :( granting 1 bonus life :)";
-                    gotoxy(34, Screen::MAP_HEIGHT + 1);
-                    setColor(COLOR_LIGHT_RED);
-                    std::cout << msg;
-					Sleep(2000);
-                    gotoxy(34, Screen::MAP_HEIGHT + 1);
-                    resetColor();
-					std::cout << std::string(msg.length(), ' ');
-                }
-                screen.setCharAt(x, y, '?'); // put the riddle symbol back
-            }
-
-            Sleep(700);
-            screen.closeAnimatedBox(bx, by, bw, bh);
-
-            //redraw map and player
-            player.stepBack(); // move player back to avoid re-triggering
-            screen.drawMap();
-            player.draw();
-
-            answered = true;
+            continue;
+        }
+        if (ans.length() < 40)
+        {
+            ans.push_back(c);
+            gotoxy(cursorX + (int)ans.length() - 1, cursorY);
+            std::cout << c;
+        }
     }
 }
-void RiddleBank::resetAllRiddles()
+
+// AI generated func to help handle the Riddle when player steps on '?'
+void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
+{
+    int x = player.getX();
+    int y = player.getY();
+    char cell = screen.getCharAt(x, y);
+
+    if (cell != '?')
+        return;
+
+    Riddle* r = getRiddleAt(x, y);
+    if (!r || r->isSolved())
+        return;
+
+    const int bx = 15, by = 5, bw = 50, bh = 12;
+    
+	screen.drawAnimatedBox(bx, by, bw, bh); // Draw initial box
+    gotoxy(bx + 2, by + 2); std::cout << "You stepped on a riddle.";
+    gotoxy(bx + 2, by + 4); std::cout << "Answer it? (Y/N): ";
+
+    while (true)
+    {
+        if (eventTimerPtr != nullptr)
+        {
+            (*eventTimerPtr)++;
+        }
+        Sleep(20);
+        char choice = getRiddleInputChar();
+        if (isLoadMode && choice == '\0') {
+            continue;
+        }
+        // ESC → pause
+        if (choice == ESC)
+        {
+            Game::pauseRequestedFromRiddle = true;
+            screen.closeAnimatedBox(bx, by, bw, bh);
+            player.stepBack();
+            return;
+        }
+        if (tolower(choice) == tolower(NO))
+        {
+            screen.closeAnimatedBox(bx, by, bw, bh);
+            player.stepBack();
+            screen.setCharAt(x, y, '?');
+
+            if (screen.isDark())
+                screen.drawMapWithTorch(player);
+            else
+                screen.drawMap();
+            player.draw();
+
+            return;
+        }
+
+        if (tolower(choice) == tolower(YES))
+        {
+            break;
+        }
+    }
+    screen.closeAnimatedBox(bx, by, bw, bh);
+
+    screen.drawAnimatedBox(bx, by, bw, bh);
+	displayRiddleQuestion(r, bx, by);  // help function to display question
+
+    int answerLine = by + 7;
+    int answerInputLine = by + 8;
+    int hintorResultLine = by + 9;
+
+    std::string answer = getUserAnswer(bx + 2, answerLine, answerInputLine,
+		hintorResultLine, r);  // help function to get user answer
+
+	//if paused during answer input
+    if (Game::pauseRequestedFromRiddle)
+    {
+        screen.closeAnimatedBox(bx, by, bw, bh);
+        player.stepBack();
+        return;
+    }
+
+    bool correct = r->checkAnswer(answer.c_str());
+
+    // Clear hint line
+    gotoxy(bx + 2, hintorResultLine);
+    std::cout << std::string(50, ' ');
+
+    gotoxy(bx + 2, hintorResultLine);  // Write feedback
+
+    if (correct)
+    {
+        std::cout << "Correct! +100 points";
+        player.addPoints(100);
+        r->markAsSolved();
+
+        // remove '?'
+        screen.setCharAt(x, y, ' ');
+		if (SAVE_MODE && gameResults != nullptr)  //check if are writing results
+        {
+            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
+        }
+    }
+    else
+    {
+        std::cout << "Wrong! -1 life";
+        player.loseLife();
+
+        screen.setCharAt(x, y, '?');  // put the riddle symbol back
+        if (SAVE_MODE && gameResults != nullptr)  //check if are writing results
+        {
+            PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
+            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
+            gameResults->addLifeLost(*eventTimerPtr, playerType);
+        }
+    }
+
+    Sleep(700);
+    screen.closeAnimatedBox(bx, by, bw, bh);
+
+    player.stepBack();  // move player back to avoid re-triggering
+    if (screen.isDark())
+        screen.drawMapWithTorch(player);
+    else
+        screen.drawMap();
+    player.draw();
+}
+
+void RiddleBank::resetAllRiddles() // Reset all riddles to unsolved state
 {
     for (size_t i = 0; i < riddleCount; ++i)
     {
         riddles[i].resetRiddle();
+    }
+}
+
+void RiddleBank::attachResults(Results* results, size_t* timerPtr)
+{
+    gameResults = results;
+    eventTimerPtr = timerPtr;
+};
+
+void RiddleBank::attachSteps(Steps* steps,bool loadmode)
+{
+    recordedSteps = steps;
+    isLoadMode = loadmode;
+};  
+
+char RiddleBank::getRiddleInputChar()
+{
+    char c;
+
+    
+    if (isLoadMode && recordedSteps != nullptr && eventTimerPtr != nullptr)
+    {
+        while (true)
+        {
+            Steps::Step step;
+            if (recordedSteps->getNextStep(*eventTimerPtr, step))
+            {
+                if (step.PlayerNum == 0)  // Riddle input
+                {
+                    c = step.key;
+                    Sleep(100);  // Small delay to see the replay
+                    return c;
+                }
+				continue; // Not a riddle step, keep waiting
+            }
+
+            // No riddle step at this time - wait for next frame
+			(*eventTimerPtr)++;
+            Sleep(20);
+        }
+    }
+    else  // ===== NORMAL MODE: GET KEYSTROKE FROM USER =====
+    {
+        c = _getch();
+
+        // Record keystroke in save mode
+        if (SAVE_MODE && recordedSteps != nullptr && eventTimerPtr != nullptr)
+        {
+            recordedSteps->addStep(*eventTimerPtr, 0, c);
+        }
+
+        return c;
     }
 }

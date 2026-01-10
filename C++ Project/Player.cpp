@@ -22,17 +22,9 @@ void Player::erase() const
 	//if on a switch - redraw the switch
 	if (tile == '/' || tile == '\\')
 	{
-		//
 		gotoxy(x, y);
-		if (tile == '/')
-		{
-			setColor(COLOR_LIGHT_GREEN); // COLOR GREEN
-		}
-		else 
-		{
-			setColor(COLOR_LIGHT_RED);  // COLOR RED
-		}
-		std::cout << tile; //paint the switch
+		setColor(COLOR_LIGHT_GREEN);
+		std::cout << tile;
 		resetColor();
 		return;
 	}
@@ -184,12 +176,12 @@ void Player::dropHeldItem()
 	Direction direction = position.getDirection();
 
 	// if the player is not moving
-	if (direction.getX()==0 && direction.getY()==0)
+	if (direction.getX() == 0 && direction.getY() == 0)
 	{
 		// default to right
 		dropX = position.getX() + 1;
 		dropY = position.getY();
-		
+
 
 		// if right blocked - try left
 		if (screen->getCharAt(dropX, dropY) != ' ')
@@ -220,7 +212,10 @@ void Player::dropHeldItem()
 	}
 	// check if drop position is empty
 	if (screen->getCharAt(dropX, dropY) == ' ') {
-		if (getHeldItem() == '@')
+
+		char droppedItem = heldItem;
+
+		if (droppedItem == '@')
 		{
 			bombDroppedRequest = true;
 			lastDropPos = Point(dropX, dropY);
@@ -228,12 +223,25 @@ void Player::dropHeldItem()
 		else
 		{
 			// put the item on the screen
-			screen->setCharAt(dropX, dropY, heldItem);
+			screen->setCharAt(dropX, dropY, droppedItem);
 		}
-		
-		DropItem();// drop from the player
-	}	
+
+		DropItem(); // drop from the player
+
+		if (droppedItem == '!' && screen->isDark())
+		{
+			screen->resetTorchState();
+			screen->drawDark();
+		}
+	}
 }
-
-
-
+// check if the key move belongs to the player
+bool Player::isMyKey(char ch) const {
+	char lowerCh = std::tolower(ch);
+	for (char key : keys) { 
+		if (std::tolower(key) == lowerCh) {
+			return true;
+		}
+	}
+	return false;
+}

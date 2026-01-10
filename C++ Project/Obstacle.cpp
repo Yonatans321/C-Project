@@ -13,6 +13,7 @@
 void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
 {
     Point obs;
+    bool pushed = false;
 
     if (isFacingObstacle(p1, screen, obs))
     {
@@ -22,31 +23,27 @@ void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
         if (count == 1)
         {
             pushChain(chain, p1.getDirection(), screen);
-            return;
+            pushed = true;
         }
-        if (count == 2 && playersAlignedAndPushing(p1, p2))
+        else if (count == 2 && playersAlignedAndPushing(p1, p2))
         {
             pushChain(chain, p1.getDirection(), screen);
-            return;
+            pushed = true;
         }
-        return;
     }
 
-    if (isFacingObstacle(p2, screen, obs))
+    if (!pushed && isFacingObstacle(p2, screen, obs))
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
-        int count = (int)chain.size();
+        size_t count = chain.size();
 
         if (count == 1)
         {
             pushChain(chain, p2.getDirection(), screen);
-            return;
         }
-
-        if (count == 2 && playersAlignedAndPushing(p2, p1))
+        else if (count == 2 && playersAlignedAndPushing(p2, p1))
         {
             pushChain(chain, p2.getDirection(), screen);
-            return;
         }
     }
 }
@@ -117,13 +114,23 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
     Point newSpot(chain.back().getX() + dir.getX(),
         chain.back().getY() + dir.getY());
 
+    bool isDark = screen.isDark();
     // move obstacle from end to start
-    for (int i =(int)chain.size() - 1; i >= 0; i--)
+    for (int i = (int)chain.size() - 1; i >= 0; i--)
     {
         Point from = chain[i];
         Point to = (i == chain.size() - 1) ? newSpot : chain[i + 1];
+        // move obstacle
+		if (isDark) // in dark mode
+        {
+            screen.setCharAtSilent(to.getX(), to.getY(), '*');
+            screen.setCharAtSilent(from.getX(), from.getY(), ' ');
+        }
 
-        screen.setCharAt(to.getX(), to.getY(), '*');
-        screen.setCharAt(from.getX(), from.getY(), ' ');
+		else // normal mode
+        {
+            screen.setCharAt(to.getX(), to.getY(), '*');
+            screen.setCharAt(from.getX(), from.getY(), ' ');
+        }
     }
 }

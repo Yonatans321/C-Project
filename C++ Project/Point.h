@@ -42,7 +42,7 @@ public:
 	void changeDirection(const Direction& new_dir) {
 		dir = new_dir;
 	}
-	Direction getDirection() const { return dir; };
+	const Direction& getDirection() const { return dir; };
 	Direction getOppositeDirection() const {
 		return Direction(-dir.getX(), -dir.getY());
 	}
