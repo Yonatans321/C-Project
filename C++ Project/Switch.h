@@ -2,7 +2,7 @@
 #include "Screen.h"
 #include "Player.h"
 #include "Door.h"
-
+// Class representing a switch in the game
 class Switch
 {
 public:
