@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Screen.h"
 # include "Results.h"
+# include "Steps.h"
 // Stores and manages multiple riddles
 // Possible outcomes when asking or checking a riddle
 
@@ -29,6 +30,7 @@ private:
     bool loadedSuccessfully = false;
 	Results* gameResults = nullptr;  // pointer to Results object
     size_t* eventTimerPtr = nullptr;           // pointer timer for events
+	Steps* recordedSteps = nullptr; // pointer to Steps riddles
 
 public:
     // Constructor
@@ -65,4 +67,5 @@ public:
     void resetAllRiddles();
 
     void attachResults(Results* results, size_t* timerPtr);
+    void attachSteps(Steps* steps);
 };
