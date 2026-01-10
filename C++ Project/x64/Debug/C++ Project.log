@@ -1,9 +1,20 @@
 ﻿  Bomb.cpp
+  Door.cpp
   Game.cpp
+  Key.cpp
   LoadGame.cpp
-  Results.cpp
+  Obstacle.cpp
+  Player.cpp
+  Point.cpp
+  Riddle.cpp
   RiddleBank.cpp
+  RoomMeta.cpp
   SaveGame.cpp
+  Screen.cpp
+  Steps.cpp
+  Switch.cpp
+  Torch.cpp
+  UIScreens.cpp
   main.cpp
   Generating Code...
-  C++ Project.vcxproj -> C:\Users\bache\C++ project\TEXT ADVENTURE PROJECT\x64\Debug\C++ Project.exe
+LINK : fatal error LNK1168: cannot open C:\Users\bache\C++ project\TEXT ADVENTURE PROJECT\x64\Debug\C++ Project.exe for writing
