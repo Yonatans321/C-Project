@@ -428,8 +428,8 @@ void Game::gameLoop()
                 p2PosLastFrame = player2.getPosition();
                 continue;
             }
-            else
-            {
+            else{
+                recordedSteps.addStepIfValid(eventTimer, ch, player1, player2);
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }
@@ -641,9 +641,7 @@ void Game::run() // main game loop
         }
         else if (currStatus == GameModes::NEW_GAME) // start new game
         {
-            //get all screen file names from the directory
-            getAllScreenFileNames(screenFileNames);
-
+            getAllScreenFileNames(screenFileNames);  //get all screen file names from the directory
             // check if any screen files were found
             if (screenFileNames.empty()) {
                 cls();
@@ -687,7 +685,8 @@ void Game::run() // main game loop
                 if (i > 0) screensString += "|";
                 screensString += screenFileNames[i];
             }
-            gameResults.setScreenFiles(screensString);
+			gameResults.setScreenFiles(screensString); 
+			recordedSteps.initForRecording(screenFileNames); // initialize steps recording
             //start the first level
             initLevel(screenFileNames[currentLevelIdx]);
 
@@ -853,3 +852,4 @@ void Game::drawActiveBomb()
         }
     }
 }
+

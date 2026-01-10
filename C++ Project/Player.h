@@ -99,5 +99,7 @@ public:
 	void clearBombRequest() { bombDroppedRequest = false; }
 
 	void resetStats() { heldItem = 0; lives = 3; points = 0; }
+
+	bool isMyKey(char ch) const; // check if the key move (A,W,D,X,E | I,J,L,M,O)  belongs to the player (& or $)
 };
 
