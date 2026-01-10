@@ -1,5 +1,7 @@
 ﻿#include "RiddleBank.h"
 #include "Game.h"
+#include "SaveGame.h"
+
 #include <iostream>
 #include <string>
 #include <conio.h>
@@ -358,7 +360,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 
         // remove '?'
         screen.setCharAt(x, y, ' ');
-		if (gameResults != nullptr)  //check if are writing results
+		if (SAVE_MODE && gameResults != nullptr)  //check if are writing results
         {
             gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
         }
@@ -369,9 +371,11 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         player.loseLife();
 
         screen.setCharAt(x, y, '?');  // put the riddle symbol back
-        if (gameResults != nullptr)  //check if are writing results
+        if (SAVE_MODE && gameResults != nullptr)  //check if are writing results
         {
-            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
+            PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
+            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
+            gameResults->addLifeLost(*eventTimerPtr, playerType);
         }
     }
 

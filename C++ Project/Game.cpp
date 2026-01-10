@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "Torch.h"
 
+bool SAVE_MODE = false;  // Define the global flag
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 
 Game::Game() // initializer list
@@ -58,7 +59,6 @@ void Game::showMenu()
     else {
         UIScreens::showMenu();
     }
-
     bool menu = true;
     while (menu)
     {
@@ -352,10 +352,7 @@ bool Game::checkGameOver()
 {
     if (player1.isDead() || player2.isDead())
     {
-        UIScreens::showGameOverMessage();
-        gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
-        gameResults.save("adv-world.result");
-        recordedSteps.saveSteps("adv-world.steps");
+        UIScreens::showGameOverMessage();;
         resetGame();
         currStatus = GameModes::MENU;
         return true;
@@ -396,9 +393,6 @@ void Game::gameLoop()
                 // Check if time's up
                 if (gameTimer <= 0) {
                     UIScreens::showGameOverMessage();
-                    gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
-                    gameResults.save("adv-world.result");
-                    recordedSteps.saveSteps("adv-world.steps");
                     resetGame();
                     currStatus = GameModes::MENU;
                     gameRunning = false;
@@ -742,9 +736,6 @@ bool Game::checkLevel() // check if level is completed
         {
             // you won the game
             showWinScreen();
-            gameResults.addGameEnd(eventTimer, player1.getScore(), player2.getScore());
-            gameResults.save("adv-world.result");
-            recordedSteps.saveSteps("adv-world.steps");
             return true;
         }
     }
@@ -854,7 +845,6 @@ void Game::drawActiveBomb()
         if (ColorsEnabled) {
 			setColor(COLOR_RED); // set bomb color
         }
-
         std::cout << '@';
 
         if (ColorsEnabled) {
