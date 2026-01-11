@@ -9,8 +9,8 @@
 #include "Utils.h"
 #include "Torch.h"
 
-bool SAVE_MODE = false;  // Define the global flag
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
+extern bool LOAD_MODE;
 
 Game::Game() // initializer list
     : player1(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'),
@@ -620,7 +620,14 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
-    waitForKey();
+
+    if (!LOAD_MODE) {  // ===== אם לא בLOAD mode, חכה לקלט =====
+        waitForKey();
+    }
+    else {  // ===== אם בLOAD mode, עשה SLEEP =====
+        Sleep(GAME_DELAY);
+    }
+
     cls();  // Clear after key press
 }
 

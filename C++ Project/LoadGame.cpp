@@ -9,8 +9,11 @@
 #include "Switch.h"
 #include "Door.h"
 
+bool LOAD_MODE = false;
+
 void LoadGame::run()
 {
+    LOAD_MODE = true;
     if (!isSilentMode)
     {
         cls();
@@ -32,8 +35,6 @@ void LoadGame::run()
         {
             std::cout << "ERROR: Could not load adv-world.result!" << std::endl;
             std::cout << "Make sure you ran -save mode first." << std::endl;
-            std::cout << "Press any key to continue..." << std::endl;
-            waitForKey();
         }
         else
         {
@@ -50,8 +51,6 @@ void LoadGame::run()
         {
             std::cout << "ERROR: Could not load adv-world.steps!" << std::endl;
             std::cout << "Steps file not found. Make sure you ran -save mode first." << std::endl;
-            std::cout << "Press any key to continue..." << std::endl;
-            waitForKey();
         }
         else
         {
@@ -69,8 +68,6 @@ void LoadGame::run()
         if (!isSilentMode)
         {
             std::cout << "ERROR: No screen files found!" << std::endl;
-            std::cout << "Press any key to continue..." << std::endl;
-            waitForKey();
         }
         else
         {
@@ -89,8 +86,6 @@ void LoadGame::run()
             if (!isSilentMode)
             {
                 std::cout << "ERROR: Could not load screen file: " << fileName << std::endl;
-                std::cout << "Press any key to continue..." << std::endl;
-                waitForKey();
             }
             else
             {
@@ -136,9 +131,7 @@ void LoadGame::run()
     // Run game loop
     replayGameLoop();
 
-    // Save to appropriate file based on mode
-    std::string resultFile = isSilentMode ? "adv-world.result.temp" : "adv-world.result";
-    gameResults.save(resultFile);
+    // ===== NO FILE SAVING - Just compare in memory =====
 
     // Validation result output
     if (isSilentMode)
@@ -157,16 +150,6 @@ void LoadGame::run()
         {
             std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
             std::cout << failureReason << std::endl;
-        }
-
-        // Clean up temp file
-        try
-        {
-            std::filesystem::remove("adv-world.result.temp");
-        }
-        catch (const std::exception&)
-        {
-            // If cleanup fails, it's not critical
         }
     }
     else
@@ -272,7 +255,7 @@ void LoadGame::replayGameLoop()
             player2.keyPressed(key);
         }
 
-        // Ignore all user input
+        // Ignore all user input in LOAD mode, but check for automatic steps
         if (_kbhit())
         {
             _getch();

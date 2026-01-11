@@ -3,6 +3,7 @@
 #include "Steps.h"
 #include <filesystem>  // Add this for file operations in silent mode
 
+extern bool LOAD_MODE;
 class LoadGame : public Game { // derived from Game
 public:
 	LoadGame(bool silent = false) : isSilentMode(silent) {} // constructor

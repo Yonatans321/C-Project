@@ -1,5 +1,6 @@
 #pragma once
 class Screen;
+extern bool LOAD_MODE;
 
 enum class GameModes { MENU, INSTRUCTIONS, NEW_GAME, EXIT, RETURN_TO_THE_GAME}; // possible game modes
 class UIScreens
