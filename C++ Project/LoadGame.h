@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Steps.h"
+#include <filesystem>  // Add this for file operations in silent mode
 
 class LoadGame : public Game { // derived from Game
 public:

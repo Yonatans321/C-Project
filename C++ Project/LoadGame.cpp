@@ -3,6 +3,7 @@
 #include <fstream>
 #include <conio.h>
 #include <windows.h>
+#include <filesystem>
 #include "Torch.h"
 #include "Key.h"
 #include "Switch.h"
@@ -135,8 +136,9 @@ void LoadGame::run()
     // Run game loop
     replayGameLoop();
 
-    // Save the generated results
-    gameResults.save("adv-world.result");
+    // Save to appropriate file based on mode
+    std::string resultFile = isSilentMode ? "adv-world.result.temp" : "adv-world.result";
+    gameResults.save(resultFile);
 
     // Validation result output
     if (isSilentMode)
@@ -155,6 +157,16 @@ void LoadGame::run()
         {
             std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
             std::cout << failureReason << std::endl;
+        }
+
+        // Clean up temp file
+        try
+        {
+            std::filesystem::remove("adv-world.result.temp");
+        }
+        catch (const std::exception&)
+        {
+            // If cleanup fails, it's not critical
         }
     }
     else
