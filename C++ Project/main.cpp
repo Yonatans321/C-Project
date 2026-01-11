@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Parse command-line arguments
-	if (strcmp(argv[1], "-save") == 0) { // save mode
+	if (strcmp(argv[1], "-save") == 0) { // Save mode - ignore -silent flag if provided (it's ignored in save mode)
+
         SAVE_MODE = true;
         SaveGame game;
         game.run();

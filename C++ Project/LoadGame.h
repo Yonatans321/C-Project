@@ -11,8 +11,14 @@ public:
 
 protected:
 	bool isSilentMode; // flag for silent mode
-	void gameLoop(); 
-    // Replay game loop that ignores user input
-    void replayGameLoop();
+	void gameLoop() override;
+	// Replay game loop that ignores user input
+	void replayGameLoop();
+	// Initialize level without drawing (for silent mode)
+	void initLevelSilent(const std::string& filename);
+	// Override checkGameOver to hide screens in silent mode
+	bool checkGameOver() override;
+	// Override checkLevel to hide screens in silent mode
+	bool checkLevel() override;
 	Steps loadedSteps; // steps loaded from file
 };

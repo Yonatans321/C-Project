@@ -4,6 +4,9 @@
 #include <conio.h>
 #include <windows.h>
 #include "Torch.h"
+#include "Key.h"
+#include "Switch.h"
+#include "Door.h"
 
 void LoadGame::run()
 {
@@ -34,13 +37,12 @@ void LoadGame::run()
         else
         {
             std::cout << "ERROR: adv-world.result not found!" << std::endl;
-            std::cout << "Make sure you ran -save mode first." << std::endl;
         }
         return;
     }
 
     // Check if adv-world.steps exists
-	loadedSteps = Steps::loadSteps("adv-world.steps");
+    loadedSteps = Steps::loadSteps("adv-world.steps");
     if (!loadedSteps.hasMoreSteps())
     {
         if (!isSilentMode)
@@ -53,11 +55,10 @@ void LoadGame::run()
         else
         {
             std::cout << "ERROR: adv-world.steps not found!" << std::endl;
-            std::cout << "Steps file not found. Make sure you ran -save mode first." << std::endl;
         }
         return;
     }
-	loadedSteps.resetReplay();
+    loadedSteps.resetReplay();
 
     // Load all screen files from directory
     getAllScreenFileNames(screenFileNames);
@@ -111,20 +112,41 @@ void LoadGame::run()
         screensString += screenFileNames[i];
     }
     gameResults.setScreenFiles(screensString);
-	gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);  // initial screen change events
+    gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
-    initLevel(screenFileNames[currentLevelIdx]);
-	riddleBank.attachSteps(&loadedSteps, true);
-    // Run game loop (will ignore user input)
-    replayGameLoop();
+    // Initialize level - only draw if NOT in silent mode
+    if (!isSilentMode)
+    {
+        initLevel(screenFileNames[currentLevelIdx]);
+    }
+    else
+    {
+        initLevelSilent(screenFileNames[currentLevelIdx]);
+    }
 
-    // Validation in silent mode
+    riddleBank.attachSteps(&loadedSteps, true);
+
+    // Tell RiddleBank if we're in SILENT mode
     if (isSilentMode)
     {
+        riddleBank.setSilentMode(true);
+    }
+
+    // Run game loop
+    replayGameLoop();
+
+    // Save the generated results
+    gameResults.save("adv-world.result");
+
+    // Validation result output
+    if (isSilentMode)
+    {
+        cls();
+        gotoxy(0, 0);
+
         std::string failureReason;
         bool testPassed = gameResults.compareWith(expectedResults, failureReason);
 
-        std::cout << "\n========================================" << std::endl;
         if (testPassed)
         {
             std::cout << "TEST PASSED: Game replay matches expected results!" << std::endl;
@@ -132,15 +154,13 @@ void LoadGame::run()
         else
         {
             std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
-            std::cout << "\nFAILURE DETAILS:" << std::endl;
             std::cout << failureReason << std::endl;
         }
-        std::cout << "========================================\n" << std::endl;
     }
     else
     {
         cls();
-		gotoxy(18, 10);
+        gotoxy(18, 10);
         std::cout << "\n========================================" << std::endl;
         std::cout << "       GAME REPLAY COMPLETED" << std::endl;
         std::cout << "========================================\n" << std::endl;
@@ -148,13 +168,52 @@ void LoadGame::run()
     }
 }
 
-// Override game loop to ignore user input and handle silent mode
+void LoadGame::initLevelSilent(const std::string& filename)
+{
+    currentRoomMeta = currentScreen.getRoomMeta();
+    currentScreen.resetTorchState();
+
+    if (currentRoomMeta.hasKeyPosition())
+    {
+        int doorID = currentRoomMeta.getKeyDoorID();
+        if (doorID != -1 && !Door::openDoors[doorID] &&
+            player1.getItemId() != doorID &&
+            player2.getItemId() != doorID)
+        {
+            Key::placeFromMetadata(currentScreen);
+        }
+    }
+
+    currentRoomMeta.placeLightSwitchFromMetadata(currentScreen);
+
+    if (currentLevelIdx == 0)
+    {
+        gameTimer = maxGameTime;
+        timerActive = true;
+    }
+
+    riddleBank.attachPositionToRoom(currentScreen);
+    riddleBank.attachResults(&gameResults, &eventTimer);
+    player1.setScreen(currentScreen);
+    player2.setScreen(currentScreen);
+
+    if (!player1.isActive())
+        player1.activate();
+    if (!player2.isActive())
+        player2.activate();
+
+    player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
+    player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'));
+
+    if (!Switch::exists(currentScreen))
+        Door::allSwitchesAreOn();
+}
+
 void LoadGame::gameLoop()
 {
     replayGameLoop();
 }
 
-// Replay game loop that ignores all user input
 void LoadGame::replayGameLoop()
 {
     bool gameRunning = true;
@@ -192,23 +251,22 @@ void LoadGame::replayGameLoop()
                 }
             }
         }
+
         Steps::Step currentStep;
         if (loadedSteps.getNextStep(eventTimer, currentStep))
         {
-            // Replay the recorded keystroke
             char key = currentStep.key;
-
-            // Send key to BOTH players - they will filter it themselves using isMyKey()
             player1.keyPressed(key);
             player2.keyPressed(key);
         }
-        // Ignore all user input (including ESC)
+
+        // Ignore all user input
         if (_kbhit())
         {
-            _getch();  // Consume key but don't process it
+            _getch();
         }
 
-        // Update game state (same as normal game)
+        // Update game state
         updateBomb();
         updatePlayers();
 
@@ -237,13 +295,7 @@ void LoadGame::replayGameLoop()
             drawActiveBomb();
             updateDisplay();
 
-            // Faster playback in load mode (20ms per frame)
             Sleep(20);
-        }
-        else
-        {
-            // Silent mode - no rendering, minimal sleep
-            Sleep(1);
         }
 
         // Check end conditions
@@ -258,12 +310,14 @@ void LoadGame::replayGameLoop()
             if (player1.isActive())
             {
                 player1.rememberPosition();
-                player1.erase();
+                if (!isSilentMode)
+                    player1.erase();
             }
             if (player2.isActive())
             {
                 player2.rememberPosition();
-                player2.erase();
+                if (!isSilentMode)
+                    player2.erase();
             }
 
             if (!isSilentMode)
@@ -282,12 +336,78 @@ void LoadGame::replayGameLoop()
         p1PosLastFrame = player1.getPosition();
         p2PosLastFrame = player2.getPosition();
     }
-
-    // Save the replay results for comparison
-    gameResults.save("adv-world.result");
-    
 }
 
+bool LoadGame::checkGameOver()
+{
+    if (player1.isDead() || player2.isDead())
+    {
+        if (!isSilentMode)
+        {
+            UIScreens::showGameOverMessage();
+        }
+        gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
+        resetGame();
+        return true;
+    }
 
+    if (checkLevel())
+    {
+        return true;
+    }
 
-//el yan 3 years contractror at microsoft
+    return false;
+}
+
+bool LoadGame::checkLevel()
+{
+    if (!player1.isActive() && !player2.isActive())
+    {
+        allLevels[currentLevelIdx] = currentScreen;
+
+        int doorId = activeDoor - '0';
+        Door* door = currentScreen.getDoorById(doorId);
+        if (!door) return false;
+
+        int nextLevelIdx = door->getDestinationLevel();
+
+        if (nextLevelIdx >= 0 && nextLevelIdx < (int)allLevels.size())
+        {
+            char p1Item = player1.getHeldItem();
+            int p1ItemId = player1.getItemId();
+            char p2Item = player2.getHeldItem();
+            int p2ItemId = player2.getItemId();
+
+            currentLevelIdx = nextLevelIdx;
+            currentScreen = allLevels[currentLevelIdx];
+            currentScreen.setDark(currentScreen.getRoomMeta().isDark());
+
+            if (!isSilentMode)
+            {
+                initLevel(screenFileNames[currentLevelIdx], doorId);
+            }
+
+            gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
+
+            if (p1Item != ' ' && p1Item != 0)
+                player1.GrabItem(p1Item, p1ItemId);
+            if (p2Item != ' ' && p2Item != 0)
+                player2.GrabItem(p2Item, p2ItemId);
+            activeDoor = ' ';
+            return false;
+        }
+        else
+        {
+            // You won the game
+            if (!isSilentMode)
+            {
+                showWinScreen();
+            }
+
+            gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
+
+            return true;
+        }
+    }
+    return false;
+}
