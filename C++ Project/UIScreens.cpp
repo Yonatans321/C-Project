@@ -5,7 +5,6 @@
 #include <windows.h>
 #include "Screen.h"
 
-
 // prints the given screen to console
 void UIScreens::printScreen(const char** screen)
 {
@@ -209,7 +208,12 @@ void UIScreens::showGameOverMessage()
     };
 
     printScreen(GAME_OVER_SCREEN);
-    waitForKey();
+    if (!LOAD_MODE) {  // ===== אם לא בLOAD mode, חכה לקלט =====
+        waitForKey();
+    }
+    else {  // ===== אם בLOAD mode, עשה SLEEP =====
+        Sleep(80);
+    }
 }
 
 void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
@@ -220,6 +224,13 @@ void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     std::cout << "You can only carry one item at a time.";
     gotoxy(13, 11);
     std::cout << "Press any key to continue...";
-	waitForKey();
+
+    if (!LOAD_MODE) {  // ===== אם לא בLOAD mode, חכה לקלט =====
+        waitForKey();
+    }
+    else {  // ===== אם בLOAD mode, עשה SLEEP =====
+        Sleep(80);
+    }
+
     Screen::closeAnimatedBox(10, 5, 50, 12);
 }

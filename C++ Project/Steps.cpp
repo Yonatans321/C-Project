@@ -1,11 +1,12 @@
 #include "Steps.h"
 #include <fstream>
+
 #include <iostream>
 
 
 // Add a step to the recording
 void Steps::addStep(size_t iteration, int playerNum, char step) {
-    steps.push_back({iteration, playerNum, step});
+    steps.push_back({ iteration, playerNum, step });
 }
 
 // Load steps from file
@@ -13,11 +14,10 @@ Steps Steps::loadSteps(const std::string& filename) {
     Steps loadedSteps;
     std::ifstream steps_file(filename);
 
-	if (!steps_file.is_open()) {// Check if file opened successfully
+    if (!steps_file.is_open()) {// Check if file opened successfully
         std::cout << "Error: Could not open steps file: " << filename << std::endl;
         return loadedSteps;
     }
-    std::cout << "Successfully opened steps file: " << filename << std::endl;
 
     // Read screen files line (first line) - format: "Loading the screens: file1|file2|file3"
     std::string screensLine;
@@ -31,7 +31,6 @@ Steps Steps::loadSteps(const std::string& filename) {
                 screens = screens.substr(start);
             }
             loadedSteps.setScreenFiles(screens);
-            std::cout << "Loaded screens: " << screens << std::endl;
         }
     }
 
@@ -47,7 +46,6 @@ Steps Steps::loadSteps(const std::string& filename) {
                 numStr = numStr.substr(start);
             }
             size_t size = std::stoul(numStr);
-            std::cout << "Loading " << size << " steps..." << std::endl;
 
             // Read each step - format: "TIME: 6 PLAYER: 1 KEY: d"
             std::string line;
@@ -75,8 +73,6 @@ Steps Steps::loadSteps(const std::string& filename) {
                         char key = keyStr[0];
 
                         loadedSteps.addStep(iteration, playerNum, key);
-                        std::cout << "Step " << (i + 1) << ": TIME=" << iteration
-                            << " PLAYER=" << playerNum << " KEY=" << key << std::endl;
                     }
                 }
             }
@@ -84,9 +80,9 @@ Steps Steps::loadSteps(const std::string& filename) {
     }
 
     steps_file.close();
-    std::cout << "Successfully loaded " << loadedSteps.steps.size() << " steps!" << std::endl;
     return loadedSteps;
 }
+
 // Save steps to file
 void Steps::saveSteps(const std::string& filename) const {
     std::ofstream steps_file(filename);
@@ -96,9 +92,9 @@ void Steps::saveSteps(const std::string& filename) const {
         return;
     }
 
-	steps_file <<"Loading the screens: " << screenFiles << '\n'; // Write screen files line (first line)
- 
-	steps_file<<"Number of steps: " << steps.size() << "\n";  // Write number of steps (second line)
+    steps_file << "Loading the screens: " << screenFiles << '\n'; // Write screen files line (first line)
+
+    steps_file << "Number of steps: " << steps.size() << "\n";  // Write number of steps (second line)
 
     // Write each step: iteration and key
     for (const auto& step : steps) {
@@ -107,7 +103,7 @@ void Steps::saveSteps(const std::string& filename) const {
             << " KEY: " << step.key << "\n";
     }
 
-	steps_file.close(); // Close the file
+    steps_file.close(); // Close the file
 
     std::cout << "Saved " << steps.size()
         << " steps to " << filename << std::endl;
@@ -132,7 +128,7 @@ bool Steps::getNextStep(size_t currentIteration, Step& outStep) {
 // Reset replay to beginning
 void Steps::resetReplay() {
     currentStepIndex = 0;
-	riddleStepIndex = 0;
+    riddleStepIndex = 0;
 }
 
 // Check if there are more steps to replay
@@ -145,32 +141,35 @@ bool Steps::hasMoreSteps() const {
 void Steps::clearSteps() {
     steps.clear();
     currentStepIndex = 0;
-	riddleStepIndex = 0;
+    riddleStepIndex = 0;
     screenFiles = "";
 }
+
 // Initialize for recording with screen file names
 void Steps::initForRecording(const std::vector<std::string>& fileNames) {
-   
-	clearSteps(); // Clear any existing steps
 
-  
-	std::string screensString = ""; // Concatenate file names with '|' delimiter
-	for (size_t i = 0; i < fileNames.size(); i++) {  // Iterate through file names
-		if (i > 0) screensString += "|"; // Add delimiter for all but first
-		screensString += fileNames[i]; // Append file name
+    clearSteps(); // Clear any existing steps
+
+
+    std::string screensString = ""; // Concatenate file names with '|' delimiter
+    for (size_t i = 0; i < fileNames.size(); i++) {  // Iterate through file names
+        if (i > 0) screensString += "|"; // Add delimiter for all but first
+        screensString += fileNames[i]; // Append file name
     }
 
-	screenFiles = screensString; // Set the concatenated string
+    screenFiles = screensString; // Set the concatenated string
 }
+
 // Add step if key belongs to a player
 void Steps::addStepIfValid(size_t iteration, char ch, const Player& p1, const Player& p2) {
-	if (p1.isMyKey(ch)) {// player 1 is identified with the sign '&' - we will register it as playerNum 1
+    if (p1.isMyKey(ch)) {// player 1 is identified with the sign '&' - we will register it as playerNum 1
         addStep(iteration, 1, ch);
     }
-	else if (p2.isMyKey(ch)) { // player 2 is identified with the sign '$' - we will register it as playerNum 2
+    else if (p2.isMyKey(ch)) { // player 2 is identified with the sign '$' - we will register it as playerNum 2
         addStep(iteration, 2, ch);
     }
 }
+
 // Get next riddle step (PlayerNum == 0)
 bool Steps::getNextRiddleStep(Step& outStep) {
     // Scan forward from riddleStepIndex looking for PlayerNum == 0

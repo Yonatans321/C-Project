@@ -3,8 +3,12 @@
 #include <conio.h>
 #include <windows.h>
 #include "Torch.h"
+
+bool SAVE_MODE = false;
+
 void SaveGame::run() // override run method helped by AI
 {
+    LOAD_MODE = false;
     while (currStatus != GameModes::EXIT)
     {
         if (currStatus == GameModes::MENU)
@@ -67,7 +71,7 @@ void SaveGame::run() // override run method helped by AI
 
             // ===== INITIALIZE STEPS RECORDING =====
             recordedSteps.initForRecording(screenFileNames);
-			riddleBank.attachSteps(&recordedSteps,false);
+            riddleBank.attachSteps(&recordedSteps, false);
             // ===== INITIALIZE SCREEN CHANGE EVENT =====
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
@@ -76,7 +80,7 @@ void SaveGame::run() // override run method helped by AI
 
             // ===== SAVE FILES AFTER GAME ENDS =====
             gameResults.save("adv-world.result");
-			recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
+            recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
             cls();  // Clear the screen first
             gotoxy(18, 10);
             std::cout << "\n========================================" << std::endl;
@@ -169,7 +173,7 @@ void SaveGame::saveGameLoop() // custom game loop that records events
             }
             else
             {
-				recordedSteps.addStepIfValid(eventTimer, ch, player1, player2); // Record valid player steps
+                recordedSteps.addStepIfValid(eventTimer, ch, player1, player2); // Record valid player steps
                 player1.keyPressed(ch);
                 player2.keyPressed(ch);
             }
@@ -247,6 +251,7 @@ bool SaveGame::checkGameOver() // override checkGameOver to record game over eve
     {
         UIScreens::showGameOverMessage();
         gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
+        recordedSteps.addStep(eventTimer, 0, ' '); // ===== NEW: Record the "any key" press =====
         resetGame();
         currStatus = GameModes::MENU;
         return true;
@@ -302,6 +307,7 @@ bool SaveGame::checkLevel() // override checkLevel to record screen changes
 
             // ===== RECORD GAME FINISHED =====
             gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
+            recordedSteps.addStep(eventTimer, 0, ' '); // ===== NEW: Record the "any key" press =====
 
             return true;
         }

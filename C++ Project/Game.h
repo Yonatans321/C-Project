@@ -14,7 +14,7 @@
 #include "Steps.h"  
 
 enum class Mode { REGULAR, SAVE, LOAD };
-
+extern bool LOAD_MODE;
 class Game {
 protected:
 
@@ -32,7 +32,7 @@ protected:
 	static constexpr char INSTRUCTIONS_KEY = '8'; // show instructions
 	static constexpr char EXIT_KEY = '9'; // exit game
 	static constexpr char Colors_ON_OFF = '2'; // toggle colors
-
+	
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
 	void updateBomb();        // update bomb state

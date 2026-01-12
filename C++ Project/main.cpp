@@ -5,26 +5,26 @@
 #include <iostream>
 #include <cstring>
 
+extern bool LOAD_MODE;
+extern bool SAVE_MODE;  
 int main(int argc, char* argv[]) {
-
-    // No arguments - normal game with menu
+        // No arguments - normal game with menu
     if (argc == 1) {
-        SAVE_MODE = false;
         Game game;
         game.run();
         return 0;
     }
 
     // Parse command-line arguments
-	if (strcmp(argv[1], "-save") == 0) { // save mode
+	if (strcmp(argv[1], "-save") == 0) { // Save mode - ignore -silent flag if provided (it's ignored in save mode)
+
         SAVE_MODE = true;
         SaveGame game;
         game.run();
     }
 	else if (strcmp(argv[1], "-load") == 0) { // load mode
-        SAVE_MODE = false;
         bool silent = false;
-
+        LOAD_MODE = true;
 		if (argc > 2 && strcmp(argv[2], "-silent") == 0) { // silent mode
             silent = true;
         }
