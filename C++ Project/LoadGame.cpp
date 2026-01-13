@@ -131,16 +131,29 @@ void LoadGame::run()
     // Run game loop
     replayGameLoop();
 
-    // ===== NO FILE SAVING - Just compare in memory =====
-
-    // Validation result output
+    // ===== SILENT MODE: Save to temp, compare, then delete =====
     if (isSilentMode)
     {
+        // Save to temporary file
+        gameResults.save("adv-world.result.tmp");
+
+        // Load the temp file to compare
+        Results tempResults;
+        try
+        {
+            tempResults.load("adv-world.result.tmp");
+        }
+        catch (const std::exception&)
+        {
+            std::cout << "ERROR: Could not load temp results file!" << std::endl;
+            return;
+        }
+
         cls();
         gotoxy(0, 0);
 
         std::string failureReason;
-        bool testPassed = gameResults.compareWith(expectedResults, failureReason);
+        bool testPassed = tempResults.compareWith(expectedResults, failureReason);
 
         if (testPassed)
         {
@@ -150,6 +163,16 @@ void LoadGame::run()
         {
             std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
             std::cout << failureReason << std::endl;
+        }
+
+        // Clean up temp file
+        try
+        {
+            std::filesystem::remove("adv-world.result.tmp");
+        }
+        catch (const std::exception&)
+        {
+            // If cleanup fails, it's not critical
         }
     }
     else
@@ -248,7 +271,7 @@ void LoadGame::replayGameLoop()
         }
 
         Steps::Step currentStep;
-        if (loadedSteps.getNextStep(eventTimer, currentStep))
+        while (loadedSteps.getNextStep(eventTimer, currentStep))
         {
             char key = currentStep.key;
             player1.keyPressed(key);
