@@ -34,7 +34,7 @@ void UIScreens::showMenu()
         "                            [1]  Start a New Game                                ",
         "                            [8]  Instructions & Controls                         ",
         "                            [9]  Exit                                            ",
-        "                                                                                ",
+        "                            [3]  Load saved game                                ",
         "                                                                                ",
         "                       Tip: If you get lost that's on you.                      ",
         "                                                                                ",
@@ -107,7 +107,7 @@ void UIScreens::showPauseScreen()
         "                                                                                ", // 7
         "                      Press ESC to return to the game                            ", // 8
         "                      Press H   to return to the main menu                       ", // 9
-        "                                                                                ", // 10
+        "                      Press S   to save the game                                ", // 10
         "                                                                                ", // 11
         "                                                                                ", // 12
         "                                                                                ", // 13

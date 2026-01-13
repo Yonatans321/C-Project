@@ -13,9 +13,11 @@
 #include <filesystem> // for directory iteration
 #include "Steps.h"  
 
+
 enum class Mode { REGULAR, SAVE, LOAD };
-extern bool LOAD_MODE;
+
 class Game {
+	friend class GameStateManager;
 protected:
 
 	// Constants
@@ -32,7 +34,7 @@ protected:
 	static constexpr char INSTRUCTIONS_KEY = '8'; // show instructions
 	static constexpr char EXIT_KEY = '9'; // exit game
 	static constexpr char Colors_ON_OFF = '2'; // toggle colors
-	
+	static constexpr char LOAD_SAVED_GAME_KEY = '3'; // load saved game
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
 	void updateBomb();        // update bomb state

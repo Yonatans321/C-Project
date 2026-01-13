@@ -84,10 +84,13 @@ public:
 	void addPoints(int pts);
 	void losePoints(int pts);
 	int getScore() const;
+	void setScore(int s) { points = s; } // set score
 	void addLives();
 	int getLives() const;
+	void setLives(int l) { lives = l; } // set lives
 	void loseLife();
 	bool isDead() const;
+	void setHeldItem(char item, int id) { heldItem = item; itemId = id; }// set held item
 
 	// Player active status
 	bool isActive() const { return active; }
