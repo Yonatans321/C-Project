@@ -29,7 +29,7 @@ public:
 	bool tryOpen(int keyId); // tries to open the door with the given key id
 	bool canPass() const { return open; } // can the player pass through the door ?
 	static bool isDoorChar(char c) { return (c >= '1' && c <= '9'); } // is the char a door char ?
-	static bool handleDoor(Player& p, Screen& screen, char& foundDoor); // handle door interaction
+	static bool handleDoor(Player& p, Screen& screen, char& foundDoor, bool isSilent = false); // handle door interaction
 	void setOpen() { open = true; } // SET DOOR OPEN
    //SET AWITCHES ON
 	static void allSwitchesAreOn() { switchesAreOn = true; } // set all switches on

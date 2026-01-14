@@ -22,12 +22,15 @@ int main(int argc, char* argv[]) {
         SaveGame game;
         game.run();
     }
-	else if (strcmp(argv[1], "-load") == 0) { // load mode
+    else if (strcmp(argv[1], "-load") == 0) 
+    { // load mode
         bool silent = false;
         LOAD_MODE = true;
-		if (argc > 2 && strcmp(argv[2], "-silent") == 0) { // silent mode
+        if (argc > 2 && strcmp(argv[2], "-silent") == 0)
+        { // silent mode
             silent = true;
         }
+    
         LoadGame game(silent);
         game.run();
     }

@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <fstream>
 
-
+bool Screen::silentMode = false;
 static int torchLastX = -1;
 static int torchLastY = -1;
 //   CONSTRUCTOR
@@ -513,6 +513,7 @@ void Screen::clearBox(int x, int y, int w, int h)
 // DRAW ANIMATED BOX
 void Screen::drawAnimatedBox(int x, int y, int w, int h)
 {
+    if (silentMode) return;
     for (int i = 0; i <= h; i += 2)
     {
         drawBox(x, y, w, i);
@@ -522,6 +523,10 @@ void Screen::drawAnimatedBox(int x, int y, int w, int h)
 // CLOSE ANIMATED BOX
 void Screen::closeAnimatedBox(int x, int y, int w, int h)
 {
+    if (silentMode) {
+        clearBox(x, y, w, h);
+        return;
+    }
     for (int i = h; i >= 0; i -= 2)
     {
         drawBox(x, y, w, i);
@@ -532,6 +537,7 @@ void Screen::closeAnimatedBox(int x, int y, int w, int h)
 // PRINT SOME TXT IN BOX (helped by AI)
 void Screen::printInBox(int x, int y, const std::string& msg)
 {
+    if (silentMode) return;
     size_t idx = 0;
     const int innerW = 50;
     const int innerH = 10;
@@ -548,6 +554,7 @@ void Screen::printInBox(int x, int y, const std::string& msg)
 // SHOW MESSAGE (helped by AI)
 void Screen::showMessage(const std::string& msg)
 {
+    if (silentMode) return;
     int x = 20, y = 10, w = 40, h = 5;
 
     drawAnimatedBox(x, y, w, h);

@@ -141,6 +141,10 @@ void Game::initLevel(const std::string& filename, int specificDoor)
 	// Attach riddle positions to the room
     riddleBank.attachPositionToRoom(currentScreen);
     riddleBank.attachResults(&gameResults, &eventTimer);
+    riddleBank.setSilentMode(silentMode);
+    Screen::setSilentMode(silentMode);
+    player1.attachResults(&gameResults, &eventTimer, PlayerType::Player1);
+    player2.attachResults(&gameResults, &eventTimer, PlayerType::Player2);
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
@@ -180,6 +184,8 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
                 paused = false;
             else if (c == 'H' || c == 'h')
             {
+				recordedSteps.addStep(eventTimer, 0, c); // record step
+                recordedSteps.saveSteps("adv-world.steps");
                 currStatus = GameModes::MENU;
                 gameRunning = false;
                 return;
@@ -420,6 +426,8 @@ void Game::gameLoop()
 
             if (ch == ESC)
             {
+                recordedSteps.addStep(eventTimer, 0, ESC);
+
                 handlePause(currentScreen, gameRunning);
                 clearInputBuffer();
                 if (!gameRunning) break;
@@ -498,8 +506,8 @@ void Game::gameLoop()
 		// remember last positions
         p1PosLastFrame = player1.getPosition();
         p2PosLastFrame = player2.getPosition();
-
-        Sleep(GAME_DELAY);
+        if(!silentMode)
+            Sleep(GAME_DELAY);
     }
 }
 
@@ -588,7 +596,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
     {
-        bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor);// try to handle door
+        bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor,silentMode);// try to handle door
         if (doorOpened)
         {
             return true;
@@ -837,6 +845,7 @@ void Game::resetGame()
         activeBomb = nullptr;
 	}
     // Reset timer
+    eventTimer = 0;
     gameTimer = 0;
     timerActive = false;
 }

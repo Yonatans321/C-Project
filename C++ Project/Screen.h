@@ -37,7 +37,7 @@ private:
 	void clearScreenBuffer(); // clears the screen buffer
 	bool isLegendPositionValid(int x, int y, const std::string& filename); // checks if the legend position is valid
 	RoomMeta roomMeta; // metadata for the room
-
+	static bool silentMode;
 public:
 	Screen();
 	char screen[HEIGHT][WIDTH + 1];
@@ -90,4 +90,7 @@ public:
 	bool validateMetadata(const std::string& filename);
 	bool validateKey(const std::string& filename);
 	bool validateDoors (const std::string& filename);
+
+	static void setSilentMode(bool mode) { silentMode = mode; }
+	static bool isSilent() { return silentMode; }
 };

@@ -273,11 +273,23 @@ void LoadGame::replayGameLoop()
         Steps::Step currentStep;
         while (loadedSteps.getNextStep(eventTimer, currentStep))
         {
-            char key = currentStep.key;
-            player1.keyPressed(key);
-            player2.keyPressed(key);
+            if (currentStep.PlayerNum == 0)
+            {
+                // אם המקש הוא h/H, זה אומר שהמשתמש יצא מהמשחק בזמן ההקלטה
+                if (currentStep.key == 'h' || currentStep.key == 'H')
+                {
+                    gameResults.addGameExit(eventTimer, player1.getScore(), player2.getScore());
+                    gameRunning = false;
+                    break; // יוצא מלולאת הצעדים
+                }
+            }
+            else {
+                char key = currentStep.key;
+                player1.keyPressed(key);
+                player2.keyPressed(key);
+            }
         }
-
+        if (!gameRunning) break;
         // Ignore all user input in LOAD mode, but check for automatic steps
         if (_kbhit())
         {
@@ -428,4 +440,9 @@ bool LoadGame::checkLevel()
         }
     }
     return false;
+}
+
+void LoadGame::setSilentMode(bool isSilent) {
+    this->silentMode = isSilent;
+    riddleBank.setSilentMode(isSilent);
 }
