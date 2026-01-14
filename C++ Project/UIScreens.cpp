@@ -20,7 +20,6 @@ void UIScreens::printScreen(const char** screen)
 
 void UIScreens::showMenu()
 {
-    //the menu screen design
     static const char* MENU_SCREEN[HEIGHT] =
     {
         "                                                                                ",
@@ -32,7 +31,9 @@ void UIScreens::showMenu()
         "                                    MAIN  MENU                                   ",
         "                                                                                ",
         "                            [1]  Start a New Game                                ",
+        "                            [3]  Load Saved Game                                 ",
         "                            [8]  Instructions & Controls                         ",
+        "                            [2]  Colors: ON                                      ",
         "                            [9]  Exit                                            ",
         "                            [3]  Load saved game                                ",
         "                                                                                ",
@@ -46,13 +47,11 @@ void UIScreens::showMenu()
         "                                                                                ",
         "                                                                                ",
         "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
     };
 
     printScreen(MENU_SCREEN);
-    gotoxy(0, 14);  
-    std::cout << "                            [2] Colors: "
+    gotoxy(0, 11);
+    std::cout << "                            [2]  Colors: "
         << (ColorsEnabled ? "ON" : "OFF");
 }
 
@@ -82,7 +81,7 @@ void UIScreens::showInstructions()
         "   ?    - Riddle      | Solve it or stare until it solves you.                   ", // 17
         "   A    - Light Switch| Turns lights ON/OFF in dark rooms. Magic? No.            ", // 18
         "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
-        "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
+        "   ssss - temp Wall   | Temporary wall. Controlled by a switchâ€¦ usually.         ", // 20
         "                                                                                 ", // 21
         "        TIME LIMIT: 6 minutes. Fail to finish and you die. No pressure.          ", // 22
         "       -   6 minutes in heaven... after it , it will become HELL...  -          ", // 23
@@ -98,36 +97,35 @@ void UIScreens::showPauseScreen()
 {
     static const char* PAUSE_SCREEN[HEIGHT] =
     {
-        "                                                                                ", // 1
-        "                                   GAME PAUSED                                  ", // 2
-        "                                                                                ", // 3
-        "                                 ================                                ", // 4
-        "                                  The game is paused                             ", // 5
-        "                                 ================                                ", // 6
-        "                                                                                ", // 7
-        "                      Press ESC to return to the game                            ", // 8
-        "                      Press H   to return to the main menu                       ", // 9
-        "                      Press S   to save the game                                ", // 10
-        "                                                                                ", // 11
-        "                                                                                ", // 12
-        "                                                                                ", // 13
-        "                                                                                ", // 14
-        "                                                                                ", // 15
-        "                                                                                ", // 16
-        "                                                                                ", // 17
-        "                                                                                ", // 18
-        "                                                                                ", // 19
-        "                                                                                ", // 20
-        "                                                                                ", // 21
-        "                                                                                ", // 22
-        "                                                                                ", // 23
-        "                                                                                ", // 24
-        "                                                                                "  // 25
+        "                                                                                ",
+        "                                   GAME PAUSED                                  ",
+        "                                                                                ",
+        "                                 ================                                ",
+        "                                  The game is paused                             ",
+        "                                 ================                                ",
+        "                                                                                ",
+        "                      Press ESC to return to the game                            ",
+        "                      Press S   to save game                                     ",
+        "                      Press H   to return to the main menu                       ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                "
     };
 
     printScreen(PAUSE_SCREEN);
 }
-
 // win screen
 
 void UIScreens::showWinScreen()
@@ -208,10 +206,10 @@ void UIScreens::showGameOverMessage()
     };
 
     printScreen(GAME_OVER_SCREEN);
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+    if (!LOAD_MODE) {  // ===== Ã Ã­ Ã¬Ã  Ã¡LOAD mode, Ã§Ã«Ã¤ Ã¬Ã·Ã¬Ã¨ =====
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+    else {  // ===== Ã Ã­ Ã¡LOAD mode, Ã²Ã¹Ã¤ SLEEP =====
         Sleep(80);
     }
 }
@@ -225,10 +223,10 @@ void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     gotoxy(13, 11);
     std::cout << "Press any key to continue...";
 
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+    if (!LOAD_MODE) {  // ===== Ã Ã­ Ã¬Ã  Ã¡LOAD mode, Ã§Ã«Ã¤ Ã¬Ã·Ã¬Ã¨ =====
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+    else {  // ===== Ã Ã­ Ã¡LOAD mode, Ã²Ã¹Ã¤ SLEEP =====
         Sleep(80);
     }
 

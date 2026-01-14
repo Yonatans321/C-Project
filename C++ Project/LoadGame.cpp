@@ -166,14 +166,14 @@ void LoadGame::run()
         }
 
         // Clean up temp file
-        try
-        {
-            std::filesystem::remove("adv-world.result.tmp");
-        }
-        catch (const std::exception&)
-        {
-            // If cleanup fails, it's not critical
-        }
+        //try
+        //{
+        //    std::filesystem::remove("adv-world.result.tmp");
+        //}
+        //catch (const std::exception&)
+        //{
+        //    // If cleanup fails, it's not critical
+        //}
     }
     else
     {
