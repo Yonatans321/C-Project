@@ -7,6 +7,7 @@
 
 extern bool LOAD_MODE;
 extern bool SAVE_MODE;  
+
 int main(int argc, char* argv[]) {
         // No arguments - normal game with menu
     if (argc == 1) {

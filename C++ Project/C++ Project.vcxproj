@@ -128,6 +128,7 @@
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="LoadGame.h" />
     <ClInclude Include="Obstacle.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Direction.cpp" />
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="LoadGame.cpp" />
     <ClCompile Include="main.cpp" />
