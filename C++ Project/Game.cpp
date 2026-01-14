@@ -8,6 +8,7 @@
 #include "Switch.h"
 #include "Utils.h"
 #include "Torch.h"
+#include "GameStateManager.h"
 
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 extern bool LOAD_MODE;
@@ -96,6 +97,13 @@ void Game::showMenu()
                 currStatus = GameModes::EXIT;
                 menu = false;
                 break;
+			case LOAD_GAME_KEY:
+                quickLoad();
+                if (currStatus != GameModes::NEW_GAME) {
+                    UIScreens::showMenu();
+                }
+                break;
+
             }
         }
     }
@@ -167,6 +175,7 @@ void Game::initLevel(const std::string& filename, int specificDoor)
 // Handle pause function
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
+
     UIScreens::showPauseScreen();
     clearInputBuffer();
 
@@ -184,17 +193,30 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
                 gameRunning = false;
                 return;
             }
+            else if (c == 'S' || c == 's')  // ← SAVE
+            {
+                StateSnapshot snap;
+                createSaveSnapshot(snap);
+
+                if (GameStateManager::showSaveMenu(snap)) {
+                    currStatus = GameModes::MENU;
+                    gameRunning = false;
+                    return;
+                }
+            }
         }
         Sleep(GAME_DELAY);
     }
 
     clearInputBuffer();
-	if (currentScreen.isDark()) // redraw based on dark/torch state
+    if (currentScreen.isDark())
         currentScreen.drawMapWithTorch(player1);
     else
-        currentScreen.drawMap();;    player1.draw();
+        currentScreen.drawMap();
+    player1.draw();
     player2.draw();
 }
+
 // Helper function to handle screen drawing based on torch / dark state
 void Game::drawCurrentScreen()
 {
@@ -860,3 +882,146 @@ void Game::drawActiveBomb()
     }
 }
 
+void Game::createSaveSnapshot(StateSnapshot& snap)
+{
+    // ===== נתוני שחקנים =====
+    snap.p1_x = player1.getX();
+    snap.p1_y = player1.getY();
+    snap.p1_lives = player1.getLives();
+    snap.p1_score = player1.getScore();
+    snap.p1_item = player1.getHeldItem();
+    snap.p1_item_id = player1.getItemId();
+
+    snap.p2_x = player2.getX();
+    snap.p2_y = player2.getY();
+    snap.p2_lives = player2.getLives();
+    snap.p2_score = player2.getScore();
+    snap.p2_item = player2.getHeldItem();
+    snap.p2_item_id = player2.getItemId();
+
+    // ===== נתוני משחק =====
+    snap.level = currentLevelIdx;
+    snap.timer = gameTimer;  // ✅ שמור את הטיימר הנוכחי
+    snap.timer_active = timerActive;
+
+    // ===== מצב דלתות =====
+    for (int i = 0; i < 10; i++)
+        snap.door_open[i] = Door::openDoors[i];
+    snap.switches_on = Door::switchesAreOn;
+
+    // ===== מצב המסך כולו (חידות, מכשולים, כל שינוי) =====
+    for (int y = 0; y < 22; y++) {
+        for (int x = 0; x < 80; x++) {
+            snap.mapData[y][x] = currentScreen.getCharAt(x, y);
+        }
+    }
+
+    // ===== רשימת קבצים =====
+    snap.screens = "";
+    for (size_t i = 0; i < screenFileNames.size(); i++) {
+        if (i > 0) snap.screens += "|";
+        snap.screens += screenFileNames[i];
+    }
+
+    allLevels[currentLevelIdx] = currentScreen;
+}
+
+
+void Game::quickLoad() {
+    StateSnapshot* snap = GameStateManager::showLoadMenu();
+
+    if (!snap) {
+        return;
+    }
+
+    // ===== טען את קבצי המסך =====
+    getAllScreenFileNames(screenFileNames);
+    allLevels.clear();
+    for (const auto& f : screenFileNames) {
+        Screen s;
+        if (s.loadMapFromFile(f))
+            allLevels.push_back(s);
+    }
+
+    if (snap->level < 0 || snap->level >= static_cast<int>(allLevels.size())) {
+        snap->level = 0;
+    }
+
+    // ===== החל את מצב המסך =====
+    currentLevelIdx = snap->level;
+    currentScreen = allLevels[currentLevelIdx];
+    currentScreen.resetTorchState();
+
+    // ===== החל את מצב המסך מהשמירה =====
+    for (int y = 0; y < 22; y++) {
+        for (int x = 0; x < 80; x++) {
+            currentScreen.setCharAtSilent(x, y, snap->mapData[y][x]);
+        }
+    }
+
+    // ===== החל מיקומי שחקנים =====
+    player1.setPosition(Point(snap->p1_x, snap->p1_y,
+        Direction::directions[Direction::STAY], '&'));
+    player2.setPosition(Point(snap->p2_x, snap->p2_y,
+        Direction::directions[Direction::STAY], '$'));
+
+    // ===== החל חיים וניקוד ישירות בלי resetStats! =====
+    // resetStats מוסיף 3 חיים חדשים, אנחנו רוצים את הנתונים הטעונים בדיוק
+
+    // הסר את החיים הזמניים (אם יש)
+    while (player1.getLives() > 0) player1.loseLife();
+    while (player2.getLives() > 0) player2.loseLife();
+
+    // הוסף את החיים הנכונים מהשמירה
+    for (int i = 0; i < snap->p1_lives; i++) player1.addLives();
+    for (int i = 0; i < snap->p2_lives; i++) player2.addLives();
+
+    // ✅ החל ניקוד בדיוק כמו שהיה (בלי addPoints שמוסיף!)
+    // אנחנו צריכים להציב את הערך הנכון
+    // כרגע אנחנו משתמשים ב-addPoints שמוסיף, אבל אנחנו צריכים להציב
+    // לכן נוסיף קודם לשלילה (losePoints) ואז הוספה
+    int currentScore1 = player1.getScore();
+    int currentScore2 = player2.getScore();
+
+    if (currentScore1 > 0) player1.losePoints(currentScore1);
+    if (currentScore2 > 0) player2.losePoints(currentScore2);
+
+    player1.addPoints(snap->p1_score);
+    player2.addPoints(snap->p2_score);
+
+    // ===== החל פריטים =====
+    if (snap->p1_item && snap->p1_item != ' ')
+        player1.GrabItem(snap->p1_item, snap->p1_item_id);
+    if (snap->p2_item && snap->p2_item != ' ')
+        player2.GrabItem(snap->p2_item, snap->p2_item_id);
+
+    // ===== החל מצב דלתות =====
+    for (int i = 0; i < 10; i++)
+        Door::openDoors[i] = snap->door_open[i];
+    Door::switchesAreOn = snap->switches_on;
+
+    // ===== החל טיימר =====
+    gameTimer = snap->timer;
+    timerActive = snap->timer_active;
+
+    // ===== אתחול תוצאות =====
+    gameResults = Results();
+    gameResults.setScreenFiles(snap->screens);
+
+    // ===== הכן שחקנים =====
+    player1.setScreen(currentScreen);
+    player2.setScreen(currentScreen);
+
+    if (!player1.isActive()) player1.activate();
+    if (!player2.isActive()) player2.activate();
+
+    // ===== הצג את המסך הטעון =====
+    drawCurrentScreen();
+    player1.draw();
+    player2.draw();
+
+    delete snap;  // ✅ שחרר את הזיכרון
+
+    // ✅ הפעל את המשחק!
+    gameLoop();
+}

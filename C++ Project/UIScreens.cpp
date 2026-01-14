@@ -20,7 +20,6 @@ void UIScreens::printScreen(const char** screen)
 
 void UIScreens::showMenu()
 {
-    //the menu screen design
     static const char* MENU_SCREEN[HEIGHT] =
     {
         "                                                                                ",
@@ -32,7 +31,9 @@ void UIScreens::showMenu()
         "                                    MAIN  MENU                                   ",
         "                                                                                ",
         "                            [1]  Start a New Game                                ",
+        "                            [3]  Load Saved Game                                 ",
         "                            [8]  Instructions & Controls                         ",
+        "                            [2]  Colors: ON                                      ",
         "                            [9]  Exit                                            ",
         "                                                                                ",
         "                                                                                ",
@@ -46,13 +47,11 @@ void UIScreens::showMenu()
         "                                                                                ",
         "                                                                                ",
         "                                                                                ",
-        "                                                                                ",
-        "                                                                                ",
     };
 
     printScreen(MENU_SCREEN);
-    gotoxy(0, 14);  
-    std::cout << "                            [2] Colors: "
+    gotoxy(0, 11);
+    std::cout << "                            [2]  Colors: "
         << (ColorsEnabled ? "ON" : "OFF");
 }
 
@@ -98,36 +97,35 @@ void UIScreens::showPauseScreen()
 {
     static const char* PAUSE_SCREEN[HEIGHT] =
     {
-        "                                                                                ", // 1
-        "                                   GAME PAUSED                                  ", // 2
-        "                                                                                ", // 3
-        "                                 ================                                ", // 4
-        "                                  The game is paused                             ", // 5
-        "                                 ================                                ", // 6
-        "                                                                                ", // 7
-        "                      Press ESC to return to the game                            ", // 8
-        "                      Press H   to return to the main menu                       ", // 9
-        "                                                                                ", // 10
-        "                                                                                ", // 11
-        "                                                                                ", // 12
-        "                                                                                ", // 13
-        "                                                                                ", // 14
-        "                                                                                ", // 15
-        "                                                                                ", // 16
-        "                                                                                ", // 17
-        "                                                                                ", // 18
-        "                                                                                ", // 19
-        "                                                                                ", // 20
-        "                                                                                ", // 21
-        "                                                                                ", // 22
-        "                                                                                ", // 23
-        "                                                                                ", // 24
-        "                                                                                "  // 25
+        "                                                                                ",
+        "                                   GAME PAUSED                                  ",
+        "                                                                                ",
+        "                                 ================                                ",
+        "                                  The game is paused                             ",
+        "                                 ================                                ",
+        "                                                                                ",
+        "                      Press ESC to return to the game                            ",
+        "                      Press S   to save game                                     ",
+        "                      Press H   to return to the main menu                       ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                "
     };
 
     printScreen(PAUSE_SCREEN);
 }
-
 // win screen
 
 void UIScreens::showWinScreen()

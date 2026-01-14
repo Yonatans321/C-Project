@@ -13,6 +13,7 @@
 #include <filesystem> // for directory iteration
 #include "Steps.h"  
 
+struct StateSnapshot; // forward declaration
 enum class Mode { REGULAR, SAVE, LOAD };
 extern bool LOAD_MODE;
 class Game {
@@ -32,7 +33,8 @@ protected:
 	static constexpr char INSTRUCTIONS_KEY = '8'; // show instructions
 	static constexpr char EXIT_KEY = '9'; // exit game
 	static constexpr char Colors_ON_OFF = '2'; // toggle colors
-	
+	static constexpr char LOAD_GAME_KEY = '3';
+
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
 	void updateBomb();        // update bomb state
@@ -52,8 +54,9 @@ protected:
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
 	void handlePause(Screen& currentScreen, bool& gameRunning);
 	virtual bool checkLevel();// check if level is completed
+	void quickLoad();                              // טעון משחק שמור
+	void createSaveSnapshot(StateSnapshot& snap);  // אסוף נתוני משחק
 
-  
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      
 	RoomMeta currentRoomMeta;       // current room metadata
