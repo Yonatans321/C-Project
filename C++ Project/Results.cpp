@@ -143,9 +143,12 @@ void Results::load(const std::string& filename)
 
     while (std::getline(file, line))
     {
-        Event event;
-        parseEventLine(line, event);
-        events.push_back(event);
+        if (line.find("time= ") != std::string::npos && line.find("event= ") != std::string::npos)
+        {
+            Event event;
+            parseEventLine(line, event);
+            events.push_back(event);
+        }
     }
 }
 
@@ -258,7 +261,9 @@ Event Results::pop()
 
 bool Results::compareWith(const Results& other, std::string& failureReason) const
 {
-    // Check 1: Screen files must match
+    failureReason = ""; // איפוס הודעת השגיאה
+
+    // בדיקה 1: השוואת קבצי המסך (מפות)
     if (screenFiles != other.screenFiles)
     {
         failureReason = "Screen files don't match!\n";
@@ -267,88 +272,79 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
         return false;
     }
 
-    // Check 2: Event count must match
-    if (events.size() != other.events.size())
+    auto itActual = events.begin();
+    auto itExpected = other.events.begin();
+    int eventIndex = 0; // 
+    std::string passedEventsLog = "Events matched successfully so far:\n";
+
+    // לולאת השוואה אחת שבודקת הכל
+    while (itActual != events.end() && itExpected != other.events.end())
     {
-        failureReason = "Event count mismatch!\n";
-        failureReason += "Expected: " + std::to_string(other.events.size()) + " events\n";
-        failureReason += "Got: " + std::to_string(events.size()) + " events";
-        return false;
-    }
+        const Event& actual = *itActual;
+        const Event& expected = *itExpected;
 
-    // Check 3: Compare each event
-    auto it1 = events.begin();
-    auto it2 = other.events.begin();
-    int eventIndex = 0;
+        bool mismatch = false;
+        std::string diffDetail = "";
 
-    while (it1 != events.end() && it2 != other.events.end())
-    {
-        const Event& actualEvent = *it1;
-        const Event& expectedEvent = *it2;
+        // בדיקת זמן, סוג ומידע
+        if (actual.time != expected.time) {
+            mismatch = true;
+            diffDetail = "Time mismatch (Expected: " + std::to_string(expected.time) + ", Got: " + std::to_string(actual.time) + ")";
+        }
+        else if (actual.type != expected.type) {
+            mismatch = true;
+            diffDetail = "Event type mismatch (Expected: " + eventTypeToString(expected.type) + ", Got: " + eventTypeToString(actual.type) + ")";
+        }
+        else if (actual.info != expected.info) {
+            mismatch = true;
+            diffDetail = "Data/Info mismatch (Expected: '" + expected.info + "', Got: '" + actual.info + "')";
+        }
+        else if (actual.type == EventType::LifeLost && actual.player != expected.player) {
+            mismatch = true;
+            diffDetail = "Player mismatch";
+        }
+        else if (actual.type == EventType::Riddle && actual.riddle != expected.riddle) {
+            mismatch = true;
+            diffDetail = "Riddle result mismatch";
+        }
 
-        // Check event time
-        if (actualEvent.time != expectedEvent.time)
-        {
-            failureReason = "Event #" + std::to_string(eventIndex) + ": Time mismatch!\n";
-            failureReason += "Expected time: " + std::to_string(expectedEvent.time) + "\n";
-            failureReason += "Got time: " + std::to_string(actualEvent.time);
+        if (mismatch) {
+            failureReason = "!!! MISMATCH AT EVENT #" + std::to_string(eventIndex) + " !!!\n";
+            failureReason += diffDetail + "\n\n";
+            failureReason += "EXPECTED: [" + eventToDebugString(expected) + "]\n";
+            failureReason += "GOT:      [" + eventToDebugString(actual) + "]\n\n";
+            failureReason += passedEventsLog;
             return false;
         }
 
-        // Check event type
-        if (actualEvent.type != expectedEvent.type)
-        {
-            failureReason = "Event #" + std::to_string(eventIndex) + ": Event type mismatch!\n";
-            failureReason += "Expected: " + eventTypeToString(expectedEvent.type) + "\n";
-            failureReason += "Got: " + eventTypeToString(actualEvent.type);
-            return false;
-        }
+        // אם הכל תקין, מתעדים את ההצלחה וממשיכים
+        passedEventsLog += "  v Event #" + std::to_string(eventIndex) + ": " + eventTypeToString(actual.type) + "\n";
 
-        // Check event data (for relevant events)
-        if (actualEvent.info != expectedEvent.info)
-        {
-            failureReason = "Event #" + std::to_string(eventIndex) + ": Event data mismatch!\n";
-            failureReason += "Expected: " + expectedEvent.info + "\n";
-            failureReason += "Got: " + actualEvent.info;
-            return false;
-        }
-
-        // For LifeLost and Riddle events, check player/result
-        if (actualEvent.type == EventType::LifeLost)
-        {
-            if (actualEvent.player != expectedEvent.player)
-            {
-                failureReason = "Event #" + std::to_string(eventIndex) + ": Player mismatch!\n";
-                std::string expectedPlayer = (expectedEvent.player == PlayerType::Player1) ? "Player1" : "Player2";
-                std::string gotPlayer = (actualEvent.player == PlayerType::Player1) ? "Player1" : "Player2";
-                failureReason += "Expected: " + expectedPlayer + "\n";
-                failureReason += "Got: " + gotPlayer;
-                return false;
-            }
-        }
-
-        if (actualEvent.type == EventType::Riddle)
-        {
-            if (actualEvent.riddle != expectedEvent.riddle)
-            {
-                failureReason = "Event #" + std::to_string(eventIndex) + ": Riddle result mismatch!\n";
-                std::string expectedResult = (expectedEvent.riddle == RiddleResult::Solved) ? "Solved" : "Failed";
-                std::string gotResult = (actualEvent.riddle == RiddleResult::Solved) ? "Solved" : "Failed";
-                failureReason += "Expected: " + expectedResult + "\n";
-                failureReason += "Got: " + gotResult;
-                return false;
-            }
-        }
-
-        ++it1;
-        ++it2;
+        ++itActual;
+        ++itExpected;
         ++eventIndex;
     }
 
-    // If we got here, everything matches!
-    return true;
-}
+    // בדיקה 2: בדיקת כמות אירועים (כאן קורית השגיאה מהתמונה שלך)
+    if (events.size() != other.events.size())
+    {
+        failureReason = "!!! EVENT COUNT MISMATCH !!!\n";
+        failureReason += "Expected: " + std::to_string(other.events.size()) + " events\n";
+        failureReason += "Got: " + std::to_string(events.size()) + " events\n\n";
 
+        if (itExpected != other.events.end()) {
+            failureReason += "Next missing event expected: [" + eventToDebugString(*itExpected) + "]\n";
+        }
+        else if (itActual != events.end()) {
+            failureReason += "Got extra unexpected event: [" + eventToDebugString(*itActual) + "]\n";
+        }
+
+        failureReason += "\n" + passedEventsLog;
+        return false;
+    }
+
+    return true; // הכל תואם לחלוטין
+}
 // Helper function to convert EventType to string
 std::string Results::eventTypeToString(EventType type) const
 {
@@ -362,4 +358,18 @@ std::string Results::eventTypeToString(EventType type) const
     case EventType::GameExit:       return "GameExit";
     default:                        return "Unknown";
     }
+}
+
+
+// פונקציית עזר להמרת אירוע למחרוזת קריאה לצורכי דיבאג
+std::string Results::eventToDebugString(const Event& e) const {
+    std::string res = "Time: " + std::to_string(e.time) + ", Type: " + eventTypeToString(e.type);
+    if (!e.info.empty()) res += ", Info: " + e.info;
+    if (e.type == EventType::LifeLost) {
+        res += (e.player == PlayerType::Player1 ? " (Player1)" : " (Player2)");
+    }
+    if (e.type == EventType::Riddle) {
+        res += (e.riddle == RiddleResult::Solved ? " (Solved)" : " (Failed)");
+    }
+    return res;
 }

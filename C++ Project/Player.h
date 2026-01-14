@@ -1,6 +1,7 @@
 #pragma once
 #include "Point.h"
 #include "Bomb.h"
+#include "results.h"
 #include <cstddef> //for size_t
 
 // forward declarations
@@ -11,6 +12,8 @@ class Bomb;
 class Player
 {
 private:
+	
+
 	static constexpr size_t NUM_KEYS = 6; //numbers of controlled keys
 	Point position; // current pos
 	Point prevPos; // prev pos
@@ -24,9 +27,13 @@ private:
 	bool hasKey = false; // does the player have a key
 	bool active = true;// does the player is active
 
-	bool bombDroppedRequest = false; // דגל חדש
-	Point lastDropPos;               // המיקום שב
-	
+	bool bombDroppedRequest = false; 
+	Point lastDropPos;               
+	// Results logging silent mode
+	bool isSilentMode = false;
+	Results* gameResults = nullptr;
+	size_t* eventTimerPtr = nullptr;
+	PlayerType type;
 public:
 	//constructor
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS])
@@ -84,10 +91,13 @@ public:
 	void addPoints(int pts);
 	void losePoints(int pts);
 	int getScore() const;
+	void setScore(int s) { points = s; } // set score
 	void addLives();
 	int getLives() const;
+	void setLives(int l) { lives = l; } // set lives
 	void loseLife();
 	bool isDead() const;
+	void setHeldItem(char item, int id) { heldItem = item; itemId = id; }// set held item
 
 	// Player active status
 	bool isActive() const { return active; }
@@ -101,5 +111,14 @@ public:
 	void resetStats() { heldItem = 0; lives = 3; points = 0; }
 
 	bool isMyKey(char ch) const; // check if the key move (A,W,D,X,E | I,J,L,M,O)  belongs to the player (& or $)
+
+	// Silent mode and results attachment
+	void setSilentMode(bool silent) { isSilentMode = silent; }
+	void attachResults(Results* res, size_t* timer, PlayerType pType) {
+		gameResults = res;
+		eventTimerPtr = timer;
+		type = pType;
+	
+	}
 };
 

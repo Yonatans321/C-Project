@@ -1,7 +1,6 @@
 ﻿#include "RiddleBank.h"
 #include "Game.h"
 #include "SaveGame.h"
-
 #include <iostream>
 #include <string>
 #include <conio.h>
@@ -363,7 +362,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         player.addPoints(100);
         r->markAsSolved();
         screen.setCharAt(x, y, ' ');
-        if (SAVE_MODE && gameResults != nullptr)
+        if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
         {
             gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
         }
@@ -373,7 +372,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         std::cout << "Wrong! -1 life";
         player.loseLife();
         screen.setCharAt(x, y, '?');
-        if (SAVE_MODE && gameResults != nullptr)
+        if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
         {
             PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
             gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
@@ -451,31 +450,47 @@ char RiddleBank::getRiddleInputChar()
 void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r, int x, int y)
 {
     Steps::Step riddleStep;
-    if (recordedSteps && recordedSteps->getNextRiddleStep(riddleStep))
-    {
-        std::string answer(1, riddleStep.key);
-        bool correct = r->checkAnswer(answer.c_str());
+    std::string fullAnswer = "";
+    size_t finalIteration = 0;
 
-        if (correct)
-        {
-            player.addPoints(100);
-            r->markAsSolved();
-            screen.setCharAt(x, y, ' ');
-            if (SAVE_MODE && gameResults != nullptr)
-            {
-                gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
-            }
+    // 1. קליטת שלב ה-Y (הסכמה לחידה)
+    if (recordedSteps->getNextRiddleStep(riddleStep)) {
+        finalIteration = riddleStep.iteration;
+    }
+
+    // 2. קליטת כל מקשי התשובה עד המקש האחרון (Enter/סיום)
+    // אנחנו רצים בלולאה כדי לצרוך את כל הצעדים ששייכים לחידה הזו
+    while (recordedSteps->getNextRiddleStep(riddleStep)) {
+        finalIteration = riddleStep.iteration; // תמיד נשמור את הסיבוב האחרון
+
+        // אם הגענו למקש ריק/Enter (כפי שמופיע בקובץ הצעדים שלך בסיבוב 29)
+        if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
+            break;
         }
-        else
-        {
-            player.loseLife();
-            screen.setCharAt(x, y, '?');
-            if (SAVE_MODE && gameResults != nullptr)
-            {
-                PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
-                gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
-                gameResults->addLifeLost(*eventTimerPtr, playerType);
-            }
+        fullAnswer += riddleStep.key;
+    }
+
+    bool correct = r->checkAnswer(fullAnswer.c_str());
+
+    // עדכון מצב המשחק
+    if (correct) {
+        player.addPoints(100);
+        r->markAsSolved();
+        screen.setCharAt(x, y, ' ');
+    }
+    else {
+        player.loseLife();
+        screen.setCharAt(x, y, '?');
+    }
+
+    // 3. הרישום ל-Results - השתמש ב-finalIteration מהקובץ!
+    if (gameResults != nullptr) {
+        // שימוש ב-finalIteration מבטיח התאמה מושלמת ל-Expected Time
+        gameResults->addRiddle(finalIteration, r->getRiddleID(), r->getQuestion(), fullAnswer, correct);
+
+        if (!correct) {
+            PlayerType pt = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
+            gameResults->addLifeLost(finalIteration, pt);
         }
     }
 }

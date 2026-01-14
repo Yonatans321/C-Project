@@ -1,6 +1,5 @@
 #include "Steps.h"
 #include <fstream>
-
 #include <iostream>
 
 
@@ -168,6 +167,7 @@ void Steps::addStepIfValid(size_t iteration, char ch, const Player& p1, const Pl
     else if (p2.isMyKey(ch)) { // player 2 is identified with the sign '$' - we will register it as playerNum 2
         addStep(iteration, 2, ch);
     }
+    
 }
 
 // Get next riddle step (PlayerNum == 0)
@@ -183,3 +183,4 @@ bool Steps::getNextRiddleStep(Step& outStep) {
     }
     return false;  // No more riddle steps
 }
+

@@ -15,8 +15,9 @@
 
 struct StateSnapshot; // forward declaration
 enum class Mode { REGULAR, SAVE, LOAD };
-extern bool LOAD_MODE;
+
 class Game {
+	friend class GameStateManager;
 protected:
 
 	// Constants
@@ -54,8 +55,8 @@ protected:
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
 	void handlePause(Screen& currentScreen, bool& gameRunning);
 	virtual bool checkLevel();// check if level is completed
-	void quickLoad();                              // èòåï îùç÷ ùîåø
-	void createSaveSnapshot(StateSnapshot& snap);  // àñåó ðúåðé îùç÷
+	void quickLoad();                              // Ã¨Ã²Ã¥Ã¯ Ã®Ã¹Ã§Ã· Ã¹Ã®Ã¥Ã¸
+	void createSaveSnapshot(StateSnapshot& snap);  // Ã Ã±Ã¥Ã³ Ã°ÃºÃ¥Ã°Ã© Ã®Ã¹Ã§Ã·
 
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      

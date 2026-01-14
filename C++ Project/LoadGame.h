@@ -1,12 +1,18 @@
 #pragma once
 #include "Game.h"
 #include "Steps.h"
+#include "Screen.h"
 #include <filesystem>  // Add this for file operations in silent mode
 
 extern bool LOAD_MODE;
 class LoadGame : public Game { // derived from Game
 public:
-	LoadGame(bool silent = false) : isSilentMode(silent) {} // constructor
+	// constructor
+	LoadGame(bool silent = false) :Game(), isSilentMode(silent) {
+		Screen::setSilentMode(silent);
+		this->silentMode = silent;
+		riddleBank.setSilentMode(silent);
+	} 
 	virtual ~LoadGame() = default; // virtual destructor
 
 	void run() override; // override run method
@@ -23,4 +29,5 @@ protected:
 	// Override checkLevel to hide screens in silent mode
 	bool checkLevel() override;
 	Steps loadedSteps; // steps loaded from file
+	void setSilentMode(bool isSilent);
 };
