@@ -35,7 +35,7 @@ void UIScreens::showMenu()
         "                            [8]  Instructions & Controls                         ",
         "                            [2]  Colors: ON                                      ",
         "                            [9]  Exit                                            ",
-        "                            [3]  Load saved game                                ",
+        "                                                                                ",
         "                                                                                ",
         "                       Tip: If you get lost that's on you.                      ",
         "                                                                                ",

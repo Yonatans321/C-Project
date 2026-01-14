@@ -293,15 +293,15 @@ void LoadGame::replayGameLoop()
         // Ignore all user input in LOAD mode, but check for automatic steps
         if (_kbhit())
         {
-            _getch();
+			waitForKey(); 
         }
 
         // Update game state
         updateBomb();
         updatePlayers();
 
-        player1LastPos = p1PosLastFrame;
-        player2LastPos = p2PosLastFrame;
+        p1PosLastFrame = player1.getPosition();
+        p2PosLastFrame = player2.getPosition();
 
         bool p1Moved = player1.isActive() &&
             ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||

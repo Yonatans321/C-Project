@@ -350,7 +350,12 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     }
 
     bool correct = r->checkAnswer(answer.c_str());
-
+    if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
+    {
+        PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
+        gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, correct);
+        
+    }
     gotoxy(bx + 2, hintorResultLine);
     std::cout << std::string(50, ' ');
 
@@ -362,22 +367,13 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         player.addPoints(100);
         r->markAsSolved();
         screen.setCharAt(x, y, ' ');
-        if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
-        {
-            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
-        }
+       
     }
     else
     {
         std::cout << "Wrong! -1 life";
         player.loseLife();
         screen.setCharAt(x, y, '?');
-        if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
-        {
-            PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
-            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
-            gameResults->addLifeLost(*eventTimerPtr, playerType);
-        }
     }
 
     Sleep(700);
