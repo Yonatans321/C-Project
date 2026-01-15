@@ -16,8 +16,8 @@ struct StateSnapshot {
     bool timer_active = false, switches_on = false;
     bool door_open[10] = { false };
 
-    // Map data - שמור את מצב החדר כולו
-    char mapData[22][80] = {};  // 22 שורות, 80 עמודות
+    // Map data - שמור את מצב כל החדרים
+    char mapData[3][22][80] = {};  // ✅ 3 חדרים, 22 שורות, 80 עמודות
 
     // Meta
     std::string screens = "";

@@ -175,7 +175,6 @@ void Game::initLevel(const std::string& filename, int specificDoor)
 // Handle pause function
 void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 {
-
     UIScreens::showPauseScreen();
     clearInputBuffer();
 
@@ -195,6 +194,20 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
             }
             else if (c == 'S' || c == 's')  // ← SAVE
             {
+                // ✅ בדוק אם אנחנו ב-SAVE/LOAD mode
+                extern bool SAVE_MODE;
+                extern bool LOAD_MODE;
+
+                if (SAVE_MODE || LOAD_MODE) {
+                    cls();
+                    gotoxy(15, 10);
+					std::cout << "YOU CAN CREATE A SAVING ONLY IN REGULAR MODE!";
+                    Sleep(2000);
+                    // חזור להשהיה
+                    UIScreens::showPauseScreen();
+                    continue;
+                }
+
                 StateSnapshot snap;
                 createSaveSnapshot(snap);
 
@@ -901,7 +914,7 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
 
     // ===== נתוני משחק =====
     snap.level = currentLevelIdx;
-    snap.timer = gameTimer;  // ✅ שמור את הטיימר הנוכחי
+    snap.timer = gameTimer;
     snap.timer_active = timerActive;
 
     // ===== מצב דלתות =====
@@ -909,10 +922,15 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
         snap.door_open[i] = Door::openDoors[i];
     snap.switches_on = Door::switchesAreOn;
 
-    // ===== מצב המסך כולו (חידות, מכשולים, כל שינוי) =====
-    for (int y = 0; y < 22; y++) {
-        for (int x = 0; x < 80; x++) {
-            snap.mapData[y][x] = currentScreen.getCharAt(x, y);
+    // ✅ עדכן את המסך הנוכחי לפני שמירה (כדי לשמור obstacles שהוזרו)
+    allLevels[currentLevelIdx] = currentScreen;
+
+    // ===== מצב כל החדרים (חידות, מכשולים, סוויץ', הכל) =====
+    for (int room = 0; room < static_cast<int>(allLevels.size()) && room < 3; room++) {
+        for (int y = 0; y < 22; y++) {
+            for (int x = 0; x < 80; x++) {
+                snap.mapData[room][y][x] = allLevels[room].getCharAt(x, y);
+            }
         }
     }
 
@@ -922,10 +940,7 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
         if (i > 0) snap.screens += "|";
         snap.screens += screenFileNames[i];
     }
-
-    allLevels[currentLevelIdx] = currentScreen;
 }
-
 
 void Game::quickLoad() {
     StateSnapshot* snap = GameStateManager::showLoadMenu();
@@ -952,12 +967,17 @@ void Game::quickLoad() {
     currentScreen = allLevels[currentLevelIdx];
     currentScreen.resetTorchState();
 
-    // ===== החל את מצב המסך מהשמירה =====
-    for (int y = 0; y < 22; y++) {
-        for (int x = 0; x < 80; x++) {
-            currentScreen.setCharAtSilent(x, y, snap->mapData[y][x]);
+    // ===== החל את מצב כל החדרים מהשמירה =====
+    for (int room = 0; room < static_cast<int>(allLevels.size()) && room < 3; room++) {
+        for (int y = 0; y < 22; y++) {
+            for (int x = 0; x < 80; x++) {
+                allLevels[room].setCharAtSilent(x, y, snap->mapData[room][y][x]);
+            }
         }
     }
+
+    // עדכן את המסך הנוכחי גם כן
+    currentScreen = allLevels[currentLevelIdx];
 
     // ===== החל מיקומי שחקנים =====
     player1.setPosition(Point(snap->p1_x, snap->p1_y,

@@ -52,10 +52,12 @@ bool GameStateManager::save(const StateSnapshot& state, const std::string& saveN
     for (int i = 0; i < 10; i++)
         file.write((char*)&state.door_open[i], 1);
 
-    // כתוב מצב המסך כולו
-    for (int y = 0; y < 22; y++) {
-        for (int x = 0; x < 80; x++) {
-            file.write((char*)&state.mapData[y][x], 1);
+    // כתוב מצב המסך כולו (כל החדרים)
+    for (int room = 0; room < 3; room++) {
+        for (int y = 0; y < 22; y++) {
+            for (int x = 0; x < 80; x++) {
+                file.write((char*)&state.mapData[room][y][x], 1);
+            }
         }
     }
 
@@ -103,10 +105,12 @@ bool GameStateManager::load(StateSnapshot& state, const std::string& saveName) {
     for (int i = 0; i < 10; i++)
         file.read((char*)&state.door_open[i], 1);
 
-    // קרא מצב המסך כולו
-    for (int y = 0; y < 22; y++) {
-        for (int x = 0; x < 80; x++) {
-            file.read((char*)&state.mapData[y][x], 1);
+    // קרא מצב המסך כולו (כל החדרים)
+    for (int room = 0; room < 3; room++) {
+        for (int y = 0; y < 22; y++) {
+            for (int x = 0; x < 80; x++) {
+                file.read((char*)&state.mapData[room][y][x], 1);
+            }
         }
     }
 
