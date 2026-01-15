@@ -11,7 +11,7 @@
 
 bool LOAD_MODE = false;
 
-void LoadGame::run()
+void LoadGame::run() // override run method
 {
     LOAD_MODE = true;
     if (!isSilentMode)
@@ -165,15 +165,15 @@ void LoadGame::run()
             std::cout << failureReason << std::endl;
         }
 
-        // Clean up temp file
-        //try
-        //{
-        //    std::filesystem::remove("adv-world.result.tmp");
-        //}
-        //catch (const std::exception&)
-        //{
-        //    // If cleanup fails, it's not critical
-        //}
+         //Clean up temp file
+        try
+        {
+            std::filesystem::remove("adv-world.result.tmp");
+        }
+        catch (const std::exception&)
+        {
+            // If cleanup fails, it's not critical
+        }
     }
     else
     {
@@ -186,23 +186,21 @@ void LoadGame::run()
     }
 }
 
-void LoadGame::initLevelSilent(const std::string& filename)
+void LoadGame::initLevelSilent(const std::string& filename) // initialize level without drawing
 {
-    currentRoomMeta = currentScreen.getRoomMeta();
-    currentScreen.resetTorchState();
+	currentRoomMeta = currentScreen.getRoomMeta(); // get current room metadata
+	currentScreen.resetTorchState(); // reset torch state
 
-    if (currentRoomMeta.hasKeyPosition())
+	if (currentRoomMeta.hasKeyPosition()) // checks key from metadata if exists
     {
-        int doorID = currentRoomMeta.getKeyDoorID();
-        if (doorID != -1 && !Door::openDoors[doorID] &&
-            player1.getItemId() != doorID &&
-            player2.getItemId() != doorID)
+		int doorID = currentRoomMeta.getKeyDoorID(); // get door ID for key
+		if (doorID != -1 && !Door::openDoors[doorID] && player1.getItemId() != doorID && player2.getItemId() != doorID) // check if door is closed and players don't have the key
         {
-            Key::placeFromMetadata(currentScreen);
+			Key::placeFromMetadata(currentScreen); // place key from metadata
         }
     }
 
-    currentRoomMeta.placeLightSwitchFromMetadata(currentScreen);
+	currentRoomMeta.placeLightSwitchFromMetadata(currentScreen); // place light switch from metadata
 
     if (currentLevelIdx == 0)
     {
@@ -227,12 +225,12 @@ void LoadGame::initLevelSilent(const std::string& filename)
         Door::allSwitchesAreOn();
 }
 
-void LoadGame::gameLoop()
+void LoadGame::gameLoop() // override game loop
 {
     replayGameLoop();
 }
 
-void LoadGame::replayGameLoop()
+void LoadGame::replayGameLoop() // main replay game loop
 {
     bool gameRunning = true;
     Point p1PosLastFrame = player1.getPosition();
@@ -243,9 +241,9 @@ void LoadGame::replayGameLoop()
     ULONGLONG lastTickTime = GetTickCount64();
     const DWORD timerInterval = 1000;
 
-    if (!isSilentMode)
+	if (!isSilentMode) // initial draw
     {
-        redrawGame();
+		redrawGame(); // Draw full screen at start
     }
 
     while (gameRunning)
@@ -356,11 +354,11 @@ void LoadGame::replayGameLoop()
     }
 }
 
-bool LoadGame::checkGameOver()
+bool LoadGame::checkGameOver() // override check game over
 {
-    if (player1.isDead() || player2.isDead())
+	if (player1.isDead() || player2.isDead()) // check if any player is dead
     {
-        if (!isSilentMode)
+		if (!isSilentMode) // show game over message only if not in silent mode
         {
             UIScreens::showGameOverMessage();
         }
@@ -377,7 +375,7 @@ bool LoadGame::checkGameOver()
     return false;
 }
 
-bool LoadGame::checkLevel()
+bool LoadGame::checkLevel() // override check level completion
 {
     if (!player1.isActive() && !player2.isActive())
     {

@@ -24,8 +24,8 @@ private:
 	bool hasKey = false; // does the player have a key
 	bool active = true;// does the player is active
 
-	bool bombDroppedRequest = false; // דגל חדש
-	Point lastDropPos;               // המיקום שב
+	bool bombDroppedRequest = false; // flag for bomb drop request
+	Point lastDropPos;               // position of last bomb drop
 	
 public:
 	//constructor

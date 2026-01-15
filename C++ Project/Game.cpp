@@ -181,12 +181,12 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     bool paused = true;
     while (paused)
     {
-        if (_kbhit())
+		if (_kbhit()) // check for key press
         {
             char c = _getch();
-            if (c == ESC)
+			if (c == ESC) // ← RESUME
                 paused = false;
-            else if (c == 'H' || c == 'h')
+			else if (c == 'H' || c == 'h') // return to HOME MENU
             {
                 currStatus = GameModes::MENU;
                 gameRunning = false;
@@ -194,24 +194,9 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
             }
             else if (c == 'S' || c == 's')  // ← SAVE
             {
-                // ✅ בדוק אם אנחנו ב-SAVE/LOAD mode
-                extern bool SAVE_MODE;
-                extern bool LOAD_MODE;
-
-                if (SAVE_MODE || LOAD_MODE) {
-                    cls();
-                    gotoxy(15, 10);
-					std::cout << "YOU CAN CREATE A SAVING ONLY IN REGULAR MODE!";
-                    Sleep(2000);
-                    // חזור להשהיה
-                    UIScreens::showPauseScreen();
-                    continue;
-                }
-
-                StateSnapshot snap;
-                createSaveSnapshot(snap);
-
-                if (GameStateManager::showSaveMenu(snap)) {
+				StateSnapshot snap; // create snapshot
+				createSaveSnapshot(snap); // fill snapshot with current game state
+				if (GameStateManager::showSaveMenu(snap)) { // show save menu
                     currStatus = GameModes::MENU;
                     gameRunning = false;
                     return;
@@ -222,7 +207,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     }
 
     clearInputBuffer();
-    if (currentScreen.isDark())
+	if (currentScreen.isDark()) // redraw screen based on torch / dark state
         currentScreen.drawMapWithTorch(player1);
     else
         currentScreen.drawMap();
@@ -233,23 +218,23 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
 // Helper function to handle screen drawing based on torch / dark state
 void Game::drawCurrentScreen()
 {
-    bool isDark = currentScreen.getRoomMeta().isDark();
+	bool isDark = currentScreen.getRoomMeta().isDark(); // check if room is dark
 
-    if (isDark)
+	if (isDark) // room is dark
     {
 		bool hasTorch = Torch::playerHasTorch(player1) || Torch::playerHasTorch(player2); // check if any player has torch
 
 		if (hasTorch) // draw with torch
         {
-            if (Torch::playerHasTorch(player1))
-                currentScreen.drawMapWithTorch(player1);
+			if (Torch::playerHasTorch(player1)) // player 1 has torch
+				currentScreen.drawMapWithTorch(player1); // draw with player 1 torch
             else if (Torch::playerHasTorch(player2))
                 currentScreen.drawMapWithTorch(player2);
         }
         else
         {
-            currentScreen.drawDark();
-            currentScreen.resetTorchState();
+			currentScreen.drawDark(); // draw dark screen
+			currentScreen.resetTorchState(); // reset torch state
         }
     }
     else
@@ -405,17 +390,17 @@ bool Game::checkGameOver()
 // Main game loop 
 void Game::gameLoop()
 {
-    bool gameRunning = true;
-    Point p1PosLastFrame = player1.getPosition();
-    Point p2PosLastFrame = player2.getPosition();
-	player1LastPos = p1PosLastFrame;
-	player2LastPos = p2PosLastFrame;
+	bool gameRunning = true; // game running flag
+	Point p1PosLastFrame = player1.getPosition(); // track last positions
+	Point p2PosLastFrame = player2.getPosition(); // track last positions
+	player1LastPos = p1PosLastFrame; // update last positions
+	player2LastPos = p2PosLastFrame; // update last positions
 	// timer tracker (taken from AI)
-    ULONGLONG lastTickTime = GetTickCount64();
-    const DWORD timerInterval = 1000;
+    ULONGLONG lastTickTime = GetTickCount64(); 
+    const DWORD timerInterval = 1000; 
     redrawGame(); // Draw full screen at start
 
-    while (gameRunning)
+	while (gameRunning) // main loop
     {
 		eventTimer++; // update event timer
         // Update timer
@@ -453,7 +438,7 @@ void Game::gameLoop()
         {
             char ch = _getch();
 
-            if (ch == ESC)
+			if (ch == ESC) // pause key
             {
                 handlePause(currentScreen, gameRunning);
                 clearInputBuffer();
@@ -478,12 +463,8 @@ void Game::gameLoop()
 		player2LastPos = p2PosLastFrame;
 
 		// check if players moved
-        bool p1Moved = player1.isActive() &&
-            ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
-                (p1PosLastFrame.getY() != player1.getPosition().getY()));
-        bool p2Moved = player2.isActive() &&
-            ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||
-                (p2PosLastFrame.getY() != player2.getPosition().getY()));
+        bool p1Moved = player1.isActive() &&((p1PosLastFrame.getX() != player1.getPosition().getX()) ||(p1PosLastFrame.getY() != player1.getPosition().getY()));
+        bool p2Moved = player2.isActive() && ((p2PosLastFrame.getX() != player2.getPosition().getX()) ||(p2PosLastFrame.getY() != player2.getPosition().getY()));
 
 		// draw based on dark / torch state if players moved
         bool isDark = currentScreen.getRoomMeta().isDark();
@@ -656,10 +637,10 @@ void Game::showWinScreen()
 {
     UIScreens::showWinScreen();
 
-    if (!LOAD_MODE) {  // ===== אם לא בLOAD mode, חכה לקלט =====
+	if (!LOAD_MODE) {  // if not in LOAD mode,  wait for key press
         waitForKey();
     }
-    else {  // ===== אם בLOAD mode, עשה SLEEP =====
+	else {  // we are in LOAD mode, wait for a short delay
         Sleep(GAME_DELAY);
     }
 
@@ -895,16 +876,16 @@ void Game::drawActiveBomb()
     }
 }
 
-void Game::createSaveSnapshot(StateSnapshot& snap)
+void Game::createSaveSnapshot(StateSnapshot& snap) // create a snapshot of the current game state for saving generated by AI
 {
-    // ===== נתוני שחקנים =====
+	// player 1 data
     snap.p1_x = player1.getX();
     snap.p1_y = player1.getY();
     snap.p1_lives = player1.getLives();
     snap.p1_score = player1.getScore();
     snap.p1_item = player1.getHeldItem();
     snap.p1_item_id = player1.getItemId();
-
+	// player 2 data
     snap.p2_x = player2.getX();
     snap.p2_y = player2.getY();
     snap.p2_lives = player2.getLives();
@@ -912,20 +893,20 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
     snap.p2_item = player2.getHeldItem();
     snap.p2_item_id = player2.getItemId();
 
-    // ===== נתוני משחק =====
+	// game state data
     snap.level = currentLevelIdx;
     snap.timer = gameTimer;
     snap.timer_active = timerActive;
 
-    // ===== מצב דלתות =====
+	// door states
     for (int i = 0; i < 10; i++)
         snap.door_open[i] = Door::openDoors[i];
     snap.switches_on = Door::switchesAreOn;
 
-    // ✅ עדכן את המסך הנוכחי לפני שמירה (כדי לשמור obstacles שהוזרו)
+	// current screen state
     allLevels[currentLevelIdx] = currentScreen;
 
-    // ===== מצב כל החדרים (חידות, מכשולים, סוויץ', הכל) =====
+	// map data for all rooms
     for (int room = 0; room < static_cast<int>(allLevels.size()) && room < 3; room++) {
         for (int y = 0; y < 22; y++) {
             for (int x = 0; x < 80; x++) {
@@ -934,7 +915,7 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
         }
     }
 
-    // ===== רשימת קבצים =====
+	// file names of all screens
     snap.screens = "";
     for (size_t i = 0; i < screenFileNames.size(); i++) {
         if (i > 0) snap.screens += "|";
@@ -942,14 +923,14 @@ void Game::createSaveSnapshot(StateSnapshot& snap)
     }
 }
 
-void Game::quickLoad() {
+void Game::quickLoad() { // load game without going through menu generated by AI
     StateSnapshot* snap = GameStateManager::showLoadMenu();
 
-    if (!snap) {
+	if (!snap) { // user cancelled load
         return;
     }
 
-    // ===== טען את קבצי המסך =====
+	// load all levels from files
     getAllScreenFileNames(screenFileNames);
     allLevels.clear();
     for (const auto& f : screenFileNames) {
@@ -958,16 +939,16 @@ void Game::quickLoad() {
             allLevels.push_back(s);
     }
 
-    if (snap->level < 0 || snap->level >= static_cast<int>(allLevels.size())) {
+	if (snap->level < 0 || snap->level >= static_cast<int>(allLevels.size())) { // validate level index
         snap->level = 0;
     }
 
-    // ===== החל את מצב המסך =====
+	// set current level and screen
     currentLevelIdx = snap->level;
     currentScreen = allLevels[currentLevelIdx];
     currentScreen.resetTorchState();
 
-    // ===== החל את מצב כל החדרים מהשמירה =====
+	// restore map data for all rooms
     for (int room = 0; room < static_cast<int>(allLevels.size()) && room < 3; room++) {
         for (int y = 0; y < 22; y++) {
             for (int x = 0; x < 80; x++) {
@@ -976,72 +957,64 @@ void Game::quickLoad() {
         }
     }
 
-    // עדכן את המסך הנוכחי גם כן
+	// update current screen after restoring map data
     currentScreen = allLevels[currentLevelIdx];
 
-    // ===== החל מיקומי שחקנים =====
+	// restore player positions
     player1.setPosition(Point(snap->p1_x, snap->p1_y,
         Direction::directions[Direction::STAY], '&'));
     player2.setPosition(Point(snap->p2_x, snap->p2_y,
         Direction::directions[Direction::STAY], '$'));
-
-    // ===== החל חיים וניקוד ישירות בלי resetStats! =====
-    // resetStats מוסיף 3 חיים חדשים, אנחנו רוצים את הנתונים הטעונים בדיוק
-
-    // הסר את החיים הזמניים (אם יש)
+	// restore lives
     while (player1.getLives() > 0) player1.loseLife();
     while (player2.getLives() > 0) player2.loseLife();
 
-    // הוסף את החיים הנכונים מהשמירה
+	// add lives according to snapshot
     for (int i = 0; i < snap->p1_lives; i++) player1.addLives();
     for (int i = 0; i < snap->p2_lives; i++) player2.addLives();
-
-    // ✅ החל ניקוד בדיוק כמו שהיה (בלי addPoints שמוסיף!)
-    // אנחנו צריכים להציב את הערך הנכון
-    // כרגע אנחנו משתמשים ב-addPoints שמוסיף, אבל אנחנו צריכים להציב
-    // לכן נוסיף קודם לשלילה (losePoints) ואז הוספה
+	// restore scores
     int currentScore1 = player1.getScore();
     int currentScore2 = player2.getScore();
-
+	// remove current scores
     if (currentScore1 > 0) player1.losePoints(currentScore1);
     if (currentScore2 > 0) player2.losePoints(currentScore2);
-
+	// add scores from snapshot
     player1.addPoints(snap->p1_score);
     player2.addPoints(snap->p2_score);
 
-    // ===== החל פריטים =====
+	// update held items
     if (snap->p1_item && snap->p1_item != ' ')
         player1.GrabItem(snap->p1_item, snap->p1_item_id);
     if (snap->p2_item && snap->p2_item != ' ')
         player2.GrabItem(snap->p2_item, snap->p2_item_id);
 
-    // ===== החל מצב דלתות =====
+	// restore door states
     for (int i = 0; i < 10; i++)
         Door::openDoors[i] = snap->door_open[i];
     Door::switchesAreOn = snap->switches_on;
 
-    // ===== החל טיימר =====
+	// restore timer
     gameTimer = snap->timer;
     timerActive = snap->timer_active;
 
-    // ===== אתחול תוצאות =====
+	// restore riddles
     gameResults = Results();
     gameResults.setScreenFiles(snap->screens);
 
-    // ===== הכן שחקנים =====
+	// creating room meta and placing items based on metadata
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
     if (!player1.isActive()) player1.activate();
     if (!player2.isActive()) player2.activate();
 
-    // ===== הצג את המסך הטעון =====
+	// show loaded screen
     drawCurrentScreen();
     player1.draw();
     player2.draw();
 
-    delete snap;  // ✅ שחרר את הזיכרון
+	delete snap;  // release snapshot memory
 
-    // ✅ הפעל את המשחק!
+	// start game loop
     gameLoop();
 }

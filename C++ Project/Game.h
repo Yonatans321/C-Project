@@ -33,7 +33,7 @@ protected:
 	static constexpr char INSTRUCTIONS_KEY = '8'; // show instructions
 	static constexpr char EXIT_KEY = '9'; // exit game
 	static constexpr char Colors_ON_OFF = '2'; // toggle colors
-	static constexpr char LOAD_GAME_KEY = '3';
+	static constexpr char LOAD_GAME_KEY = '3'; // quick load game
 
 	void drawCurrentScreen(); // draw the current screen
 	void redrawGame();         // redraw game elements
@@ -54,8 +54,8 @@ protected:
 	void placeNextToDoor(const Point& targetDoorPos);// place player next to a specific door (helper)
 	void handlePause(Screen& currentScreen, bool& gameRunning);
 	virtual bool checkLevel();// check if level is completed
-	void quickLoad();                              // טעון משחק שמור
-	void createSaveSnapshot(StateSnapshot& snap);  // אסוף נתוני משחק
+	void quickLoad();                              // quick load last saved game
+	void createSaveSnapshot(StateSnapshot& snap);  // create a snapshot of the current game state for saving
 
 	std::vector<std::string> screenFileNames; // list of screen file names
 	Screen currentScreen;             // current game screen      
@@ -66,10 +66,10 @@ protected:
 	
 	char activeDoor = ' '; // to track last door used
 	GameModes currStatus = GameModes::MENU; // Game modes - options of the game
-    Player player1;         
+    Player player1;
     Player player2;
-	RiddleBank riddleBank;
-	Results gameResults;
+	RiddleBank riddleBank; // riddle bank to manage riddles
+	Results gameResults; // game results logger
     
 	Point player1LastPos; // last position of player 1
 	Point player2LastPos;// last position of player 2

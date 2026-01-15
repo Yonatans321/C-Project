@@ -122,8 +122,3 @@ bool Door::handleDoor(Player& p, Screen& screen, char& foundDoor)
 	}
 	return false;
 }
-
-
-
-
-
