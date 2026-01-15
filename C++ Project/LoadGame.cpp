@@ -237,9 +237,9 @@ void LoadGame::replayGameLoop()
     Point p2PosLastFrame = player2.getPosition();
     player1LastPos = p1PosLastFrame;
     player2LastPos = p2PosLastFrame;
-
-    ULONGLONG lastTickTime = GetTickCount64();
-    const DWORD timerInterval = 1000;
+	int timeAccumulator = 0;
+    //ULONGLONG lastTickTime = GetTickCount64();
+    //const DWORD timerInterval = 1000;
 
     if (!isSilentMode)
     {
@@ -253,11 +253,13 @@ void LoadGame::replayGameLoop()
         // Update timer
         if (timerActive)
         {
-            ULONGLONG currentTime = GetTickCount64();
-            if (currentTime - lastTickTime >= timerInterval)
+            timeAccumulator += GAME_DELAY;
+            //ULONGLONG currentTime = GetTickCount64();
+            if (timeAccumulator>=1000)
             {
                 gameTimer--;
-                lastTickTime = currentTime;
+                //lastTickTime = currentTime;
+                timeAccumulator -= 1000;
 
                 if (gameTimer <= 0)
                 {
