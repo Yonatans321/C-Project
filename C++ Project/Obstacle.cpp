@@ -121,7 +121,7 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
         Point from = chain[i];
         Point to = (i == chain.size() - 1) ? newSpot : chain[i + 1];
         // move obstacle
-		if (isDark) // in dark mode
+		if (isDark || Screen::isSilent()) // in dark mode or silent mode
         {
             screen.setCharAtSilent(to.getX(), to.getY(), '*');
             screen.setCharAtSilent(from.getX(), from.getY(), ' ');

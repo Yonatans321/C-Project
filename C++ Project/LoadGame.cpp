@@ -157,6 +157,7 @@ void LoadGame::run()
 
         if (testPassed)
         {
+           
             std::cout << "TEST PASSED: Game replay matches expected results!" << std::endl;
         }
         else
@@ -164,16 +165,6 @@ void LoadGame::run()
             std::cout << "TEST FAILED: Game replay does NOT match expected results!" << std::endl;
             std::cout << failureReason << std::endl;
         }
-
-        // Clean up temp file
-        //try
-        //{
-        //    std::filesystem::remove("adv-world.result.tmp");
-        //}
-        //catch (const std::exception&)
-        //{
-        //    // If cleanup fails, it's not critical
-        //}
     }
     else
     {
@@ -212,6 +203,13 @@ void LoadGame::initLevelSilent(const std::string& filename)
 
     riddleBank.attachPositionToRoom(currentScreen);
     riddleBank.attachResults(&gameResults, &eventTimer);
+
+    player1.attachResults(&gameResults, &eventTimer, PlayerType::Player1);
+    player2.attachResults(&gameResults, &eventTimer, PlayerType::Player2);
+
+    player1.setSilentMode(true);
+    player2.setSilentMode(true);
+
     player1.setScreen(currentScreen);
     player2.setScreen(currentScreen);
 
@@ -293,7 +291,7 @@ void LoadGame::replayGameLoop()
         // Ignore all user input in LOAD mode, but check for automatic steps
         if (_kbhit())
         {
-			waitForKey(); 
+            _getch();
         }
 
         // Update game state
@@ -415,6 +413,16 @@ bool LoadGame::checkLevel()
             if (!isSilentMode)
             {
                 initLevel(screenFileNames[currentLevelIdx], doorId);
+            }
+            else
+            {
+				
+                // Fix: Properly initialize the level logic even in silent mode
+                
+                initLevelSilent(screenFileNames[currentLevelIdx]);
+                placePlayersAtEntrance(doorId);
+
+                //std::cout << "Screen changed to: " << screenFileNames[currentLevelIdx] << std::endl;
             }
 
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);

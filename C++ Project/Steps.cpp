@@ -110,6 +110,8 @@ void Steps::saveSteps(const std::string& filename) const {
 
 // Get the next step for replay
 bool Steps::getNextStep(size_t currentIteration, Step& outStep) {
+
+    
     // Check if we've exhausted all steps
     if (currentStepIndex >= steps.size()) {
         return false;

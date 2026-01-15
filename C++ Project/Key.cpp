@@ -45,7 +45,14 @@ void Key::placeFromMetadata(Screen& screen)
         // Then place the key at the metadata position (if valid)
         if (isValidPosition(screen, metaKeyX, metaKeyY))
         {
-            screen.setCharAt(metaKeyX, metaKeyY, 'K');
+            if (Screen::isSilent())
+            {
+                screen.setCharAtSilent(metaKeyX, metaKeyY, 'K');
+            }
+            else
+            {
+                screen.setCharAt(metaKeyX, metaKeyY, 'K');
+            }
         }
     }
 }

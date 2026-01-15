@@ -1,6 +1,7 @@
 #include "Results.h"
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 void Results::setScreenFiles(const std::string& files)
 {
@@ -32,7 +33,9 @@ void Results::addRiddle(size_t time, int riddleId, const std::string& riddleText
     event.time = time;
     event.type = EventType::Riddle;
     event.riddle = solved ? RiddleResult::Solved : RiddleResult::Failed;
-    event.info = std::to_string(riddleId) + "|" + riddleText + "|" + answer;
+    std::string cleanText = riddleText;
+    std::replace(cleanText.begin(), cleanText.end(), '\n', ' ');
+    event.info = std::to_string(riddleId) + "|" + cleanText + "|" + answer;
     events.push_back(event);
 }
 
@@ -150,6 +153,10 @@ void Results::load(const std::string& filename)
             events.push_back(event);
         }
     }
+	// Sort events by time after loading
+    events.sort([](const Event& a, const Event& b) {
+        return a.time < b.time;
+        });
 }
 
 void Results::parseEventLine(const std::string& line, Event& event)
