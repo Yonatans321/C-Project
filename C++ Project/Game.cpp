@@ -218,7 +218,9 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
     if (currentScreen.isDark())
         currentScreen.drawMapWithTorch(player1);
     else
-        currentScreen.drawMap();
+    clearInputBuffer();
+    drawCurrentScreen();
+       
     player1.draw();
     player2.draw();
 }
@@ -380,6 +382,7 @@ bool Game::checkGameOver()
 {
     if (player1.isDead() || player2.isDead())
     {
+        gameResults.addGameOver(eventTimer, player1.getScore(), player2.getScore());
         UIScreens::showGameOverMessage();;
         resetGame();
         currStatus = GameModes::MENU;

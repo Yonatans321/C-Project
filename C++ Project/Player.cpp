@@ -8,12 +8,15 @@
 // moving and drawing functions
  // draw player at current position
 void Player::draw() {
+	if (isSilentMode) return;
+
 	if (active)
 		position.draw();
 }
 // erase player from current position
 void Player::erase() const
 {
+	if (isSilentMode) return;
 	int x = position.getX();
 	int y = position.getY();
 

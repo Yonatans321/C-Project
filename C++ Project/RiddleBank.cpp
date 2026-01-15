@@ -448,45 +448,71 @@ void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r
     Steps::Step riddleStep;
     std::string fullAnswer = "";
     size_t finalIteration = 0;
+    bool firstStep = true; // דגל לזיהוי הצעד הראשון
+    bool declined = false;
 
-    // 1. קליטת שלב ה-Y (הסכמה לחידה)
-    if (recordedSteps->getNextRiddleStep(riddleStep)) {
-        finalIteration = riddleStep.iteration;
-    }
-
-    // 2. קליטת כל מקשי התשובה עד המקש האחרון (Enter/סיום)
-    // אנחנו רצים בלולאה כדי לצרוך את כל הצעדים ששייכים לחידה הזו
+    // 1. לולאה לקליטת התשובה (עם סינון ה-'y' בהתחלה)
     while (recordedSteps->getNextRiddleStep(riddleStep)) {
-        finalIteration = riddleStep.iteration; // תמיד נשמור את הסיבוב האחרון
+        finalIteration = riddleStep.iteration; // שומרים את הזמן
 
-        // אם הגענו למקש ריק/Enter (כפי שמופיע בקובץ הצעדים שלך בסיבוב 29)
+        // === התיקון: טיפול במקש הראשון ===
+        if (firstStep) {
+            firstStep = false;
+            char key = tolower(riddleStep.key);
+
+            if (key == 'n') { // השחקן בחר לא לענות
+                declined = true;
+                break;
+            }
+            if (key == 'y') { // השחקן אישר - מדלגים על ה-'y' הזה!
+                continue;
+            }
+        }
+        // =================================
+
+        // בדיקת מקש סיום (Enter)
         if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
             break;
         }
+
+        // הוספת התו לתשובה (עכשיו ה-'y' לא ייכנס לכאן)
         fullAnswer += riddleStep.key;
     }
 
+    // 2. סנכרון שעון (Time Sync)
+    // חייבים לקדם את השעון לזמן הסיום כדי למנוע Time Mismatch
+    if (eventTimerPtr != nullptr && *eventTimerPtr < finalIteration) {
+        size_t currentT = *eventTimerPtr;
+        for (size_t t = currentT + 1; t <= finalIteration; t++) {
+            Steps::Step dummy;
+            while (recordedSteps->getNextStep(t, dummy));
+        }
+        *eventTimerPtr = finalIteration;
+    }
+
+    // אם השחקן ויתר על החידה
+    if (declined) {
+        player.stepBack();
+        return;
+    }
+
+    // 3. בדיקת תשובה ורישום
     bool correct = r->checkAnswer(fullAnswer.c_str());
 
-    // עדכון מצב המשחק
+    if (gameResults != nullptr) {
+        gameResults->addRiddle(finalIteration, r->getRiddleID(), r->getQuestion(), fullAnswer, correct);
+    }
+
+    // 4. עדכון לוגיקה ותצוגה
     if (correct) {
         player.addPoints(100);
         r->markAsSolved();
-        screen.setCharAt(x, y, ' ');
+        if (!isSilentLoadMode) screen.setCharAt(x, y, ' ');
+        else screen.setCharAtSilent(x, y, ' ');
     }
     else {
         player.loseLife();
-        screen.setCharAt(x, y, '?');
-    }
-
-    // 3. הרישום ל-Results - השתמש ב-finalIteration מהקובץ!
-    if (gameResults != nullptr) {
-        // שימוש ב-finalIteration מבטיח התאמה מושלמת ל-Expected Time
-        gameResults->addRiddle(finalIteration, r->getRiddleID(), r->getQuestion(), fullAnswer, correct);
-
-        if (!correct) {
-            PlayerType pt = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
-            gameResults->addLifeLost(finalIteration, pt);
-        }
+        if (!isSilentLoadMode) screen.setCharAt(x, y, '?');
+        else screen.setCharAtSilent(x, y, '?');
     }
 }

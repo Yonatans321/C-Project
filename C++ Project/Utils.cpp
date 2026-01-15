@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include <conio.h>
 #include <limits>
+#include "Screen.h"
 
 using std::cout; 
 using std::endl;   
@@ -12,6 +13,7 @@ bool ColorsEnabled = true;
 
 //Taken from lab exercise 10.11.25
 void gotoxy(int x, int y) {
+    
     std::cout.flush();
     COORD coord = { 0,0 };
     coord.X = x;
@@ -28,6 +30,7 @@ void hideCursor() {
 }
 //Taken from lab exercise 10.11.25
 void cls() {
+  
     system("cls");
 }
 
@@ -49,7 +52,7 @@ void setColor(int color) {
     }
 }
 void resetColor() {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // 7 is the default color
 }
 // clear the input from any previous key presses
 void clearInputBuffer()
