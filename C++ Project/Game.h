@@ -89,3 +89,5 @@ public:
 	virtual void run(); // main game loop
 	static bool pauseRequestedFromRiddle; // stop in the middle of riddle
 };
+
+//בוא נראה שעובד
