@@ -23,11 +23,11 @@ class Player; // forward declaration
 // class to manage the screen layout and interactions
 class Screen {
 public:
-	static constexpr int WIDTH = 80;
-	static constexpr int HEIGHT = 25;
-	static constexpr int MAP_HEIGHT = 23;
-	static constexpr int NUM_MAPS = 4;
-	static constexpr int MAX_DOORS = 10;
+	static constexpr int WIDTH = 80; // screen width
+	static constexpr int HEIGHT = 25; // screen height
+	static constexpr int MAP_HEIGHT = 23; // map height
+	static constexpr int NUM_MAPS = 4; // number of maps
+	static constexpr int MAX_DOORS = 10; // maximum number of doors
 
 private:
 	
@@ -43,25 +43,24 @@ public:
 	char screen[HEIGHT][WIDTH + 1];
 	// Map drawing
 	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
-	//void loadMap(int level);
-	void drawMap() const;
-	Point getLegendPos() const { return legendPos; }
-	void drawMapWithTorch(const Player& p1) const;
-	bool isDark() const;
-	void setDark(bool isDark);
-	void drawDark() const;
-	static void resetTorchState();
+	void drawMap() const; // draws the map to the screen
+	Point getLegendPos() const { return legendPos; } // position of the legend
+	void drawMapWithTorch(const Player& p1) const; // draws the map with torch effect
+	bool isDark() const; // checks if the screen is dark
+	void setDark(bool isDark); // sets the dark state of the screen
+	void drawDark() const; // draws the dark screen
+	static void resetTorchState(); // resets the torch state
 	// Text drawing
 	void setCharAt(const Point& p, char ch);
 	void setCharAt(int x, int y, char ch);
-	void setCharAtSilent(int x, int y, char ch);
-	void drawStatusBar(char inv1, int lives1, int score1,char inv2, int lives2, int score2 ,int timeRemaining, int gameTimer=-1);
-	static void drawBox(int x, int y, int width, int height);
-	static void clearBox(int x, int y, int width, int height);
-	static void drawAnimatedBox(int x, int y, int w, int h);
-	static void closeAnimatedBox(int x, int y, int w, int h);
-	void printInBox(int x, int y, const std::string& message);
-	void showMessage(const std::string& msg);
+	void setCharAtSilent(int x, int y, char ch); // sets char without drawing
+	void drawStatusBar(char inv1, int lives1, int score1, char inv2, int lives2, int score2, int timeRemaining, int gameTimer = -1); // draws the status bar
+	static void drawBox(int x, int y, int width, int height); // draws a box
+	static void clearBox(int x, int y, int width, int height);	 // clears a box
+	static void drawAnimatedBox(int x, int y, int w, int h); // draws an animated box
+	static void closeAnimatedBox(int x, int y, int w, int h); // closes an animated box
+	void printInBox(int x, int y, const std::string& message); // prints message in a box
+	void showMessage(const std::string& msg); // shows a message on the screen
 
 	//Map logic
 	char getCharAt(const Point& p) const;

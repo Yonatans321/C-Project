@@ -5,8 +5,8 @@
 #include <iostream>
 #include <cstring>
 
-extern bool LOAD_MODE;
-extern bool SAVE_MODE;  
+extern bool LOAD_MODE; // flag for load mode
+extern bool SAVE_MODE;   // flag for save mode
 
 int main(int argc, char* argv[]) {
         // No arguments - normal game with menu
@@ -41,5 +41,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
-// REGEL SHEL DAVIDA MAHAR 
