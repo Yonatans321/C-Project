@@ -454,22 +454,31 @@ void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r
     // 1. לולאה לקליטת התשובה (עם סינון ה-'y' בהתחלה)
     while (recordedSteps->getNextRiddleStep(riddleStep)) {
         finalIteration = riddleStep.iteration; // שומרים את הזמן
-
+        char riddleKey = riddleStep.key;
         // === התיקון: טיפול במקש הראשון ===
         if (firstStep) {
-            firstStep = false;
+            
             char key = tolower(riddleStep.key);
 
             if (key == 'n') { // השחקן בחר לא לענות
                 declined = true;
                 break;
             }
-            if (key == 'y') { // השחקן אישר - מדלגים על ה-'y' הזה!
+            if (key == 'y') { 
+                firstStep = false;
                 continue;
             }
+			continue; //ignore other keys at first step
         }
-        // =================================
-
+        if ((riddleKey == 'h' || riddleKey == 'H') && fullAnswer.empty()) {
+            continue;
+        }
+        if (riddleKey == 8) {
+            if (!fullAnswer.empty()) {
+                fullAnswer.pop_back();
+            }
+			continue;
+        }
         // בדיקת מקש סיום (Enter)
         if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
             break;
