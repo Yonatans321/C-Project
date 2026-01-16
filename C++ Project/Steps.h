@@ -8,7 +8,7 @@ public:
     struct Step
     {
         size_t iteration; // Game cycle / iteration
-        int PlayerNum;  // Player number (1 or 2)  
+        int PlayerNum;  // Player number (1 ,2 OR 0)  
         char key;        // Key pressed
     };
 

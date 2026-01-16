@@ -81,7 +81,7 @@ void UIScreens::showInstructions()
         "   ?    - Riddle      | Solve it or stare until it solves you.                   ", // 17
         "   A    - Light Switch| Turns lights ON/OFF in dark rooms. Magic? No.            ", // 18
         "   /\\   - Switch      | ON/OFF. Dramatic click guaranteed.                       ", // 19
-        "   ssss - temp Wall   | Temporary wall. Controlled by a switch… usually.         ", // 20
+        "   ssss - temp Wall   | Temporary wall. Controlled by a switchâ€¦ usually.         ", // 20
         "                                                                                 ", // 21
         "        TIME LIMIT: 6 minutes. Fail to finish and you die. No pressure.          ", // 22
         "       -   6 minutes in heaven... after it , it will become HELL...  -          ", // 23
@@ -206,10 +206,10 @@ void UIScreens::showGameOverMessage()
     };
 
     printScreen(GAME_OVER_SCREEN);
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+    if (!LOAD_MODE) {  // ===== Ã Ã­ Ã¬Ã  Ã¡LOAD mode, Ã§Ã«Ã¤ Ã¬Ã·Ã¬Ã¨ =====
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+    else {  // ===== Ã Ã­ Ã¡LOAD mode, Ã²Ã¹Ã¤ SLEEP =====
         Sleep(80);
     }
 }
@@ -223,10 +223,10 @@ void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     gotoxy(13, 11);
     std::cout << "Press any key to continue...";
 
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+    if (!LOAD_MODE) {  // ===== Ã Ã­ Ã¬Ã  Ã¡LOAD mode, Ã§Ã«Ã¤ Ã¬Ã·Ã¬Ã¨ =====
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+    else {  // ===== Ã Ã­ Ã¡LOAD mode, Ã²Ã¹Ã¤ SLEEP =====
         Sleep(80);
     }
 

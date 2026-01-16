@@ -1,7 +1,6 @@
 ﻿#include "RiddleBank.h"
 #include "Game.h"
 #include "SaveGame.h"
-
 #include <iostream>
 #include <string>
 #include <conio.h>
@@ -351,7 +350,12 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
     }
 
     bool correct = r->checkAnswer(answer.c_str());
-
+    if ((SAVE_MODE || isLoadMode) && gameResults != nullptr)
+    {
+        PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
+        gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, correct);
+        
+    }
     gotoxy(bx + 2, hintorResultLine);
     std::cout << std::string(50, ' ');
 
@@ -363,22 +367,13 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         player.addPoints(100);
         r->markAsSolved();
         screen.setCharAt(x, y, ' ');
-        if (SAVE_MODE && gameResults != nullptr)
-        {
-            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
-        }
+       
     }
     else
     {
         std::cout << "Wrong! -1 life";
         player.loseLife();
         screen.setCharAt(x, y, '?');
-        if (SAVE_MODE && gameResults != nullptr)
-        {
-            PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
-            gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
-            gameResults->addLifeLost(*eventTimerPtr, playerType);
-        }
     }
 
     Sleep(700);
@@ -451,31 +446,73 @@ char RiddleBank::getRiddleInputChar()
 void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r, int x, int y)
 {
     Steps::Step riddleStep;
-    if (recordedSteps && recordedSteps->getNextRiddleStep(riddleStep))
-    {
-        std::string answer(1, riddleStep.key);
-        bool correct = r->checkAnswer(answer.c_str());
+    std::string fullAnswer = "";
+    size_t finalIteration = 0;
+    bool firstStep = true; // דגל לזיהוי הצעד הראשון
+    bool declined = false;
 
-        if (correct)
-        {
-            player.addPoints(100);
-            r->markAsSolved();
-            screen.setCharAt(x, y, ' ');
-            if (SAVE_MODE && gameResults != nullptr)
-            {
-                gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, true);
+    // 1. לולאה לקליטת התשובה (עם סינון ה-'y' בהתחלה)
+    while (recordedSteps->getNextRiddleStep(riddleStep)) {
+        finalIteration = riddleStep.iteration; // שומרים את הזמן
+
+        // === התיקון: טיפול במקש הראשון ===
+        if (firstStep) {
+            firstStep = false;
+            char key = tolower(riddleStep.key);
+
+            if (key == 'n') { // השחקן בחר לא לענות
+                declined = true;
+                break;
+            }
+            if (key == 'y') { // השחקן אישר - מדלגים על ה-'y' הזה!
+                continue;
             }
         }
-        else
-        {
-            player.loseLife();
-            screen.setCharAt(x, y, '?');
-            if (SAVE_MODE && gameResults != nullptr)
-            {
-                PlayerType playerType = (player.getChar() == '&') ? PlayerType::Player1 : PlayerType::Player2;
-                gameResults->addRiddle(*eventTimerPtr, r->getRiddleID(), r->getQuestion(), answer, false);
-                gameResults->addLifeLost(*eventTimerPtr, playerType);
-            }
+        // =================================
+
+        // בדיקת מקש סיום (Enter)
+        if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
+            break;
         }
+
+        // הוספת התו לתשובה (עכשיו ה-'y' לא ייכנס לכאן)
+        fullAnswer += riddleStep.key;
+    }
+
+    // 2. סנכרון שעון (Time Sync)
+    // חייבים לקדם את השעון לזמן הסיום כדי למנוע Time Mismatch
+    if (eventTimerPtr != nullptr && *eventTimerPtr < finalIteration) {
+        size_t currentT = *eventTimerPtr;
+        for (size_t t = currentT + 1; t <= finalIteration; t++) {
+            Steps::Step dummy;
+            while (recordedSteps->getNextStep(t, dummy));
+        }
+        *eventTimerPtr = finalIteration;
+    }
+
+    // אם השחקן ויתר על החידה
+    if (declined) {
+        player.stepBack();
+        return;
+    }
+
+    // 3. בדיקת תשובה ורישום
+    bool correct = r->checkAnswer(fullAnswer.c_str());
+
+    if (gameResults != nullptr) {
+        gameResults->addRiddle(finalIteration, r->getRiddleID(), r->getQuestion(), fullAnswer, correct);
+    }
+
+    // 4. עדכון לוגיקה ותצוגה
+    if (correct) {
+        player.addPoints(100);
+        r->markAsSolved();
+        if (!isSilentLoadMode) screen.setCharAt(x, y, ' ');
+        else screen.setCharAtSilent(x, y, ' ');
+    }
+    else {
+        player.loseLife();
+        if (!isSilentLoadMode) screen.setCharAt(x, y, '?');
+        else screen.setCharAtSilent(x, y, '?');
     }
 }

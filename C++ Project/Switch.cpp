@@ -19,7 +19,7 @@ void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch pos
     {
         // Update the map data
         screen.setCharAtSilent(pos.getX(), pos.getY(), '/');
-
+        if (Screen::isSilent) return;
         // Check if room is dark
         bool isDark = screen.isDark();
 

@@ -8,12 +8,15 @@
 // moving and drawing functions
  // draw player at current position
 void Player::draw() {
-	if (active) 
-	position.draw();
+	if (isSilentMode) return;
+
+	if (active)
+		position.draw();
 }
 // erase player from current position
 void Player::erase() const
 {
+	if (isSilentMode) return;
 	int x = position.getX();
 	int y = position.getY();
 
@@ -43,9 +46,9 @@ char Player::getChar() const { // get player's character representation
 }
 // move player in the current direction if no wall is there - taken from lab 4
 void Player::move() {
-  prevPos=position;
+	prevPos = position;
 	if (!active) return;
-	Point nextPosition = position;	
+	Point nextPosition = position;
 	nextPosition.move();
 	char nextCell = screen->getCharAt(nextPosition);
 	if (screen->isWall(nextPosition))
@@ -68,10 +71,10 @@ void Player::stepBack() { // move player back to previous position
 }
 
 // change direction based on key pressed - Taken from lab 4
-void Player::keyPressed(char ch) 
+void Player::keyPressed(char ch)
 {
 	char lower = std::tolower(ch);
-	if (lower==std::tolower(keys[5])&& heldItem !=0)
+	if (lower == std::tolower(keys[5]) && heldItem != 0)
 	{
 		dropHeldItem();
 		return;
@@ -106,7 +109,7 @@ int Player::getItemId() const { // get the held item id
 	return itemId;
 }
 void Player::DropItem() // drop the held item 
-{ 
+{
 	heldItem = 0;
 	itemId = -1;
 }
@@ -116,18 +119,18 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 	heldItem = item;
 	itemId = id;
 }
-bool Player::useKeyForDoor( char doorChar) const  // use key for a door
+bool Player::useKeyForDoor(char doorChar) const  // use key for a door
 { // check if player hasn't a key
 	if (heldItem == 'K')
 	{
 		return true;
 	}
-		return false;
-	
+	return false;
+
 }
-		
+
 void Player::keyUsed() { // remove the used key
-	
+
 	DropItem();
 }
 // points and life functions
@@ -149,9 +152,12 @@ void Player::addLives()
 }
 void Player::loseLife()
 {
-	if (lives>0)
+	if (lives > 0)
 	{
 		lives--;
+		if (gameResults && eventTimerPtr) {
+			gameResults->addLifeLost(*eventTimerPtr, type);
+		}
 	}
 }
 int Player::getLives() const
@@ -238,7 +244,7 @@ void Player::dropHeldItem()
 // check if the key move belongs to the player
 bool Player::isMyKey(char ch) const {
 	char lowerCh = std::tolower(ch);
-	for (char key : keys) { 
+	for (char key : keys) {
 		if (std::tolower(key) == lowerCh) {
 			return true;
 		}

@@ -15,8 +15,9 @@
 
 struct StateSnapshot; // forward declaration
 enum class Mode { REGULAR, SAVE, LOAD };
-extern bool LOAD_MODE;
+
 class Game {
+	friend class GameStateManager;
 protected:
 
 	// Constants
@@ -90,4 +91,4 @@ public:
 	static bool pauseRequestedFromRiddle; // stop in the middle of riddle
 };
 
-//беа ршад щтебг
+//Ч‘Ч•Чђ Ч ЧЁЧђЧ” Ч©ЧўЧ•Ч‘Ч“

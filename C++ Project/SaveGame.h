@@ -19,5 +19,5 @@ protected:
     bool checkGameOver() override;
     bool checkLevel() override;
 
-	Steps recordedSteps; // steps for recording player actions
+
 };
