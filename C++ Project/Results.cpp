@@ -280,7 +280,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
 
     auto itActual = events.begin();
     auto itExpected = other.events.begin();
-    int eventIndex = 0; // 
+    int eventIndex = 0; 
     std::string passedEventsLog = "Events matched successfully so far:\n";
 
 	// loop through both event lists
@@ -367,7 +367,7 @@ std::string Results::eventTypeToString(EventType type) const
 }
 
 
-// פונקציית עזר להמרת אירוע למחרוזת קריאה לצורכי דיבאג
+// helper function to convert an Event to a debug string
 std::string Results::eventToDebugString(const Event& e) const {
     std::string res = "Time: " + std::to_string(e.time) + ", Type: " + eventTypeToString(e.type);
     if (!e.info.empty()) res += ", Info: " + e.info;

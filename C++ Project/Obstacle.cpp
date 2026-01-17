@@ -3,7 +3,8 @@
 #include "Screen.h"
 #include "Point.h"
 #include "Direction.h"
-
+#include "Constants.h"
+using BoardSymbols::OBSTACLE;
 
 // Handle obstacle interaction for two players (helped by AI)
 // pushing rules:
@@ -57,7 +58,7 @@ bool Obstacle::isFacingObstacle(const Player& p, Screen& screen, Point& obstacle
 
     Point forward(pos.getX() + dir.getX(), pos.getY() + dir.getY()); //pos in front of player
 
-    if (screen.getCharAt(forward.getX(), forward.getY()) == '*') // check if obstacle
+    if (screen.getCharAt(forward.getX(), forward.getY()) == OBSTACLE) // check if obstacle
     {
         obstaclePos = forward; // store obstacle position
         return true;
@@ -94,13 +95,13 @@ std::vector<Point> Obstacle::collectChain( Point start, const Direction& dir,con
     std::vector<Point> chain; // store obstacle chain
     Point cur = start;
 	// collect obstacles in the direction
-    while (screen.getCharAt(cur.getX(), cur.getY()) == '*')
+    while (screen.getCharAt(cur.getX(), cur.getY()) == OBSTACLE)
     {
         chain.push_back(cur);
         cur = Point(cur.getX() + dir.getX(), cur.getY() + dir.getY());
     }
 	// check if next position is empty
-    if (screen.getCharAt(cur.getX(), cur.getY()) != ' ')
+    if (screen.getCharAt(cur.getX(), cur.getY()) != BoardSymbols::EMPTY)
         return {};
 
     return chain;
@@ -123,14 +124,14 @@ void Obstacle::pushChain(const std::vector<Point>& chain, const Direction& dir, 
         // move obstacle
 		if (isDark || Screen::isSilent()) // in dark mode or silent mode
         {
-            screen.setCharAtSilent(to.getX(), to.getY(), '*');
-            screen.setCharAtSilent(from.getX(), from.getY(), ' ');
+            screen.setCharAtSilent(to.getX(), to.getY(), OBSTACLE);
+            screen.setCharAtSilent(from.getX(), from.getY(), BoardSymbols::EMPTY);
         }
 
 		else // normal mode
         {
-            screen.setCharAt(to.getX(), to.getY(), '*');
-            screen.setCharAt(from.getX(), from.getY(), ' ');
+            screen.setCharAt(to.getX(), to.getY(), OBSTACLE);
+            screen.setCharAt(from.getX(), from.getY(), BoardSymbols::EMPTY);
         }
     }
 }

@@ -6,6 +6,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include "Constants.h"
 
 bool Screen::silentMode = false;
 static int torchLastX = -1;
@@ -221,7 +222,6 @@ bool Screen::validateMetadata(const std::string& filename)
     if (!roomMeta.validateLightSwitchPosition(*this, filename))
         return false;
 
-
     return true;
 }
 //   DRAW MAP
@@ -257,12 +257,7 @@ bool Screen::isLegendPositionValid(int x, int y, const std::string& filename) //
         return false;
 	}
 	return true;
-
-
-
 }
-
-
 //   DRAWING HELPERS
 void Screen::setCharAt(int x, int y, char ch)
 {
@@ -299,7 +294,7 @@ bool Screen::isDark() const
 // draw map with torchlight effect
 void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight effect
 {
-    if (p.getHeldItem() != '!') // no torch
+    if (p.getHeldItem() != BoardSymbols::TORCH) // no torch
     {
         drawDark();
         resetTorchState();
@@ -336,7 +331,7 @@ void Screen::drawMapWithTorch(const Player& p) const // draw map with torchlight
                     gotoxy(x, y);
                     char c = screen[y][x];
 
-                    if ((c >= '1' && c <= '9') || c == '!')
+                    if ((c >= '1' && c <= '9') || c == BoardSymbols::TORCH)
                     {
                         applyColor(c);
                         std::cout << c;
@@ -586,7 +581,7 @@ bool Screen::isWall(const Point& p) const
 // checks if obstacle
 bool Screen::isObstacle(const Point& p) const
 {
-    return getCharAt(p) == '*';
+    return getCharAt(p) == BoardSymbols::OBSTACLE;
 }
 // get door at point
 Door* Screen::getDoor(const Point& p)
@@ -630,36 +625,36 @@ void Screen::applyColor(char c) const
 {
     switch (c)
     {
-    case '\\':   // switch OFF
+    case BoardSymbols::SWITCH_OFF:   // switch OFF
         setColor(COLOR_LIGHT_RED);
         break;
 
-    case '/':    // switch ON
+    case BoardSymbols::SWITCH_ON:    // switch ON
         setColor(COLOR_LIGHT_GREEN);
         break;
 
-    case 's':    // temporary wall
+    case BoardSymbols::SWITCH_WALL:    // temporary wall
         setColor(COLOR_YELLOW);
         break;
 
-    case '*':    // obstacle
+    case BoardSymbols::OBSTACLE:    // obstacle
         setColor(COLOR_GRAY);
         break;
 
-    case '?':    // riddle
+    case BoardSymbols::RIDDLE:    // riddle
         setColor(COLOR_LIGHT_PURPLE);
         break;
 
-    case 'K':    // key
+    case BoardSymbols::KEY:     // key
         setColor(COLOR_GOLD);
         break;
-	case '@':    // Bomb
+    case BoardSymbols::BOMB:    // Bomb
         setColor(COLOR_CYAN);
         break;
-	case '!':    // Torch
+    case BoardSymbols::TORCH:    // Torch
         setColor(COLOR_RED);
         break;
-    case 'A':
+    case BoardSymbols::LIGHT_SWITCH:
         setColor(COLOR_YELLOW);  // Yellow for light switch
         break;
     default:
@@ -668,5 +663,29 @@ void Screen::applyColor(char c) const
         else
             resetColor();
         break;
+    }
+}
+// Bomb explosion logic moved to Room/Screen class
+void Screen::explodeBomb(int centerX, int centerY)
+{
+    // 1. Remove the bomb from logical map and physical screen
+    setCharAt(centerX, centerY, ' ');
+
+    // 2. Destroy 'w' walls and '*' obstacles in range 1 (3x3 area)
+    for (int y = -3; y <= 3; y++)
+    {
+        for (int x = -3; x <= 3; x++)
+        {
+            if (x == 0 && y == 0) continue; // Skip the center
+
+            int targetX = centerX + x; // Target cell coordinates
+            int targetY = centerY + y;
+
+            char targetChar = getCharAt(targetX, targetY);
+            if (targetChar == BoardSymbols::WALL || targetChar == BoardSymbols::OBSTACLE) // Check for walls and obstacles
+            {
+                setCharAt(targetX, targetY, BoardSymbols::EMPTY); // Remove from map and screen
+            }
+        }
     }
 }

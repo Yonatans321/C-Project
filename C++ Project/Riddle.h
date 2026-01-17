@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cstring>
+#include "Utils.h"
 #include "Point.h"
 class Riddle
 {
@@ -14,6 +15,43 @@ private:
 public:
 	Riddle() : riddleID(-1), question(nullptr), answer(nullptr), solved(false), hint(nullptr), pos(0, 0) {}
 	Riddle(int id, const char* q, const char* a, const char* h) :riddleID(id), question(q), answer(a), solved(false), hint(h), pos(0, 0) {}
+	// Copy Constructor
+	Riddle(const Riddle& other) : riddleID(other.riddleID), solved(other.solved), pos(other.pos)
+	{
+		question = other.question ? allocateString(other.question) : nullptr;
+		answer = other.answer ? allocateString(other.answer) : nullptr;
+		hint = other.hint ? allocateString(other.hint) : nullptr;
+	}
+
+	// Assignment Operator
+	Riddle& operator=(const Riddle& other)
+	{
+		if (this != &other)
+		{
+			// Free existing memory
+			if (question) delete[] question;
+			if (answer) delete[] answer;
+			if (hint) delete[] hint;
+
+			// Copy data
+			riddleID = other.riddleID;
+			solved = other.solved;
+			pos = other.pos;
+			question = other.question ? allocateString(other.question) : nullptr;
+			answer = other.answer ? allocateString(other.answer) : nullptr;
+			hint = other.hint ? allocateString(other.hint) : nullptr;
+		}
+		return *this;
+	}
+
+	// Destructor
+	~Riddle()
+	{
+		if (question) delete[] question;
+		if (answer) delete[] answer;
+		if (hint) delete[] hint;
+	}
+
 	// functions declaration
 	bool checkAnswer(const char* userAnswer); // check if the answer is correct
 	bool isSolved() const; // check if the riddle is solved

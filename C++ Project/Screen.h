@@ -30,7 +30,7 @@ public:
 	static constexpr int MAX_DOORS = 10; // maximum number of doors
 
 private:
-	
+	char screen[HEIGHT][WIDTH + 1];
 	Door doors [10]; // array to hold doors
 	bool dark = false; // is the screen dark
 	Point legendPos; // position of the legend
@@ -40,7 +40,6 @@ private:
 	static bool silentMode;
 public:
 	Screen();
-	char screen[HEIGHT][WIDTH + 1];
 	// Map drawing
 	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
 	void drawMap() const; // draws the map to the screen
@@ -61,7 +60,8 @@ public:
 	static void closeAnimatedBox(int x, int y, int w, int h); // closes an animated box
 	void printInBox(int x, int y, const std::string& message); // prints message in a box
 	void showMessage(const std::string& msg); // shows a message on the screen
-
+	// Bomb explosion logic
+	void explodeBomb(int centerX, int centerY);
 	//Map logic
 	char getCharAt(const Point& p) const;
 	char getCharAt(int x, int y) const;

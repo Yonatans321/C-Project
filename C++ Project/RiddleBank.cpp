@@ -287,7 +287,7 @@ void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
         return;
     }
 
-    // ===== NORMAL GAME MODE OR REGULAR LOAD MODE =====
+    // NORMAL GAME MODE OR REGULAR LOAD MODE 
     const int bx = 15, by = 5, bw = 50, bh = 12;
 
     screen.drawAnimatedBox(bx, by, bw, bh);
@@ -453,9 +453,9 @@ void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r
 
 	// first build the full answer from recorded steps
     while (recordedSteps->getNextRiddleStep(riddleStep)) {
-        finalIteration = riddleStep.iteration; // שומרים את הזמן
+		finalIteration = riddleStep.iteration; // keep updating final iteration
         char riddleKey = riddleStep.key;
-        // === התיקון: טיפול במקש הראשון ===
+		// handle first step (Y/N)
         if (firstStep) {
             
             char key = tolower(riddleStep.key);

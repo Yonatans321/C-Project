@@ -9,14 +9,15 @@
 #include "Utils.h"
 #include "Torch.h"
 #include "GameStateManager.h"
+#include "Constants.h"
 
 bool Game::pauseRequestedFromRiddle = false; //stop in the middle of riddle
 extern bool LOAD_MODE;
 
 Game::Game() // initializer list
-    : player1(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'),
+    : player1(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], BoardSymbols::PLAYER_1),
         { 'W','D','X','A','S','E' }),
-    player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'),
+    player2(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], BoardSymbols::PLAYER_2),
         { 'I','L','M','J','K','O' }),
 	player1LastPos(-1, -1),player2LastPos(-1,-1),
     gameTimer(0), maxGameTime(360), timerActive(false)
@@ -165,8 +166,8 @@ void Game::initLevel(const std::string& filename, int specificDoor)
         placePlayersAtEntrance(specificDoor); 
     else
     {
-        player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], '&'));
-        player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], '$'));
+        player1.setPosition(Point(P1_START_X, P1_START_Y, Direction::directions[Direction::STAY], BoardSymbols::PLAYER_1));
+        player2.setPosition(Point(P2_START_X, P2_START_Y, Direction::directions[Direction::STAY], BoardSymbols::PLAYER_2));
     }
     drawCurrentScreen();
     player1.draw();
@@ -198,7 +199,7 @@ void Game::handlePause(Screen& currentScreen, bool& gameRunning)
                 gameRunning = false;
                 return;
             }
-            else if (c == 'S' || c == 's')  // ← SAVE
+            else if (c == 'S' || c == 's')  //  SAVE
             {
 				StateSnapshot snap; // create snapshot
 				createSaveSnapshot(snap); // fill snapshot with current game state
@@ -301,7 +302,7 @@ void Game::updateDisplay()
         Point bombPos = activeBomb->getPosition();
         gotoxy(bombPos.getX(), bombPos.getY());
         setColor(COLOR_RED);
-        std::cout << '@';
+        std::cout << BoardSymbols::BOMB;
         resetColor();
     }
 }
@@ -341,40 +342,27 @@ void Game::updateBomb()
     }    
 }
 
+// Helper to update single player
+void Game::updateSinglePlayer(Player& player){
+    if (player.isActive())
+    {
+        
+        char underPlayer = currentScreen.getCharAt(player.getX(), player.getY());
+        player.erase();
+        // Restore 'A' if it was there
+        if (underPlayer == BoardSymbols::LIGHT_SWITCH)
+            currentScreen.setCharAt(player.getX(), player.getY(), BoardSymbols::LIGHT_SWITCH);
+    }  
+	bool stop = handleTile(player);// handle tile interaction
+    if (!stop)
+        player.move();
+}
 // Handle player movement and collisions
 void Game::updatePlayers()
 {
-	char underPlayer1 = ' ';// to track what is under each player
-    char underPlayer2 = ' ';
-
-    if (player1.isActive())
-    {
-        underPlayer1 = currentScreen.getCharAt(player1.getX(), player1.getY());
-        player1.erase();
-        // Restore 'A' if it was there
-        if (underPlayer1 == 'A')
-            currentScreen.setCharAt(player1.getX(), player1.getY(), 'A');
-    }
-        
-
-    if (player2.isActive())
-    {
-        underPlayer2 = currentScreen.getCharAt(player2.getX(), player2.getY());
-        player2.erase();
-        // Restore 'A' if it was there
-        if (underPlayer2 == 'A')
-            currentScreen.setCharAt(player2.getX(), player2.getY(), 'A');
-    }
-
-    bool stop1 = handleTile(player1);
-    bool stop2 = handleTile(player2);
-
-    if (!stop1)
-        player1.move();
-    if (!stop2)
-        player2.move();
+    updateSinglePlayer(player1);
+    updateSinglePlayer(player2);
 }
-
 // Check game end conditions
 bool Game::checkGameOver()
 {
@@ -541,7 +529,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     char targetCell = currentScreen.getCharAt(targetPos);
 	Point& lastPos = (&player == &player1) ? player1LastPos : player2LastPos;
 
-    if (targetCell == 'K' || targetCell == '@' || targetCell == '!') {
+    if (targetCell == BoardSymbols::KEY || targetCell == BoardSymbols::BOMB || targetCell == BoardSymbols::TORCH) {
         if (player.getHeldItem() != ' ' && player.getHeldItem() != 0) {
             UIScreens::showInventoryFullMessage(currentScreen);
 
@@ -557,7 +545,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
     }
     switch (cell)
     {
-    case 'A': // light switch
+    case BoardSymbols::LIGHT_SWITCH: // light switch
         if (currentRoomMeta.hasLightSwitchAt(pos.getX(), pos.getY()))
         {
 			if (lastPos.getX() != pos.getX() || lastPos.getY() != pos.getY()) // Check if switch position changed
@@ -572,41 +560,41 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         }
         break;
 
-    case '?':// riddle
+    case BoardSymbols::RIDDLE:// riddle
         riddleBank.handleRiddle(player, currentScreen, currentLevelIdx);
         break;
 
-    case 'K':// key
-        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+    case BoardSymbols::KEY:// key
+        if (player.getHeldItem() == BoardSymbols::EMPTY || player.getHeldItem() == 0)
         {
             Key keyFromRoom = currentRoomMeta.getRoomKey();  // get the key info from room meta
-            player.GrabItem('K', keyFromRoom.getDoorID());   
-            currentScreen.setCharAt(pos, ' ');
+            player.GrabItem(BoardSymbols::KEY, keyFromRoom.getDoorID());
+            currentScreen.setCharAt(pos, BoardSymbols::EMPTY);
         }
         else
             return true;
         break;
 
-    case '!': // Torch
-        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0)
+    case BoardSymbols::TORCH: // Torch
+        if (player.getHeldItem() == BoardSymbols::EMPTY || player.getHeldItem() == 0)
         {
-            player.GrabItem('!');
-            currentScreen.setCharAt(pos, ' ');
+            player.GrabItem(BoardSymbols::TORCH);
+            currentScreen.setCharAt(pos, BoardSymbols::EMPTY);
         }
         else
             return true;
         break;
-    case '@':// bomb
-        if (player.getHeldItem() == ' ' || player.getHeldItem() == 0) {
-            player.GrabItem('@');
-            currentScreen.setCharAt(pos, ' ');
+    case BoardSymbols::BOMB:// bomb
+        if (player.getHeldItem() == BoardSymbols::EMPTY || player.getHeldItem() == 0) {
+            player.GrabItem(BoardSymbols::BOMB);
+            currentScreen.setCharAt(pos, BoardSymbols::EMPTY);
         }
         else
             return true;
         break;
         // switch
-    case '\\':
-    case '/':
+    case BoardSymbols::SWITCH_OFF:
+    case BoardSymbols::SWITCH_ON:
         Switch::handleSwitch(player, currentScreen);
         return false;
     }
@@ -624,20 +612,20 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         break;
 
     }
-    case '*':// obstacle
+    case BoardSymbols::OBSTACLE:// obstacle
     {
         Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
 
         char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
 
-        if (afterPush == '*')
+        if (afterPush == BoardSymbols::OBSTACLE)
             return true;    // cannot move, obstacle not moved
         
         player.setPosition(targetPos);// move player into obstacle's previous position
         return true;
     }
 
-    case 's':// switch wall
+    case BoardSymbols::SWITCH_WALL:// switch wall
         return true;
     }
 
@@ -762,8 +750,7 @@ bool Game::checkLevel() // check if level is completed
             activeDoor = ' ';
             return false;
         }
-        else
-        {
+        else{
             showWinScreen();   // you won the game
 			activeDoor = ' ';
             return true;
@@ -917,14 +904,12 @@ void Game::createSaveSnapshot(StateSnapshot& snap) // create a snapshot of the c
         snap.screens += screenFileNames[i];
     }
 }
-
 void Game::quickLoad() { // load game without going through menu generated by AI
     StateSnapshot* snap = GameStateManager::showLoadMenu();
 
 	if (!snap) { // user cancelled load
         return;
     }
-
 	// load all levels from files
     getAllScreenFileNames(screenFileNames);
     allLevels.clear();
@@ -933,7 +918,6 @@ void Game::quickLoad() { // load game without going through menu generated by AI
         if (s.loadMapFromFile(f))
             allLevels.push_back(s);
     }
-
 	if (snap->level < 0 || snap->level >= static_cast<int>(allLevels.size())) { // validate level index
         snap->level = 0;
     }
@@ -950,9 +934,7 @@ void Game::quickLoad() { // load game without going through menu generated by AI
             }
         }
     }
-
-	// update current screen after restoring map data
-    currentScreen = allLevels[currentLevelIdx];
+    currentScreen = allLevels[currentLevelIdx]; // update current screen after restoring map data
 	// restore player positions
     player1.setPosition(Point(snap->p1_x, snap->p1_y,
         Direction::directions[Direction::STAY], '&'));
@@ -1002,6 +984,5 @@ void Game::quickLoad() { // load game without going through menu generated by AI
     player1.draw();
     player2.draw();
 	delete snap;  // release snapshot memory
-	// start game loop
-    gameLoop();
+    gameLoop();  // start game loop
 }

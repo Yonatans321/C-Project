@@ -38,7 +38,7 @@ public:
 	//constructor
 	Player(const Point& start_point, const char(&the_keys)[NUM_KEYS])
 		:position(start_point), screen(nullptr), heldItem(0), itemId(-1),points(0),
-		lives(3),myKey(nullptr),hasKey(false),active(true)
+		lives(3),myKey(nullptr),hasKey(false),active(true), type(PlayerType::Player1)
 	{
 		// initialize control keys
 		for (size_t i = 0; i < NUM_KEYS; ++i) {

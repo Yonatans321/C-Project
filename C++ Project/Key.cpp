@@ -1,8 +1,10 @@
 #include "Key.h"
 #include "Screen.h"
 #include "RoomMeta.h"
+#include "Constants.h"
 #include <iostream>
 
+using  BoardSymbols::KEY;
 // Static helper function to check if a position is valid for placing a key
 bool Key::isValidPosition(const Screen& screen, int x, int y)
 {
@@ -11,7 +13,7 @@ bool Key::isValidPosition(const Screen& screen, int x, int y)
 
     char cell = screen.getCharAt(x, y);
     // Key can only be placed on empty space
-    return (cell == ' '||cell=='K'||cell=='k');
+    return (cell == ' '||cell== KEY ||cell=='k');
 }
 
 // Static helper function to check if there's already a 'K' in the map
@@ -21,7 +23,7 @@ bool Key::existsInMap(const Screen& screen)
     {
         for (int x = 0; x < Screen::WIDTH; x++)
         {
-            if (screen.getCharAt(x, y) == 'K')
+            if (screen.getCharAt(x, y) == KEY)
                 return true;
         }
     }
@@ -47,11 +49,11 @@ void Key::placeFromMetadata(Screen& screen)
         {
             if (Screen::isSilent())
             {
-                screen.setCharAtSilent(metaKeyX, metaKeyY, 'K');
+                screen.setCharAtSilent(metaKeyX, metaKeyY, KEY);
             }
             else
             {
-                screen.setCharAt(metaKeyX, metaKeyY, 'K');
+                screen.setCharAt(metaKeyX, metaKeyY, KEY);
             }
         }
     }
@@ -63,7 +65,7 @@ void Key::removeAllKeysFromMap(Screen& screen)
     {
         for (int x = 0; x < Screen::WIDTH; x++)
         {
-            if (screen.getCharAt(x, y) == 'K')
+            if (screen.getCharAt(x, y) == KEY)
             {
                 screen.setCharAt(x, y, ' ');  // Replace with empty space
             }
