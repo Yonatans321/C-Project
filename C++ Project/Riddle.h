@@ -64,3 +64,4 @@ public:
 	void setPosition(const Point& p); // set the position of the riddle
 	void resetRiddle(); // reset the riddle to unsolved state
 };
+
