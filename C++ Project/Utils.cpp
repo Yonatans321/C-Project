@@ -30,7 +30,7 @@ void hideCursor() {
 }
 //Taken from lab exercise 10.11.25
 void cls() {
-  
+ 
     system("cls");
 }
 

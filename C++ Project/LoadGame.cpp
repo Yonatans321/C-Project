@@ -8,6 +8,7 @@
 #include "Key.h"
 #include "Switch.h"
 #include "Door.h"
+#include <sstream>// for silent mode comparison (AI helper)
 
 bool LOAD_MODE = false;
 
@@ -121,11 +122,13 @@ void LoadGame::run() // override run method helped by AI
     }
 
     riddleBank.attachSteps(&loadedSteps, true);
-
+	std::streambuf* oldCoutBuffer = nullptr;// for silent mode (helped by AI)
+	std::stringstream trashStream;// for silent mode
     // Tell RiddleBank if we're in SILENT mode
     if (isSilentMode)
     {
         riddleBank.setSilentMode(true);
+		oldCoutBuffer = std::cout.rdbuf(trashStream.rdbuf());// redirect cout to trash
     }
 
     // Run game loop
@@ -134,6 +137,8 @@ void LoadGame::run() // override run method helped by AI
     // ===== SILENT MODE: Save to temp, compare, then delete =====
     if (isSilentMode)
     {
+		std::cout.rdbuf(oldCoutBuffer);// restore cout
+
         // Save to temporary file
         gameResults.save("adv-world.result.tmp");
 
@@ -142,13 +147,14 @@ void LoadGame::run() // override run method helped by AI
         try
         {
             tempResults.load("adv-world.result.tmp");
+           
         }
         catch (const std::exception&)
         {
             std::cout << "ERROR: Could not load temp results file!" << std::endl;
             return;
         }
-
+        Screen::setSilentMode(false);
         cls();
         gotoxy(0, 0);
 
@@ -246,8 +252,8 @@ void LoadGame::replayGameLoop() // main replay game loop
     player1LastPos = p1PosLastFrame;
     player2LastPos = p2PosLastFrame;
 	int timeAccumulator = 0;
-
-	if (!isSilentMode) // initial draw
+	bool wasDark = currentScreen.getRoomMeta().isDark();
+    if (!isSilentMode)
     {
 		redrawGame(); // Draw full screen at start
     }
@@ -255,16 +261,13 @@ void LoadGame::replayGameLoop() // main replay game loop
     while (gameRunning)
     {
         eventTimer++;
-
         // Update timer
         if (timerActive)
         {
             timeAccumulator += GAME_DELAY;
-            //ULONGLONG currentTime = GetTickCount64();
             if (timeAccumulator>=1000)
             {
                 gameTimer--;
-                //lastTickTime = currentTime;
                 timeAccumulator -= 1000;
 
                 if (gameTimer <= 0)
@@ -306,9 +309,10 @@ void LoadGame::replayGameLoop() // main replay game loop
         updateBomb();
         updatePlayers();
 
-        p1PosLastFrame = player1.getPosition();
-        p2PosLastFrame = player2.getPosition();
-
+        /*p1PosLastFrame = player1.getPosition();
+        p2PosLastFrame = player2.getPosition();*/
+        player1LastPos = p1PosLastFrame;
+        player2LastPos = p2PosLastFrame;
         bool p1Moved = player1.isActive() &&
             ((p1PosLastFrame.getX() != player1.getPosition().getX()) ||
                 (p1PosLastFrame.getY() != player1.getPosition().getY()));
@@ -319,8 +323,14 @@ void LoadGame::replayGameLoop() // main replay game loop
         // Render only if not in silent mode
         if (!isSilentMode)
         {
-            bool isDark = currentScreen.getRoomMeta().isDark();
-            if (isDark)
+            bool isNowDark = currentScreen.getRoomMeta().isDark();
+            if(wasDark&&!isNowDark)
+            {
+                // Room just became lit
+                currentScreen.drawMap();
+			}
+            wasDark = isNowDark;
+            if (isNowDark)
             {
                 if (Torch::playerHasTorch(player1))
                     currentScreen.drawMapWithTorch(player1);
@@ -371,6 +381,7 @@ void LoadGame::replayGameLoop() // main replay game loop
 
         p1PosLastFrame = player1.getPosition();
         p2PosLastFrame = player2.getPosition();
+       
     }
 }
 

@@ -453,20 +453,31 @@ void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r
 
 	// first build the full answer from recorded steps
     while (recordedSteps->getNextRiddleStep(riddleStep)) {
-		finalIteration = riddleStep.iteration; // save last iteration
-
-		// handle first step separately
+        finalIteration = riddleStep.iteration; // שומרים את הזמן
+        char riddleKey = riddleStep.key;
+        // === התיקון: טיפול במקש הראשון ===
         if (firstStep) {
-            firstStep = false;
+            
             char key = tolower(riddleStep.key);
 
 			if (key == 'n') { // player declined
                 declined = true;
                 break;
             }
-			if (key == 'y') { // player accepted
+            if (key == 'y') { 
+                firstStep = false;
                 continue;
             }
+			continue; //ignore other keys at first step
+        }
+        if ((riddleKey == 'h' || riddleKey == 'H') && fullAnswer.empty()) {
+            continue;
+        }
+        if (riddleKey == 8) {
+            if (!fullAnswer.empty()) {
+                fullAnswer.pop_back();
+            }
+			continue;
         }
 		// check for end of answer
         if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
