@@ -10,58 +10,24 @@
 // Update signature to match Bomb.h (3 arguments)
 void Bomb::explode(Screen& screen, Player& p1, Player& p2, bool isInCurrentRoom)
 {
-    // 1. Remove the bomb from logical map and physical screen
-    screen.setCharAt(position, ' ');
-    if (isInCurrentRoom) {
-        position.draw(' ');
-    }
-
-
+  
     int centerX = position.getX(); // Center of explosion
     int centerY = position.getY(); // Center of explosion
 
-    // 2. Destroy 'w' walls and '*' obstacles in range 1 (3x3 area)
-    for (int y = -3; y <= 3; y++)
-    {
-        for (int x = -3; x <= 3; x++)
-        {
-            if (x == 0 && y == 0) continue; // Skip the center
-
-            int targetX = centerX + x; // Target cell coordinates
-            int targetY = centerY + y;
-
-            char targetChar = screen.getCharAt(targetX, targetY);
-            if (targetChar == 'w' || targetChar == '*') // Check for walls and obstacles
-            {
-                screen.setCharAt(targetX, targetY, ' '); // Remove from logical map
-                if (isInCurrentRoom) {
-                    Point(targetX, targetY).draw(' '); // Remove from physical screen
-                }
-
-            }
-        }
-    }
+    // 1. & 2. Delegate environmental damage to the Screen (Room)
+    screen.explodeBomb(centerX, centerY);
     if (isInCurrentRoom)
     {
         // 3. Check for player damage in range 3 (Chebyshev distance)
         // If player is within 3 cells (including diagonals), they lose a life
         if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
             p1.loseLife();
-            //if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
-            //{
-            //    gameResults->addLifeLost(eventTimer, PlayerType::Player1);
-            //}
         }
         if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
             p2.loseLife();
-            //if (SAVE_MODE && gameResults != nullptr)   // if we are writing results
-            //{
-            //    gameResults->addLifeLost(eventTimer, PlayerType::Player2);
-            //}
         }
     }
 }
-
 
 bool Bomb::tick(Screen& screen, Player& p1, Player& p2, int currentRoomID)
 {

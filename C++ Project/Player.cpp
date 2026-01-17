@@ -31,7 +31,6 @@ void Player::erase() const
 		resetColor();
 		return;
 	}
-
 	position.erase();
 }
 
@@ -126,7 +125,6 @@ bool Player::useKeyForDoor(char doorChar) const  // use key for a door
 		return true;
 	}
 	return false;
-
 }
 
 void Player::keyUsed() { // remove the used key

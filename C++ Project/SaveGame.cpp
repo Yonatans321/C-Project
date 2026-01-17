@@ -78,7 +78,7 @@ void SaveGame::run() // override run method helped by AI
             initLevel(screenFileNames[currentLevelIdx]);
             saveGameLoop();  // Use custom game loop that records events
             cls();
-            // ===== SAVE FILES AFTER GAME ENDS =====
+            //  SAVE FILES AFTER GAME ENDS 
             gameResults.save("adv-world.result");
             recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
             cls();  // Clear the screen first
@@ -306,9 +306,9 @@ bool SaveGame::checkLevel() // override checkLevel to record screen changes
 			clearInputBuffer();// clear input buffer before showing win screen
             // You won the game
             showWinScreen();
-            // ===== RECORD GAME FINISHED =====
+            //  RECORD GAME FINISHED 
             gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
-            recordedSteps.addStep(eventTimer, 0, ' '); // ===== NEW: Record the "any key" press =====
+            recordedSteps.addStep(eventTimer, 0, ' '); // Record the "any key" press
 			activeDoor = ' ';// reset active door for safety
             return true;
         }

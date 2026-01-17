@@ -1,13 +1,17 @@
 ﻿#include "Switch.h"
+#include "Constants.h"
+
+using BoardSymbols::SWITCH_OFF;
+using BoardSymbols::SWITCH_ON;
 
 bool Switch::isSwitch(char c) //determines if the char is switch
 {
-    return c == '\\' || c == '/';
+    return c == SWITCH_OFF || c == SWITCH_ON;
 }
 
 Switch::State Switch::stateFromChar(char c) // decoder of switch state from char
 {
-    return (c == '\\' ? OFF : ON);
+    return (c == SWITCH_OFF ? OFF : ON);
 }
 
 void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch position
@@ -15,11 +19,11 @@ void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch pos
     char c = screen.getCharAt(pos.getX(), pos.getY());
 
     // only OFF to ON
-    if (c == '\\')
+    if (c == SWITCH_OFF)
     {
         // Update the map data
-        screen.setCharAtSilent(pos.getX(), pos.getY(), '/');
-        if (Screen::isSilent) return;
+        screen.setCharAtSilent(pos.getX(), pos.getY(), SWITCH_ON);
+        if (Screen::isSilent()) return;
         // Check if room is dark
         bool isDark = screen.isDark();
 
@@ -29,13 +33,13 @@ void Switch::toggleSwitchAt(Point pos, Screen& screen) // changes the switch pos
         if (isDark)
         {
             // In dark rooms: draw as space (invisible)
-            std::cout << ' ';
+            std::cout << BoardSymbols::EMPTY;
         }
         else
         {
             // In lit rooms: draw the new switch
             setColor(COLOR_LIGHT_GREEN);
-            std::cout << '/';
+            std::cout << SWITCH_ON;
             resetColor();
         }
     }
@@ -54,7 +58,7 @@ bool Switch::allSwitchesOn(const Screen& screen) //checks if ALL switches are on
             {
                 foundAnySwitch = true;
 
-                if (c == '\\')   // switch OFF
+                if (c == SWITCH_OFF)  // switch OFF
                     return false;
             }
         }
@@ -71,8 +75,8 @@ void Switch::clearBarriers(Screen& screen)
     {
         for (int x = 0; x < screen.getWidth(); x++)
         {
-            if (screen.getCharAt(x, y) == 's')
-                screen.setCharAt(x, y, ' ');
+            if (screen.getCharAt(x, y) == BoardSymbols::SWITCH_WALL)
+                screen.setCharAt(x, y, BoardSymbols::EMPTY);
         }
     }
 }
@@ -82,7 +86,7 @@ void Switch::handleSwitch(Player& player, Screen& screen)
     Point pos = player.getPosition();
     char c = screen.getCharAt(pos.getX(), pos.getY());
 
-    if (c=='/')
+    if (c == SWITCH_ON)
     {
         return;
     }

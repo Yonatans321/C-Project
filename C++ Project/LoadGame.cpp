@@ -309,8 +309,6 @@ void LoadGame::replayGameLoop() // main replay game loop
         updateBomb();
         updatePlayers();
 
-        /*p1PosLastFrame = player1.getPosition();
-        p2PosLastFrame = player2.getPosition();*/
         player1LastPos = p1PosLastFrame;
         player2LastPos = p2PosLastFrame;
         bool p1Moved = player1.isActive() &&
