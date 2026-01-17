@@ -25,7 +25,7 @@ void SaveGame::run() // override run method helped by AI
         {
             getAllScreenFileNames(screenFileNames);
 
-            if (screenFileNames.empty())
+			if (screenFileNames.empty()) // No screen files found
             {
                 cls();
                 std::cout << "ERROR: No screen files found (adv-world*.screen)!" << std::endl;
@@ -34,9 +34,9 @@ void SaveGame::run() // override run method helped by AI
                 continue;
             }
 
-            allLevels.clear();
+			allLevels.clear(); // Clear previous levels
             bool successLoad = true;
-            for (const auto& fileName : screenFileNames)
+			for (const auto& fileName : screenFileNames) // Load all screen files
             {
                 Screen tempScreen;
                 if (!tempScreen.loadMapFromFile(fileName))
@@ -47,7 +47,7 @@ void SaveGame::run() // override run method helped by AI
                 allLevels.push_back(tempScreen);
             }
 
-            if (!successLoad)
+			if (!successLoad) // Failed to load screen files
             {
                 std::cout << "\nERROR: Failed to load screen files!" << std::endl;
                 std::cout << "Press any key to return to Menu..." << std::endl;
@@ -69,10 +69,10 @@ void SaveGame::run() // override run method helped by AI
             }
             gameResults.setScreenFiles(screensString);
 
-            // ===== INITIALIZE STEPS RECORDING =====
+            //  INITIALIZE STEPS RECORDING 
             recordedSteps.initForRecording(screenFileNames);
             riddleBank.attachSteps(&recordedSteps, false);
-            // ===== INITIALIZE SCREEN CHANGE EVENT =====
+            //  INITIALIZE SCREEN CHANGE EVENT
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
             initLevel(screenFileNames[currentLevelIdx]);
@@ -291,7 +291,7 @@ bool SaveGame::checkLevel() // override checkLevel to record screen changes
             currentScreen.setDark(currentScreen.getRoomMeta().isDark());
             initLevel(screenFileNames[currentLevelIdx], doorId);
 
-            // ===== RECORD SCREEN CHANGE =====
+            //  RECORD SCREEN CHANGE 
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
 
             if (p1Item != ' ' && p1Item != 0)

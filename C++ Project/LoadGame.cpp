@@ -12,10 +12,10 @@
 
 bool LOAD_MODE = false;
 
-void LoadGame::run() // override run method
+void LoadGame::run() // override run method helped by AI
 {
     LOAD_MODE = true;
-    if (!isSilentMode)
+	if (!isSilentMode) // if not silent mode, show load mode message
     {
         cls();
         std::cout << "\n========================================" << std::endl;
@@ -182,7 +182,7 @@ void LoadGame::run() // override run method
             // If cleanup fails, it's not critical
         }
     }
-    else
+	else // Non-silent mode: show completion message
     {
         cls();
         gotoxy(18, 10);
@@ -214,7 +214,7 @@ void LoadGame::initLevelSilent(const std::string& filename, int specificDoor) //
         gameTimer = maxGameTime;
         timerActive = true;
     }
-
+	// Attach necessary components
     riddleBank.attachPositionToRoom(currentScreen);
     riddleBank.attachResults(&gameResults, &eventTimer);
 
@@ -280,16 +280,16 @@ void LoadGame::replayGameLoop() // main replay game loop
         }
 
         Steps::Step currentStep;
-        while (loadedSteps.getNextStep(eventTimer, currentStep))
+		while (loadedSteps.getNextStep(eventTimer, currentStep)) // process all steps for the current timer tick
         {
             if (currentStep.PlayerNum == 0)
             {
-                // àí äî÷ù äåà h/H, æä àåîø ùäîùúîù éöà îäîùç÷ áæîï ää÷ìèä
+				// if the key is 'h' or 'H', exit the game
                 if (currentStep.key == 'h' || currentStep.key == 'H')
                 {
-                    gameResults.addGameExit(eventTimer, player1.getScore(), player2.getScore());
+					gameResults.addGameExit(eventTimer, player1.getScore(), player2.getScore()); // log game exit
                     gameRunning = false;
-                    break; // éåöà îìåìàú äöòãéí
+					break; // exit the loop
                 }
             }
             else {
@@ -302,7 +302,7 @@ void LoadGame::replayGameLoop() // main replay game loop
         // Ignore all user input in LOAD mode, but check for automatic steps
         if (_kbhit())
         {
-            _getch();
+			auto i = _getch(); // discard input
         }
 
         // Update game state
@@ -441,7 +441,6 @@ bool LoadGame::checkLevel() // override check level completion
                 initLevelSilent(screenFileNames[currentLevelIdx], doorId);
                 placePlayersAtEntrance(doorId);
 
-                //std::cout << "Screen changed to: " << screenFileNames[currentLevelIdx] << std::endl;
             }
 
             gameResults.addScreenChange(eventTimer, screenFileNames[currentLevelIdx]);
@@ -469,7 +468,7 @@ bool LoadGame::checkLevel() // override check level completion
     return false;
 }
 
-void LoadGame::setSilentMode(bool isSilent) {
+void LoadGame::setSilentMode(bool isSilent) { // set silent mode
     this->silentMode = isSilent;
     riddleBank.setSilentMode(isSilent);
 }
