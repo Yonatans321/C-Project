@@ -31,7 +31,6 @@ int main(int argc, char* argv[]) {
         { // silent mode
             silent = true;
         }
-    
         LoadGame game(silent);
         game.run();
     }

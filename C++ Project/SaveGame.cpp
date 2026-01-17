@@ -77,8 +77,8 @@ void SaveGame::run() // override run method helped by AI
 
             initLevel(screenFileNames[currentLevelIdx]);
             saveGameLoop();  // Use custom game loop that records events
-
-            //  SAVE FILES AFTER GAME ENDS 
+            cls();
+            // ===== SAVE FILES AFTER GAME ENDS =====
             gameResults.save("adv-world.result");
             recordedSteps.saveSteps("adv-world.steps"); // save recorded steps 
             cls();  // Clear the screen first
@@ -105,7 +105,7 @@ void SaveGame::saveGameLoop() // custom game loop that records events
     player1LastPos = p1PosLastFrame;
     player2LastPos = p2PosLastFrame;
 
-    ULONGLONG lastTickTime = GetTickCount64();
+	int timeAccumulator = 0;
     const DWORD timerInterval = 1000;
     redrawGame();
 
@@ -116,11 +116,11 @@ void SaveGame::saveGameLoop() // custom game loop that records events
         // Update timer
         if (timerActive)
         {
-            ULONGLONG currentTime = GetTickCount64();
-            if (currentTime - lastTickTime >= timerInterval)
+			timeAccumulator += GAME_DELAY;
+            if(timeAccumulator>=(int)timerInterval)
             {
                 gameTimer--;
-                lastTickTime = currentTime;
+				timeAccumulator -= timerInterval;
 
                 if (gameTimer <= 0)
                 {
@@ -214,6 +214,7 @@ void SaveGame::saveGameLoop() // custom game loop that records events
         if (checkGameOver())
         {
             gameRunning = false;
+            break;
         }
 
         // Handle door transitions
@@ -302,13 +303,13 @@ bool SaveGame::checkLevel() // override checkLevel to record screen changes
         }
         else
         {
+			clearInputBuffer();// clear input buffer before showing win screen
             // You won the game
             showWinScreen();
-
-            //  RECORD GAME FINISHED 
+            // ===== RECORD GAME FINISHED =====
             gameResults.addGameFinished(eventTimer, player1.getScore(), player2.getScore());
-            recordedSteps.addStep(eventTimer, 0, ' '); //  Record the "any key" press 
-
+            recordedSteps.addStep(eventTimer, 0, ' '); // ===== NEW: Record the "any key" press =====
+			activeDoor = ' ';// reset active door for safety
             return true;
         }
     }
