@@ -193,7 +193,7 @@ void LoadGame::run() // override run method
     }
 }
 
-void LoadGame::initLevelSilent(const std::string& filename) // initialize level without drawing
+void LoadGame::initLevelSilent(const std::string& filename, int specificDoor) // initialize level without drawing
 {
 	currentRoomMeta = currentScreen.getRoomMeta(); // get current room metadata
 	currentScreen.resetTorchState(); // reset torch state
@@ -209,7 +209,7 @@ void LoadGame::initLevelSilent(const std::string& filename) // initialize level 
 
 	currentRoomMeta.placeLightSwitchFromMetadata(currentScreen); // place light switch from metadata
 
-    if (currentLevelIdx == 0)
+    if (specificDoor == -1 && currentLevelIdx == 0)
     {
         gameTimer = maxGameTime;
         timerActive = true;
@@ -438,7 +438,7 @@ bool LoadGame::checkLevel() // override check level completion
 				
                 // Fix: Properly initialize the level logic even in silent mode
                 
-                initLevelSilent(screenFileNames[currentLevelIdx]);
+                initLevelSilent(screenFileNames[currentLevelIdx], doorId);
                 placePlayersAtEntrance(doorId);
 
                 //std::cout << "Screen changed to: " << screenFileNames[currentLevelIdx] << std::endl;
