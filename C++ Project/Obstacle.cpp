@@ -10,38 +10,38 @@
 // 1 obstacle  -> 1 player
 // 2 obstacles -> 2 aligned players
 
-void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen)
+void Obstacle::handleObstacle(Player& p1, Player& p2, Screen& screen) // main obstacle handling function
 {
     Point obs;
     bool pushed = false;
 
-    if (isFacingObstacle(p1, screen, obs))
+	if (isFacingObstacle(p1, screen, obs)) // check if player 1 is facing an obstacle
     {
-        auto chain = collectChain(obs, p1.getDirection(), screen);
-        size_t count = chain.size();
+		auto chain = collectChain(obs, p1.getDirection(), screen); // collect obstacle chain
+		size_t count = chain.size(); // count obstacles in chain
 
-        if (count == 1)
+		if (count == 1) // single obstacle pushed by one player
         {
             pushChain(chain, p1.getDirection(), screen);
             pushed = true;
         }
-        else if (count == 2 && playersAlignedAndPushing(p1, p2))
+		else if (count == 2 && playersAlignedAndPushing(p1, p2)) // two obstacles pushed by two aligned players
         {
             pushChain(chain, p1.getDirection(), screen);
             pushed = true;
         }
     }
 
-    if (!pushed && isFacingObstacle(p2, screen, obs))
+	if (!pushed && isFacingObstacle(p2, screen, obs)) // check if player 2 is facing an obstacle
     {
         auto chain = collectChain(obs, p2.getDirection(), screen);
         size_t count = chain.size();
 
-        if (count == 1)
+        if (count == 1)// single obstacle pushed by one player
         {
             pushChain(chain, p2.getDirection(), screen);
         }
-        else if (count == 2 && playersAlignedAndPushing(p2, p1))
+        else if (count == 2 && playersAlignedAndPushing(p2, p1))  // two obstacles pushed by two aligned players
         {
             pushChain(chain, p2.getDirection(), screen);
         }

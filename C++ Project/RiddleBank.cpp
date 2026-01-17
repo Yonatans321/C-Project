@@ -83,7 +83,7 @@ Riddle* RiddleBank::getRiddleAt(int x, int y)
     }
     return nullptr;
 }
-
+// Attach riddles to their positions in the given room screen
 void RiddleBank::attachPositionToRoom(Screen& screen)
 {
     const RoomMeta& meta = screen.getRoomMeta();
@@ -164,7 +164,7 @@ void RiddleBank::attachPositionToRoom(Screen& screen)
         cls();
     }
 }
-
+// Check the answer for a given riddle ID
 RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer)
 {
     Riddle* r = getRiddleById(riddleID);
@@ -177,7 +177,7 @@ RiddleOutcome RiddleBank::checkAnswerFor(int riddleID, const std::string& answer
     }
     return RiddleOutcome::Incorrect;
 }
-
+// Display the riddle question in the box
 void RiddleBank::displayRiddleQuestion(Riddle* r, int bx, int by)
 {
     gotoxy(bx + 2, by + 1);
@@ -203,7 +203,7 @@ void RiddleBank::displayRiddleQuestion(Riddle* r, int bx, int by)
         std::cout << temp;
     }
 }
-
+// Get the user's answer to the riddle
 std::string RiddleBank::getUserAnswer(int bx, int answerLine, int answerInputLine,
     int hintorResultLine, Riddle* r)
 {
@@ -265,7 +265,7 @@ std::string RiddleBank::getUserAnswer(int bx, int answerLine, int answerInputLin
         }
     }
 }
-
+// Handle the riddle interaction when the player steps on a riddle cell
 void RiddleBank::handleRiddle(Player& player, Screen& screen, int level)
 {
     int x = player.getX();
@@ -394,19 +394,19 @@ void RiddleBank::resetAllRiddles()
         riddles[i].resetRiddle();
     }
 }
-
+// Attach results and timer pointer for logging
 void RiddleBank::attachResults(Results* results, size_t* timerPtr)
 {
     gameResults = results;
     eventTimerPtr = timerPtr;
 }
-
+// Attach steps for load/save mode
 void RiddleBank::attachSteps(Steps* steps, bool loadmode)
 {
     recordedSteps = steps;
     isLoadMode = loadmode;
 }
-
+// Get a character input for the riddle, handling load/save modes
 char RiddleBank::getRiddleInputChar()
 {
     char c;
@@ -442,45 +442,42 @@ char RiddleBank::getRiddleInputChar()
         return c;
     }
 }
-
+// Process the riddle in load mode using recorded steps
 void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r, int x, int y)
 {
     Steps::Step riddleStep;
     std::string fullAnswer = "";
     size_t finalIteration = 0;
-    bool firstStep = true; // דגל לזיהוי הצעד הראשון
+	bool firstStep = true; // flag for first step
     bool declined = false;
 
-    // 1. לולאה לקליטת התשובה (עם סינון ה-'y' בהתחלה)
+	// first build the full answer from recorded steps
     while (recordedSteps->getNextRiddleStep(riddleStep)) {
-        finalIteration = riddleStep.iteration; // שומרים את הזמן
+		finalIteration = riddleStep.iteration; // save last iteration
 
-        // === התיקון: טיפול במקש הראשון ===
+		// handle first step separately
         if (firstStep) {
             firstStep = false;
             char key = tolower(riddleStep.key);
 
-            if (key == 'n') { // השחקן בחר לא לענות
+			if (key == 'n') { // player declined
                 declined = true;
                 break;
             }
-            if (key == 'y') { // השחקן אישר - מדלגים על ה-'y' הזה!
+			if (key == 'y') { // player accepted
                 continue;
             }
         }
-        // =================================
-
-        // בדיקת מקש סיום (Enter)
+		// check for end of answer
         if (riddleStep.key == ' ' || riddleStep.key == '\0' || riddleStep.key == '\r') {
             break;
         }
 
-        // הוספת התו לתשובה (עכשיו ה-'y' לא ייכנס לכאן)
+		// append character to full answer
         fullAnswer += riddleStep.key;
     }
 
-    // 2. סנכרון שעון (Time Sync)
-    // חייבים לקדם את השעון לזמן הסיום כדי למנוע Time Mismatch
+	// advance event timer to final iteration
     if (eventTimerPtr != nullptr && *eventTimerPtr < finalIteration) {
         size_t currentT = *eventTimerPtr;
         for (size_t t = currentT + 1; t <= finalIteration; t++) {
@@ -490,20 +487,20 @@ void RiddleBank::processLoadModeRiddle(Player& player, Screen& screen, Riddle* r
         *eventTimerPtr = finalIteration;
     }
 
-    // אם השחקן ויתר על החידה
+	// player declined to answer
     if (declined) {
         player.stepBack();
         return;
     }
 
-    // 3. בדיקת תשובה ורישום
+	// check the answer
     bool correct = r->checkAnswer(fullAnswer.c_str());
 
     if (gameResults != nullptr) {
         gameResults->addRiddle(finalIteration, r->getRiddleID(), r->getQuestion(), fullAnswer, correct);
     }
 
-    // 4. עדכון לוגיקה ותצוגה
+	//update player and screen based on correctness
     if (correct) {
         player.addPoints(100);
         r->markAsSolved();
