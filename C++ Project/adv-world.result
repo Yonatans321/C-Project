@@ -1,0 +1,16 @@
+screens= adv-world_01.screen|adv-world_02.screen|adv-world_03.screen
+time= 0 event= ScreenChange screenName= adv-world_01.screen
+time= 33 event= Riddle riddleId= 2 riddleText= What does this print? for(int i=0;i<3;i++) cout << i;	 answer= 012 result= Solved
+time= 64 event= Riddle riddleId= 3 riddleText= What's the output? bool a = true; bool b = false; cout << (a && b); answer= 5 result= Failed
+time= 64 event= LifeLost player= Player1
+time= 83 event= Riddle riddleId= 3 riddleText= What's the output? bool a = true; bool b = false; cout << (a && b); answer= 0 result= Solved
+time= 113 event= Riddle riddleId= 1 riddleText= What's the output? int x = 3; cout << x + ++x; answer= 7 result= Solved
+time= 265 event= LifeLost player= Player2
+time= 384 event= ScreenChange screenName= adv-world_02.screen
+time= 437 event= Riddle riddleId= 6 riddleText= What's the output? int arr[] = {1,2,3}; cout << arr[1]; answer= 6 result= Failed
+time= 437 event= LifeLost player= Player1
+time= 441 event= Riddle riddleId= 6 riddleText= What's the output? int arr[] = {1,2,3}; cout << arr[1]; answer= 0 result= Failed
+time= 441 event= LifeLost player= Player2
+time= 446 event= Riddle riddleId= 6 riddleText= What's the output? int arr[] = {1,2,3}; cout << arr[1]; answer= 4 result= Failed
+time= 446 event= LifeLost player= Player1
+time= 446 event= GameOver score1= 200 score2= 100
