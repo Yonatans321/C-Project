@@ -23,7 +23,7 @@ protected:
 	// Replay game loop that ignores user input
 	void replayGameLoop();
 	// Initialize level without drawing (for silent mode)
-	void initLevelSilent(const std::string& filename);
+	void initLevelSilent(const std::string& filename, int specificDoor = -1);
 	// Override checkGameOver to hide screens in silent mode
 	bool checkGameOver() override;
 	// Override checkLevel to hide screens in silent mode

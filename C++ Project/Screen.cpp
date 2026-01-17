@@ -193,14 +193,15 @@ bool Screen::validateDoors(const std::string& filename)
             return false;
         }
 
-		// check that LEADS points to a valid room number
-        if (leadsTo < 0 || leadsTo >= (int)RoomLevel::NUM_ROOMS)
-        {
-            std::cout << "\n\nERROR in " << filename << std::endl;
-            std::cout << "DOOR ID=" << id << " LEADS=" << (leadsTo + 1)
-                << " - invalid room number! Only rooms 1-4 exist." << std::endl;
-            return false;
-        }
+		//// check that LEADS points to a valid room number
+  //      if (leadsTo < 0 || leadsTo >= (int)RoomLevel::NUM_ROOMS)
+  //      {
+  //          cls();
+  //          std::cout << "\n\nERROR in " << filename << std::endl;
+  //          std::cout << "DOOR ID=" << id << " LEADS=" << (leadsTo + 1)
+  //              << " - invalid room number! Only rooms 1-4 exist." << std::endl;
+  //          return false;
+  //      }
     }
     return true;
 }
