@@ -34,7 +34,7 @@ void Screen::clearScreenBuffer() {
 }
 
 // LOAD MAP FROM FILE helper function to load map and metadata from file- helped by AI
-bool Screen::loadMapFromFile(const std::string& filename)
+bool Screen::loadMapFromFile(const std::string& filename, int maxRooms)
 {
     roomMeta.clear();
     std::ifstream file(filename);
@@ -117,7 +117,7 @@ bool Screen::loadMapFromFile(const std::string& filename)
     setDark(roomMeta.isDark());
 
     //  VALIDATE METADATA
-    if (!validateMetadata(filename))
+    if (!validateMetadata(filename, maxRooms))
         return false;
 
     return true;
@@ -153,7 +153,7 @@ bool Screen::validateKey(const std::string& filename)
 }
 
 // Helper function to validate door metadata
-bool Screen::validateDoors(const std::string& filename)
+bool Screen::validateDoors(const std::string& filename, int maxRooms)
 {
     for (int id = 1; id < MAX_DOORS; id++)
     {
@@ -194,26 +194,26 @@ bool Screen::validateDoors(const std::string& filename)
             return false;
         }
 
-		//// check that LEADS points to a valid room number
-  //      if (leadsTo < 0 || leadsTo >= (int)RoomLevel::NUM_ROOMS)
-  //      {
-  //          cls();
-  //          std::cout << "\n\nERROR in " << filename << std::endl;
-  //          std::cout << "DOOR ID=" << id << " LEADS=" << (leadsTo + 1)
-  //              << " - invalid room number! Only rooms 1-4 exist." << std::endl;
-  //          return false;
-  //      }
+        //// check that LEADS points to a valid room number
+        if (leadsTo < 0 || leadsTo > maxRooms)
+        {
+            cls();
+            std::cout << "\n\nERROR in " << filename << std::endl;
+            std::cout << "DOOR ID=" << id << " LEADS=" << (leadsTo + 1)
+                << " - invalid room number! Only rooms 1-" << (maxRooms+1) << " exist." << std::endl;
+            return false;
+        }
     }
     return true;
 }
 
 // Main validation function
-bool Screen::validateMetadata(const std::string& filename)
+bool Screen::validateMetadata(const std::string& filename, int maxRooms)
 {
     if (!validateKey(filename))
         return false;
 
-    if (!validateDoors(filename))
+    if (!validateDoors(filename, maxRooms))
         return false;
 	// validate key position
     if (!Key::validateMetadataPosition(*this, filename))

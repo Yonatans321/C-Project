@@ -39,7 +39,7 @@ void SaveGame::run() // override run method helped by AI
 			for (const auto& fileName : screenFileNames) // Load all screen files
             {
                 Screen tempScreen;
-                if (!tempScreen.loadMapFromFile(fileName))
+                if (!tempScreen.loadMapFromFile(fileName, (int)screenFileNames.size()))
                 {
                     successLoad = false;
                     break;
