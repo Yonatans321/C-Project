@@ -3,12 +3,12 @@
 #include <sstream>
 #include <algorithm>
 
-void Results::setScreenFiles(const std::string& files)
+void Results::setScreenFiles(const std::string& files) // Set the screen files (maps) used in the game
 {
     screenFiles = files;
 }
 
-void Results::addLifeLost(size_t time, PlayerType player)
+void Results::addLifeLost(size_t time, PlayerType player) // Log a life lost event
 {
     Event event;
     event.time = time;
@@ -17,7 +17,7 @@ void Results::addLifeLost(size_t time, PlayerType player)
     events.push_back(event);
 }
 
-void Results::addScreenChange(size_t time, const std::string& screenName)
+void Results::addScreenChange(size_t time, const std::string& screenName) // Log a screen change event
 {
     Event event;
     event.time = time;
@@ -25,9 +25,8 @@ void Results::addScreenChange(size_t time, const std::string& screenName)
     event.info = screenName;
     events.push_back(event);
 }
-
-void Results::addRiddle(size_t time, int riddleId, const std::string& riddleText,
-    const std::string& answer, bool solved)
+// Log a riddle attempt event
+void Results::addRiddle(size_t time, int riddleId, const std::string& riddleText,const std::string& answer, bool solved)
 {
     Event event;
     event.time = time;
@@ -38,7 +37,7 @@ void Results::addRiddle(size_t time, int riddleId, const std::string& riddleText
     event.info = std::to_string(riddleId) + "|" + cleanText + "|" + answer;
     events.push_back(event);
 }
-
+// Log a game over event
 void Results::addGameOver(size_t time, int score1, int score2)
 {
     Event event;
@@ -47,7 +46,7 @@ void Results::addGameOver(size_t time, int score1, int score2)
     event.info = std::to_string(score1) + "|" + std::to_string(score2);
     events.push_back(event);
 }
-
+// Log a game finished event
 void Results::addGameFinished(size_t time, int score1, int score2)
 {
     Event event;
@@ -56,7 +55,7 @@ void Results::addGameFinished(size_t time, int score1, int score2)
     event.info = std::to_string(score1) + "|" + std::to_string(score2);
     events.push_back(event);
 }
-
+// Log a game exit event
 void Results::addGameExit(size_t time, int score1, int score2)
 {
     Event event;
@@ -65,7 +64,7 @@ void Results::addGameExit(size_t time, int score1, int score2)
     event.info = std::to_string(score1) + "|" + std::to_string(score2);
     events.push_back(event);
 }
-
+// Save results to a file
 void Results::save(const std::string& filename) const
 {
     std::ofstream file(filename);
@@ -129,7 +128,7 @@ void Results::save(const std::string& filename) const
         file << "\n";
     }
 }
-
+// Load results from a file
 void Results::load(const std::string& filename)
 {
     events.clear();
@@ -159,7 +158,7 @@ void Results::load(const std::string& filename)
         });
 }
 
-void Results::parseEventLine(const std::string& line, Event& event)
+void Results::parseEventLine(const std::string& line, Event& event) // Parse a single event line from the results file
 {
     size_t pos = line.find("time= ");
     if (pos != std::string::npos)
@@ -254,7 +253,7 @@ void Results::parseEventLine(const std::string& line, Event& event)
     }
 }
 
-bool Results::empty() const
+bool Results::empty() const // Check if there are no events logged
 {
     return events.empty();
 }
@@ -266,11 +265,11 @@ Event Results::pop()
     return event;
 }
 
-bool Results::compareWith(const Results& other, std::string& failureReason) const
+bool Results::compareWith(const Results& other, std::string& failureReason) const // Compare this Results with another, providing detailed failure reasons
 {
-    failureReason = ""; // איפוס הודעת השגיאה
+	failureReason = ""; // reset reason
 
-    // בדיקה 1: השוואת קבצי המסך (מפות)
+	// first, check screen files
     if (screenFiles != other.screenFiles)
     {
         failureReason = "Screen files don't match!\n";
@@ -284,7 +283,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
     int eventIndex = 0; // 
     std::string passedEventsLog = "Events matched successfully so far:\n";
 
-    // לולאת השוואה אחת שבודקת הכל
+	// loop through both event lists
     while (itActual != events.end() && itExpected != other.events.end())
     {
         const Event& actual = *itActual;
@@ -293,7 +292,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
         bool mismatch = false;
         std::string diffDetail = "";
 
-        // בדיקת זמן, סוג ומידע
+		// check each field for mismatches
         if (actual.time != expected.time) {
             mismatch = true;
             diffDetail = "Time mismatch (Expected: " + std::to_string(expected.time) + ", Got: " + std::to_string(actual.time) + ")";
@@ -324,7 +323,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
             return false;
         }
 
-        // אם הכל תקין, מתעדים את ההצלחה וממשיכים
+		// if all fields match, log the successful event
         passedEventsLog += "  v Event #" + std::to_string(eventIndex) + ": " + eventTypeToString(actual.type) + "\n";
 
         ++itActual;
@@ -332,7 +331,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
         ++eventIndex;
     }
 
-    // בדיקה 2: בדיקת כמות אירועים (כאן קורית השגיאה מהתמונה שלך)
+	// check for extra/missing events
     if (events.size() != other.events.size())
     {
         failureReason = "!!! EVENT COUNT MISMATCH !!!\n";
@@ -350,7 +349,7 @@ bool Results::compareWith(const Results& other, std::string& failureReason) cons
         return false;
     }
 
-    return true; // הכל תואם לחלוטין
+	return true; // all events matched
 }
 // Helper function to convert EventType to string
 std::string Results::eventTypeToString(EventType type) const

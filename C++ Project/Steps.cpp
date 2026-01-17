@@ -8,7 +8,7 @@ void Steps::addStep(size_t iteration, int playerNum, char step) {
     steps.push_back({ iteration, playerNum, step });
 }
 
-// Load steps from file
+// Load steps from file helped by AI
 Steps Steps::loadSteps(const std::string& filename) {
     Steps loadedSteps;
     std::ifstream steps_file(filename);
@@ -82,7 +82,7 @@ Steps Steps::loadSteps(const std::string& filename) {
     return loadedSteps;
 }
 
-// Save steps to file
+// Save steps to file helped by AI
 void Steps::saveSteps(const std::string& filename) const {
     std::ofstream steps_file(filename);
 
@@ -112,7 +112,7 @@ void Steps::saveSteps(const std::string& filename) const {
 bool Steps::getNextStep(size_t currentIteration, Step& outStep) {
 
     
-    // Check if we've exhausted all steps
+	// Check if we've reached the end of the steps
     if (currentStepIndex >= steps.size()) {
         return false;
     }

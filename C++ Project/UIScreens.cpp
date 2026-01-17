@@ -206,10 +206,10 @@ void UIScreens::showGameOverMessage()
     };
 
     printScreen(GAME_OVER_SCREEN);
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+	if (!LOAD_MODE) {  // if not in load mode, wait for key press
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+	else {  // if in LOAD mode, just sleep
         Sleep(80);
     }
 }
@@ -223,10 +223,10 @@ void UIScreens::showInventoryFullMessage(const Screen& currentScreen) {
     gotoxy(13, 11);
     std::cout << "Press any key to continue...";
 
-    if (!LOAD_MODE) {  // ===== àí ìà áLOAD mode, çëä ì÷ìè =====
+	if (!LOAD_MODE) {  // if not in LOAD mode,
         waitForKey();
     }
-    else {  // ===== àí áLOAD mode, òùä SLEEP =====
+	else {  //  in LOAD mode, just sleep
         Sleep(80);
     }
 
