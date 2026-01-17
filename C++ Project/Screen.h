@@ -41,7 +41,7 @@ private:
 public:
 	Screen();
 	// Map drawing
-	bool loadMapFromFile(const std::string& filename); // returns true if loaded successfully
+	bool loadMapFromFile(const std::string& filename, int maxRooms); // returns true if loaded successfully
 	void drawMap() const; // draws the map to the screen
 	Point getLegendPos() const { return legendPos; } // position of the legend
 	void drawMapWithTorch(const Player& p1) const; // draws the map with torch effect
@@ -86,9 +86,9 @@ public:
 		roomMeta = meta;
 	}
 	// Metadata placement and validation
-	bool validateMetadata(const std::string& filename);
+	bool validateMetadata(const std::string& filename, int maxRooms);
 	bool validateKey(const std::string& filename);
-	bool validateDoors (const std::string& filename);
+	bool validateDoors(const std::string& filename, int maxRooms);
 
 	static void setSilentMode(bool mode) { silentMode = mode; }
 	static bool isSilent() { return silentMode; }

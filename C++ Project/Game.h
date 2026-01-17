@@ -41,7 +41,6 @@ protected:
 	void updateBomb();        // update bomb state
 	void drawActiveBomb();   // draw the active bomb
 	void updatePlayers();      // draw both players
-	void updateSinglePlayer(Player& player); // helper to update single player
 	virtual bool checkGameOver();      // check if game over
 	void updateDisplay();	 // update players and status bar
     void getAllScreenFileNames(std::vector<std::string>& vec_to_fill); 	//function to get all screen file names from the directory

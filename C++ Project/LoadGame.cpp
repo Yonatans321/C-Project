@@ -82,7 +82,7 @@ void LoadGame::run() // override run method helped by AI
     for (const auto& fileName : screenFileNames)
     {
         Screen tempScreen;
-        if (!tempScreen.loadMapFromFile(fileName))
+        if (!tempScreen.loadMapFromFile(fileName, (int)screenFileNames.size()))
         {
             if (!isSilentMode)
             {

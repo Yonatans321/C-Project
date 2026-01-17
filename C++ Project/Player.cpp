@@ -4,6 +4,10 @@
 #include "Screen.h"
 #include "Door.h"
 #include "Key.h"
+#include "Constants.h"
+
+using BoardSymbols::SWITCH_ON;
+using BoardSymbols::SWITCH_OFF;
 
 // moving and drawing functions
  // draw player at current position
@@ -23,7 +27,7 @@ void Player::erase() const
 	char tile = screen->getCharAt(x, y);
 
 	//if on a switch - redraw the switch
-	if (tile == '/' || tile == '\\')
+	if (tile == SWITCH_ON || tile == SWITCH_OFF)
 	{
 		gotoxy(x, y);
 		setColor(COLOR_LIGHT_GREEN);
