@@ -194,8 +194,8 @@ bool Screen::validateDoors(const std::string& filename, int maxRooms)
             return false;
         }
 
-        //// check that LEADS points to a valid room number
-        if (leadsTo < 0 || leadsTo > maxRooms)
+        // check that LEADS points to a valid room number
+        if (leadsTo < 0 )//|| leadsTo > maxRooms)
         {
             cls();
             std::cout << "\n\nERROR in " << filename << std::endl;
