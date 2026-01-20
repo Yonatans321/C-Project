@@ -7,7 +7,9 @@ class Switch
 {
 public:
     enum State { OFF, ON };
-
+    static constexpr int COLOR_OFF = 12; // Light Red
+    static constexpr int COLOR_ON = 10;  // Light Green
+    static constexpr int COLOR_WALL = 14; // Yellow
     //determines if the char is switch
     static bool isSwitch(char c);
 

@@ -1,12 +1,19 @@
 ﻿#include "Screen.h"
 #include "Player.h"
 #include "Key.h"
+#include "Bomb.h"
 #include <cstring>
 #include <windows.h>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include "Constants.h"
+#include "Switch.h"
+#include "Obstacle.h"
+#include "Riddle.h"
+#include "Torch.h"
+#include "Door.h"
+#include "RoomMeta.h"
 
 bool Screen::silentMode = false;
 static int torchLastX = -1;
@@ -626,40 +633,40 @@ void Screen::applyColor(char c) const
     switch (c)
     {
     case BoardSymbols::SWITCH_OFF:   // switch OFF
-        setColor(COLOR_LIGHT_RED);
+        setColor(Switch::COLOR_OFF);
         break;
 
     case BoardSymbols::SWITCH_ON:    // switch ON
-        setColor(COLOR_LIGHT_GREEN);
+        setColor(Switch::COLOR_ON);
         break;
 
     case BoardSymbols::SWITCH_WALL:    // temporary wall
-        setColor(COLOR_YELLOW);
+        setColor(Switch::COLOR_WALL);
         break;
 
     case BoardSymbols::OBSTACLE:    // obstacle
-        setColor(COLOR_GRAY);
+        setColor(Obstacle::COLOR);
         break;
 
     case BoardSymbols::RIDDLE:    // riddle
-        setColor(COLOR_LIGHT_PURPLE);
+        setColor(Riddle::COLOR);
         break;
 
     case BoardSymbols::KEY:     // key
-        setColor(COLOR_GOLD);
+        setColor(Key::COLOR);
         break;
     case BoardSymbols::BOMB:    // Bomb
-        setColor(COLOR_CYAN);
+        setColor(Bomb::COLOR);
         break;
     case BoardSymbols::TORCH:    // Torch
-        setColor(COLOR_RED);
+        setColor(Torch::COLOR);
         break;
     case BoardSymbols::LIGHT_SWITCH:
-        setColor(COLOR_YELLOW);  // Yellow for light switch
+        setColor(RoomMeta::LIGHT_SWITCH_COLOR);  // Yellow for light switch
         break;
     default:
-        if (c >= '1' && c <= '9')   // door
-            setColor(COLOR_LIGHT_CYAN);
+        if (Door::isDoorChar(c))   // door
+            setColor(Door::COLOR);
         else
             resetColor();
         break;

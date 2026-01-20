@@ -39,14 +39,14 @@ private:
 
     RiddlePosition riddlePositions[6]; // Max 6 riddles per room
     int riddleCount;
-
+    
 public:
     RoomMeta();
     void clear();
 	//  load room metadata from a line
     void loadFromLine(const std::string& line);
 
-
+    static constexpr int LIGHT_SWITCH_COLOR = 14; // Yellow
     // setters
     void setDark(bool v);
     void setDoorOpen(int id, bool open);

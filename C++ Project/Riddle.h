@@ -51,7 +51,7 @@ public:
 		if (answer) delete[] answer;
 		if (hint) delete[] hint;
 	}
-
+	static constexpr int COLOR = 1; // Light Purple
 	// functions declaration
 	bool checkAnswer(const char* userAnswer); // check if the answer is correct
 	bool isSolved() const; // check if the riddle is solved
