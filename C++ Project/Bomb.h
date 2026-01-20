@@ -24,4 +24,6 @@ public:
 	int getRoomID() const { return roomID; } // Getter for room ID
 	int getTimer() const { return timer; } // Getter for timer
 	void attachResults(Results* results, size_t timer); // Attach results to the results file
+	static constexpr int EXPLOSION_RANGE = 3; // Explosion range
+	static constexpr int COLOR = 3; // color for bomb display
 };

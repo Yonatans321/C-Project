@@ -11,7 +11,7 @@ class Obstacle {
 public:
 	// Handle obstacle interaction for two players
     static void handleObstacle(Player& pFront, Player& pBack, Screen& screen);
-
+    static constexpr int COLOR = 8; // Gray
 private:
     // do the player face an obstacle
     static bool isFacingObstacle(const Player& p, Screen& screen, Point& obstaclePos);

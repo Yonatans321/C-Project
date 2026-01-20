@@ -14,7 +14,7 @@ public:
 	Door(int doorID, int dest = -1) : id(doorID), open(false), destinationLevel(dest) {} // constructor with id and optional destination level
 	
 	static constexpr int MAX_DOOR_ID = 10; // max door id +1 (doors 1-9)
-
+	static constexpr int COLOR = 11; // Light Cyan
 	static bool switchesAreOn; // are all switches on ?
 	static bool openDoors[MAX_DOOR_ID]; // openDoors[1] -> door with id 1
 	

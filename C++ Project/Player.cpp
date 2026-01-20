@@ -8,7 +8,9 @@
 
 using BoardSymbols::SWITCH_ON;
 using BoardSymbols::SWITCH_OFF;
-
+using BoardSymbols::KEY;
+using BoardSymbols::BOMB;
+using BoardSymbols::TORCH;
 // moving and drawing functions
  // draw player at current position
 void Player::draw() {
@@ -124,7 +126,7 @@ void Player::GrabItem(char item, int id) { // grab an item if not already holdin
 }
 bool Player::useKeyForDoor(char doorChar) const  // use key for a door
 { // check if player hasn't a key
-	if (heldItem == 'K')
+	if (heldItem == KEY)
 	{
 		return true;
 	}
@@ -223,7 +225,7 @@ void Player::dropHeldItem()
 
 		char droppedItem = heldItem;
 
-		if (droppedItem == '@')
+		if (droppedItem == BOMB)
 		{
 			bombDroppedRequest = true;
 			lastDropPos = Point(dropX, dropY);
@@ -236,7 +238,7 @@ void Player::dropHeldItem()
 
 		DropItem(); // drop from the player
 
-		if (droppedItem == '!' && screen->isDark())
+		if (droppedItem == BoardSymbols::TORCH && screen->isDark())
 		{
 			screen->resetTorchState();
 			screen->drawDark();

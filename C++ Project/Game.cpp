@@ -535,7 +535,7 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
 	Point& lastPos = (&player == &player1) ? player1LastPos : player2LastPos;
 
     if (targetCell == BoardSymbols::KEY || targetCell == BoardSymbols::BOMB || targetCell == BoardSymbols::TORCH) {
-        if (player.getHeldItem() != ' ' && player.getHeldItem() != 0) {
+        if (player.getHeldItem() != BoardSymbols::EMPTY && player.getHeldItem() != 0) {
             UIScreens::showInventoryFullMessage(currentScreen);
 
             if (currentScreen.isDark())
@@ -604,32 +604,32 @@ bool Game::handleTile(Player& player)// handle tile interaction for a player
         return false;
     }
 
-    switch (targetCell)// check target cell
-    {
-    case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9':
+    if (targetCell >= '0' && targetCell <= '9')
     {
         bool doorOpened = Door::handleDoor(player, currentScreen, activeDoor,silentMode);// try to handle door
         if (doorOpened)
         {
             return true;
         }
-        break;
-
     }
-    case BoardSymbols::OBSTACLE:// obstacle
+    else
     {
-        Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
-        char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
-        if (afterPush == BoardSymbols::OBSTACLE)
-            return true;    // cannot move, obstacle not moved
-        
-        player.setPosition(targetPos);// move player into obstacle's previous position
-        return true;
-    }
+        switch (targetCell)
+        {
+        case BoardSymbols::OBSTACLE:// obstacle
+        {
+            Obstacle::handleObstacle(player1, player2, currentScreen);// try to push obstacle
+            char afterPush = currentScreen.getCharAt(targetPos);// check if obstacle was moved
+            if (afterPush == BoardSymbols::OBSTACLE)
+                return true;    // cannot move, obstacle not moved
 
-    case BoardSymbols::SWITCH_WALL:// switch wall
-        return true;
+            player.setPosition(targetPos);// move player into obstacle's previous position
+            return true;
+        }
+
+        case BoardSymbols::SWITCH_WALL:// switch wall
+            return true;
+        }
     }
 
     return false; // the player can move

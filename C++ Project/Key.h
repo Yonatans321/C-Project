@@ -17,7 +17,7 @@ public:
 
     bool isValid() const {return doorID != -1;}  // check if the key is valid
 
-
+	static constexpr int COLOR = 6; // Gold color for key display
     // Static methods for key management in screens
     static bool isValidPosition(const Screen& screen, int x, int y);
     static bool existsInMap(const Screen& screen);

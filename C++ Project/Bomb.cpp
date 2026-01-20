@@ -20,10 +20,10 @@ void Bomb::explode(Screen& screen, Player& p1, Player& p2, bool isInCurrentRoom)
     {
         // 3. Check for player damage in range 3 (Chebyshev distance)
         // If player is within 3 cells (including diagonals), they lose a life
-        if (std::abs(p1.getX() - centerX) <= 3 && std::abs(p1.getY() - centerY) <= 3) {
+        if (std::abs(p1.getX() - centerX) <= EXPLOSION_RANGE && std::abs(p1.getY() - centerY) <= EXPLOSION_RANGE) {
             p1.loseLife();
         }
-        if (std::abs(p2.getX() - centerX) <= 3 && std::abs(p2.getY() - centerY) <= 3) {
+        if (std::abs(p2.getX() - centerX) <= EXPLOSION_RANGE && std::abs(p2.getY() - centerY) <= EXPLOSION_RANGE) {
             p2.loseLife();
         }
     }
